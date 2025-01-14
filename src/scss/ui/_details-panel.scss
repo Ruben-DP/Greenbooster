@@ -1,0 +1,12 @@
+.details-panel {
+  background-color: white;
+  height: 100vh;
+  padding: 3em;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  max-height: 80vh;
+}

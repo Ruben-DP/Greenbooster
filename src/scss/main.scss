@@ -1,0 +1,39 @@
+// scss-docs-start
+// stylelint-disable annotation-no-unknown
+
+// abstracts
+@import "abstracts/variables";
+@import "abstracts/functions";
+@import "abstracts/mixins";
+
+// animations
+// @import "animations/animations";
+
+// base
+@import "base/typography";
+@import "base/reset";
+@import "base/general";
+//form
+
+// modules
+
+//ui
+@import "ui/footer";
+@import "ui/header";
+@import "ui/menu-link";
+@import "ui/search-area";
+@import "ui/search-bar";
+@import "ui/search-results";
+
+
+@import "ui/details-panel";
+@import "ui/details/detail-confirmation";
+@import "ui/details/detail-form";
+
+@import "ui/form-field";
+
+
+
+@import "ui/buttons";
+// shame
+@import "shame";

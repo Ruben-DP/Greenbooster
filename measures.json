@@ -1,0 +1,96 @@
+{
+  "name": "Unidek dakpanelen + nieuwe dakpannen (RC6)",
+  "heat_demand": {
+    "grongebonden": [
+      {
+        "period": "tot 1965",
+        "value": 71.83
+      },
+      {
+        "period": "1965-1974",
+        "value": 22.13
+      },
+      {
+        "period": "1975-1982",
+        "value": 10.79
+      },
+      {
+        "period": "1983-1987",
+        "value": 11.09
+      },
+      {
+        "period": "1988-1991",
+        "value": 6.33
+      }
+    ],
+    "portiek": [
+      {
+        "period": "tot 1965",
+        "value": 159.35
+      },
+      {
+        "period": "1965-1974",
+        "value": 43.97
+      },
+      {
+        "period": "1975-1982",
+        "value": 22.39
+      },
+      {
+        "period": "1983-1987",
+        "value": 22.39
+      },
+      {
+        "period": "1988-1991",
+        "value": 6.18
+      }
+    ],
+    "gallerij": [
+      {
+        "period": "tot 1965",
+        "value": 159.35
+      },
+      {
+        "period": "1965-1974",
+        "value": 43.97
+      },
+      {
+        "period": "1975-1982",
+        "value": 22.39
+      },
+      {
+        "period": "1983-1987",
+        "value": 22.39
+      },
+      {
+        "period": "1988-1991",
+        "value": 6.18
+      }
+    ]
+  },
+  "measure_prices": {
+    "geisoleerde_dakplaat": {
+      "name": "Geisoleerde dakplaat Unidek Reno 8.0",
+      "aantal": {
+        "type": "AantalWoningen",
+        "value": 76,
+        "unit": "m2"
+      }
+    },
+    "extra_oppervlakte": {
+      "name": "Extra oppervlakte ivm overstek, 5%",
+      "aantal": {
+        "type": "AantalWoningen",
+        "value": 76,
+        "unit": "m2",
+        "percentage": 5
+      }
+    }
+  },
+  "additional_components": [
+    "Inzagen dakbeschot ivm brand",
+    "Panlatten",
+    "Ruiter",
+    "Gootplank"
+  ]
+}

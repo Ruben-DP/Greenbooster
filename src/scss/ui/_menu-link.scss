@@ -1,0 +1,16 @@
+.menu-link-container {
+  padding: 1em;
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  white-space: nowrap;
+  gap:16px;
+  width:100%;
+  &:hover {
+    background-color: rgb(31, 31, 31);
+  }
+  &.active {
+    background-color: var(--accent-color);
+  }
+}

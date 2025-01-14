@@ -1,0 +1,56 @@
+.detail-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex-wrap: wrap;
+  &__title {
+    font-weight: 500;
+    margin-bottom: 1.5em;
+  }
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+
+    &--bordered {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+    }
+  }
+
+  &__group-title {
+    font-size: 1.125rem;
+    font-weight: 400;
+    margin-bottom: 16px;
+    text-transform: capitalize;
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  // Component styles
+  .text-field,
+  .select-field {
+    width: 100%;
+  }
+
+  // Form control styles
+  input,
+  select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 1rem;
+
+    &:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+  }
+}
