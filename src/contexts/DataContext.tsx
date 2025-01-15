@@ -18,6 +18,7 @@ interface DataState {
     isEditing: boolean;
     pendingChanges: Record<string, ChangeRecord>;
   };
+  startEditing?: boolean;
 }
 
 type DataAction =
@@ -169,7 +170,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       const result = await updateMeasure(measure._id, measure);
-      console.log("Update result:", result);
       if (result.success) {
         await handleSearchMeasures();
         return true;
@@ -180,6 +180,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       dispatch({ type: "SET_LOADING", payload: false });
     }
   };
+  
 
   const setEditing = (isEditing: boolean) => {
     console.log("Setting editing mode:", isEditing);

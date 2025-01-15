@@ -11,7 +11,7 @@ interface SelectFieldProps {
   isEditing?: boolean;
 }
 
-export default function SelectField({
+export const SelectField = React.memo(({
   label,
   value,
   onChange,
@@ -19,31 +19,27 @@ export default function SelectField({
   required,
   disabled,
   isEditing
-}: SelectFieldProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange(e.target.value);
-  };
+}: SelectFieldProps) => (
+  <BaseField label={label} required={required}>
+    {isEditing ? (
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="input-base"
+        required={required}
+        disabled={disabled}
+      >
+        <option value="">Select an option</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    ) : (
+      <ReadOnlyContent>{value}</ReadOnlyContent>
+    )}
+  </BaseField>
+));
 
-  return (
-    <BaseField label={label} required={required}>
-      {isEditing ? (
-        <select
-          value={value}
-          onChange={handleChange}
-          className="input-base"
-          required={required}
-          disabled={disabled}
-        >
-          <option value="">Select an option</option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <ReadOnlyContent>{value}</ReadOnlyContent>
-      )}
-    </BaseField>
-  );
-}
+SelectField.displayName = 'SelectField';

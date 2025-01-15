@@ -11,45 +11,31 @@ interface TextFieldProps {
   isEditing?: boolean;
 }
 
-export default function TextField({
+export const TextField = React.memo(({
   label,
-  value = '',
+  value = '',   
   onChange,
   type = 'text',
   required,
   disabled,
   isEditing
-}: TextFieldProps) {
-  // Ensure onChange is defined before using it
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (onChange) {
-      onChange(e.target.value);
-    }
-  };
+}: TextFieldProps) => (
+  <BaseField label={label} required={required}>
+    {isEditing ? (
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
+        className="input-base"
+        required={required}
+        disabled={disabled}
+        autoFocus={isEditing}
+      />
+    ) : (
+      <ReadOnlyContent>{value}</ReadOnlyContent>
+    )}
+  </BaseField>
+));
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      (e.target as HTMLInputElement).blur();
-    }
-  };
-
-  return (
-    <BaseField label={label} required={required}>
-      {isEditing ? (
-        <input
-          type={type}
-          value={value}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          className="input-base"
-          required={required}
-          disabled={disabled}
-          autoFocus={isEditing}
-        />
-      ) : (
-        <ReadOnlyContent>{value}</ReadOnlyContent>
-      )}
-    </BaseField>
-  );
-}
+TextField.displayName = 'TextField';
