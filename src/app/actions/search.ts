@@ -1,6 +1,6 @@
 "use server";
 import clientPromise from "@/lib/mongoDB";
-import { buildMeasureQuery, Measure, MEASURES_COLLECTION } from "@/lib/measures";
+import { buildMeasureQuery, Measure, MEASURES_COLLECTION } from "@/types/measures";
 
 const databaseName = "Greenbooster";
 const searchResultLimit = 8;

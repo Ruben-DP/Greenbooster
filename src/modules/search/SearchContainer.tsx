@@ -1,57 +1,77 @@
 "use client";
-import { useState } from "react";
+
+import { useData } from "@/contexts/DataContext";
+import SearchBar from "./SearchBar";
 import SearchResults from "./SearchResults";
-import SearchHandler from "./SearchHandler";
 import { Plus } from "lucide-react";
 import Button from "../Button";
 
-type SearchableField = {
-  label: string;
-  value: string;
-};
-interface SearchCotnainerProps {
-  type: string;
-  onOpenDetail: (isNew: boolean, detailData: any) => void;
-  //type specefic fields used for search
-  searchableFields: SearchableField[];
-  projection: any;
-  query: any;
-}
+export default function SearchContainer() {
+  const { state, searchMeasures, selectMeasure } = useData();
+  const { list, isLoading } = state.measures;
 
-export default function SearchContainer({
-  type,
-  onOpenDetail,
-  searchableFields,
-  projection,
-  query,
-}: SearchCotnainerProps) {
-  const [filteredData, setFilteredData] = useState<any[]>([]);
-
-  const handleFilterUpdate = (data: any[]) => {
-    setFilteredData(data);
-  };
-
-  const handleDetailsToParent = (isNew: boolean, detailData: any) => {
-    onOpenDetail(isNew, detailData);
+  const emptyMeasure = {
+    _id: "",
+    name: "",
+    group: "",
+    heat_demand: {
+      grongebonden: [
+        { period: "tot 1965", value: 0 },
+        { period: "1965-1974", value: 0 },
+        { period: "1975-1982", value: 0 },
+        { period: "1983-1987", value: 0 },
+        { period: "1988-1991", value: 0 }
+      ],
+      portiek: [
+        { period: "tot 1965", value: 0 },
+        { period: "1965-1974",  value: 0 },
+        { period: "1975-1982",  value: 0 },
+        { period: "1983-1987",  value: 0 },
+        { period: "1988-1991",  value: 0 }
+      ],
+      gallerij: [
+        { period: "tot 1965", value: 0 },
+        { period: "1965-1974",  value: 0 },
+        { period: "1975-1982",  value: 0 },
+        { period: "1983-1987",  value: 0 },
+        { period: "1988-1991",  value: 0 }
+      ],
+    },
+    measure_prices: {
+      geisoleerde_dakplaat: {
+        name: "",
+        aantal: {
+          type: "",
+          value: 0,
+          unit: "",
+        },
+      },
+      extra_oppervlakte: {
+        name: "",
+        aantal: {
+          type: "",
+          value: 0,
+          unit: "",
+        },
+      },
+    },
+    additional_components: [],
   };
 
   return (
     <>
       <div className="search-container">
-        <SearchHandler
-          type={type}
-          onFilter={handleFilterUpdate}
-          projection={projection}
-        />
-        <Button icon={Plus} onClick={() => handleDetailsToParent(true, [])}>
+        <SearchBar onSearch={searchMeasures} isLoading={isLoading} />
+        <Button
+          icon={Plus}
+          onClick={() =>
+            selectMeasure(emptyMeasure, true)
+          }
+        >
           New
         </Button>
       </div>
-
-      <SearchResults
-        onOpenDetail={handleDetailsToParent}
-        searchList={filteredData}
-      />
+      <SearchResults searchList={list} />
     </>
   );
 }

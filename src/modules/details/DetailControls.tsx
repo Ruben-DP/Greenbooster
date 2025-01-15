@@ -17,7 +17,7 @@ export default function DetailControls({
 }: DetailControlsProps) {
   return (
     <div className="flex justify-between mb-4">
-      {!isBulkEditing && !hasChanges && (
+      {!isNew && !hasChanges && (
         <button
           onClick={onEdit}
           className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"

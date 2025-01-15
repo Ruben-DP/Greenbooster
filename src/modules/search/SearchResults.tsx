@@ -1,21 +1,17 @@
+"use client";
+
 import { Copy } from "lucide-react";
-import { Measure } from "@/lib/measures";
+import { Measure } from "@/types/measures";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { useData } from "@/contexts/DataContext";
 
 interface SearchResultProps {
   searchList: Measure[];
-  onOpenDetail: (isNew: boolean, dataDetails: any) => void;
 }
 
-interface GroupedMeasures {
-  [key: string]: Measure[];
-}
-
-export default function SearchResults({
-  searchList,
-  onOpenDetail,
-}: SearchResultProps) {
+export default function SearchResults({ searchList }: SearchResultProps) {
+  const { selectMeasure } = useData();
   const [expandedGroups, setExpandedGroups] = useState<{
     [key: string]: boolean;
   }>({});
@@ -25,7 +21,7 @@ export default function SearchResults({
   }
 
   const groupedMeasures = searchList.reduce(
-    (groups: GroupedMeasures, measure) => {
+    (groups: { [key: string]: Measure[] }, measure) => {
       const group = measure.group || "Other";
       if (!groups[group]) {
         groups[group] = [];
@@ -51,39 +47,33 @@ export default function SearchResults({
             className="search-results__group-header"
             onClick={() => toggleGroup(group)}
           >
-            <div className="search-results__group-title">
-              {expandedGroups[group] ? (
-                <ChevronUp className="search-results__group-icon" />
-              ) : (
-                <ChevronDown className="search-results__group-icon" />
-              )}
-              <span className="search-results__group-text">
-                {group} ({measures.length} measures)
-              </span>
-            </div>
+            {expandedGroups[group] ? <ChevronUp /> : <ChevronDown />}
+            <span>
+              {group} ({measures.length})
+            </span>
           </div>
-
           {expandedGroups[group] && (
-            <ul className="search-results__list">
+            <div className="search-results__items">
               {measures.map((measure) => (
-                <li
+                <div
                   key={measure._id}
+                  onClick={() => selectMeasure(measure)}
                   className="search-results__item"
-                  onClick={() => onOpenDetail(false, measure)}
                 >
-                  <span className="search-results__item-name">{measure.name}</span>
-                  <button
-                    className="search-results__copy-button"
+                  <span>{measure.name}</span>
+                  {/* copy disabled */}
+                  {/* <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onOpenDetail(true, measure);
+                      selectMeasure({ ...measure, _id: '' });
                     }}
+                    className="copy-button"
                   >
-                    <Copy className="search-results__copy-icon" />
-                  </button>
-                </li>
+                    <Copy size={16} />
+                  </button> */}
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       ))}

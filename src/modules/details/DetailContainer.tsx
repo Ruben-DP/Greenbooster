@@ -1,39 +1,21 @@
-import { ForwardedRef, forwardRef } from "react";
-import { FormField } from "@/types/types";
+"use client";
+
+import { Measure } from "@/types/measures";
 import DetailHandler from "./DetailHandler";
 
 interface DetailContainerProps {
   isNew: boolean;
-  initialFormFields: FormField[];
-  type: string;
-  onPendingChanges?: (hasPending: boolean) => void;
+  measure: Measure;
 }
 
-const DetailContainer = forwardRef(
-  (
-    {
-      isNew = false,
-      initialFormFields,
-      type,
-      onPendingChanges,
-    }: DetailContainerProps,
-    ref: ForwardedRef<{
-      handleSave: () => Promise<void>;
-      handleDiscard: () => void;
-    }>
-  ) => {
-    return (
-      <DetailHandler
-        ref={ref}
-        isNew={isNew}
-        initialFormFields={initialFormFields}
-        type={type}
-        onPendingChanges={onPendingChanges}
-      />
-    );
-  }
-);
-
-DetailContainer.displayName = "DetailContainer";
-
-export default DetailContainer;
+export default function DetailContainer({
+  isNew,
+  measure
+}: DetailContainerProps) {
+  return (
+    <DetailHandler
+      isNew={isNew}
+      measure={measure}
+    />
+  );
+}
