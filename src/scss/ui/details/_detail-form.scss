@@ -3,46 +3,91 @@
   flex-direction: column;
   gap: 24px;
   flex-wrap: wrap;
+  &__calculation {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    label {
+      display: none;
+    }
+  }
+  &__group-header {
+    * {
+      font-weight: bold;
+      text-transform: capitalize;
+      margin-bottom: 1em;
+      font-size: 1.1em;
+    }
+  }
   &__title {
     font-weight: 500;
     margin-bottom: 1.5em;
   }
-
+  &__subheading {
+    font-weight: bold;
+    text-transform: capitalize;
+    margin-bottom: 1em;
+  }
   &__group {
     display: flex;
-    flex-direction: column;
-
+    flex-direction: row;
+    gap: 40px;
+    border: 1px solid #edeef1;
+    padding: 1em;
+    border-radius: 8px;
+    margin-bottom: 3em;
+    &.has-subgroups {
+      flex-direction: column;
+    }
     &--bordered {
       border: 1px solid #e5e7eb;
       border-radius: 8px;
       padding: 16px;
     }
+    &-content {
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
   }
-
+  &__field {
+    min-height: 30px;
+  }
   &__group-title {
     font-size: 1.125rem;
     font-weight: 400;
     margin-bottom: 16px;
     text-transform: capitalize;
   }
-
   &__fields {
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
-
-  // Component styles
+  &__header {
+    height: 80px;
+    .form-field {
+      justify-content: flex-start;
+      gap: 64px;
+    }
+    .input-base {
+      max-width: 100%;
+      width: 100%;
+      font-weight: 400;
+    }
+    * {
+      font-weight: bold;
+    }
+  }
   .text-field,
   .select-field {
     width: 100%;
   }
-
-  // Form control styles
   input,
   select {
     width: 100%;
-    padding: 8px 12px;
+    padding: 4px 6px;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
     font-size: 1rem;

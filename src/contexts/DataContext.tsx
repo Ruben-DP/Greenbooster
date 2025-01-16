@@ -1,13 +1,14 @@
 "use client";
 
 import { Measure } from "@/types/measures";
-import { createContext, useContext, useReducer, ReactNode } from "react";
+import { createContext, useContext, useReducer, ReactNode, useEffect } from "react";
 import { ChangeRecord } from "@/types/types";
 import {
   searchMeasures,
   createMeasure,
   updateMeasure,
 } from "@/app/actions/measureActions";
+import { fetchVariables } from "@/app/actions/variableActions";
 
 interface DataState {
   measures: {
@@ -18,6 +19,11 @@ interface DataState {
     isEditing: boolean;
     pendingChanges: Record<string, ChangeRecord>;
   };
+  variables: {
+    list: Array<{ variableName: string }>;
+    isLoading: boolean;
+    error: string | null;
+  };
   startEditing?: boolean;
 }
 
@@ -27,12 +33,13 @@ type DataAction =
   | { type: "SET_LOADING"; payload: boolean }
   | { type: "SET_ERROR"; payload: string | null }
   | { type: "SET_EDITING"; payload: boolean }
-  | { type: "SET_PENDING_CHANGES"; payload: Record<string, ChangeRecord> };
+  | { type: "SET_PENDING_CHANGES"; payload: Record<string, ChangeRecord> }
+  | { type: "SET_VARIABLES"; payload: Array<{ name: string; value: string }> };
 
 interface DataContextType {
   state: DataState;
   searchMeasures: (searchTerm?: string) => Promise<void>;
-  selectMeasure: (measure: Measure | null, startEditing?: boolean) => void; // Updated this line
+  selectMeasure: (measure: Measure | null, startEditing?: boolean) => void;
   createMeasure: (measure: Measure) => Promise<boolean>;
   updateMeasure: (measure: Measure) => Promise<boolean>;
   setEditing: (isEditing: boolean) => void;
@@ -50,14 +57,18 @@ const initialState: DataState = {
     isEditing: false,
     pendingChanges: {},
   },
+  variables: {
+    list: [],
+    isLoading: false,
+    error: null
+  }
 };
 
 function dataReducer(state: DataState, action: DataAction): DataState {
-  console.log("Reducer Action:", action.type, action.payload);
+  console.log("Reducer Action:", action.type);
 
   switch (action.type) {
     case "SET_MEASURES":
-      console.log("Setting measures list:", action.payload);
       return {
         ...state,
         measures: {
@@ -66,7 +77,6 @@ function dataReducer(state: DataState, action: DataAction): DataState {
         },
       };
     case "SET_SELECTED_MEASURE":
-      console.log("Setting selected measure:", action.payload);
       return {
         ...state,
         measures: {
@@ -102,12 +112,21 @@ function dataReducer(state: DataState, action: DataAction): DataState {
           pendingChanges: action.payload ? state.measures.pendingChanges : {},
         },
       };
+
     case "SET_PENDING_CHANGES":
       return {
         ...state,
         measures: {
           ...state.measures,
           pendingChanges: action.payload,
+        },
+      };
+    case "SET_VARIABLES":
+      return {
+        ...state,
+        variables: {
+          ...state.variables,
+          list: action.payload,
         },
       };
     default:
@@ -117,14 +136,11 @@ function dataReducer(state: DataState, action: DataAction): DataState {
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(dataReducer, initialState);
-  console.log("Current state:", state);
 
   const handleSearchMeasures = async (searchTerm?: string) => {
-    console.log("Searching measures with term:", searchTerm);
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       const results = await searchMeasures(searchTerm);
-      console.log("Search results:", results);
       dispatch({ type: "SET_MEASURES", payload: results });
     } catch (error) {
       console.error("Search error:", error);
@@ -146,11 +162,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const handleCreateMeasure = async (measure: Measure): Promise<boolean> => {
-    console.log("Creating measure:", measure);
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       const result = await createMeasure(measure);
-      console.log("Create result:", result);
       if (result.success) {
         await handleSearchMeasures();
         return true;
@@ -166,31 +180,72 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const handleUpdateMeasure = async (measure: Measure): Promise<boolean> => {
-    console.log("Updating measure:", measure);
+    if (!measure._id) {
+      console.error("Update attempted without measure ID");
+      dispatch({ type: "SET_ERROR", payload: "Missing measure ID" });
+      return false;
+    }
+
     dispatch({ type: "SET_LOADING", payload: true });
+
     try {
       const result = await updateMeasure(measure._id, measure);
-      if (result.success) {
-        await handleSearchMeasures();
-        return true;
+
+      if (!result.success) {
+        console.error("Update failed:", result.error);
+        dispatch({
+          type: "SET_ERROR",
+          payload: result.error || "Failed to update measure",
+        });
+        return false;
       }
-      dispatch({ type: "SET_ERROR", payload: result.error || "Update failed" });
+
+      try {
+        await handleSearchMeasures();
+      } catch (searchError) {
+        console.error("Failed to refresh measures after update:", searchError);
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Critical update error:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload:
+          error instanceof Error
+            ? error.message
+            : "Unexpected error during update",
+      });
       return false;
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
   };
-  
 
   const setEditing = (isEditing: boolean) => {
-    console.log("Setting editing mode:", isEditing);
     dispatch({ type: "SET_EDITING", payload: isEditing });
   };
 
   const setPendingChanges = (changes: Record<string, ChangeRecord>) => {
-    console.log("Setting pending changes:", changes);
     dispatch({ type: "SET_PENDING_CHANGES", payload: changes });
   };
+
+  const loadVariables = async () => {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const variables = await fetchVariables();
+      dispatch({ type: "SET_VARIABLES", payload: variables });
+    } catch (error) {
+      console.error("Failed to load variables:", error);
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
+  };
+
+  // Load variables when provider mounts
+  useEffect(() => {
+    loadVariables();
+  }, []);
 
   return (
     <DataContext.Provider

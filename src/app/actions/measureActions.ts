@@ -53,29 +53,39 @@ export async function updateMeasure(
   measure: Measure
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    console.log("trying to update this id:", id);
     const client = await clientPromise;
     const collection = client
       .db("Greenbooster")
       .collection("retrofittingMeasures");
-    
+
     const { _id, ...updateData } = measure;
-    
-    const result = await collection.findOneAndUpdate(
+
+    // Use updateOne instead of findOneAndUpdate
+    const result = await collection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: updateData },
-      { returnDocument: "after" }
+      { $set: updateData }
     );
 
-    // Check if the update was successful
-    if (result.ok && result.value) {
+    console.log("Update operation result:", result);
+
+    // Check modifiedCount instead of checking result.value
+    if (result.modifiedCount === 1) {
       return { success: true };
-    } else {
-      return { 
-        success: false, 
-        error: "Update operation completed but no document was modified" 
+    }
+
+    // If no documents were modified
+    if (result.matchedCount === 0) {
+      return {
+        success: false,
+        error: "Document not found",
       };
     }
+
+    // If document was found but not modified
+    return {
+      success: false,
+      error: "Document found but not modified",
+    };
   } catch (error) {
     console.error("Update error:", error);
     return {

@@ -9,6 +9,7 @@ interface SelectFieldProps {
   required?: boolean;
   disabled?: boolean;
   isEditing?: boolean;
+  optionText?: string;
 }
 
 export const SelectField = React.memo(({
@@ -18,7 +19,8 @@ export const SelectField = React.memo(({
   options,
   required,
   disabled,
-  isEditing
+  isEditing,
+  optionText
 }: SelectFieldProps) => (
   <BaseField label={label} required={required}>
     {isEditing ? (
@@ -29,7 +31,7 @@ export const SelectField = React.memo(({
         required={required}
         disabled={disabled}
       >
-        <option value="">Select an option</option>
+        <option value="">{optionText ? optionText : "Select an option"}</option>
         {options.map((option) => (
           <option key={option} value={option}>
             {option}

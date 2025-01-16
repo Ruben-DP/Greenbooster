@@ -8,7 +8,7 @@ import { useData } from "@/contexts/DataContext";
 import { toast } from "sonner";
 import { Measure } from "@/types/measures";
 import { ChangeRecord } from "@/types/types";
-import { set, get } from "lodash"
+import { set, get } from "lodash";
 
 interface DetailHandlerProps {
   isNew: boolean;
@@ -26,15 +26,14 @@ export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
     // Create a new change record
     const changeRecord: ChangeRecord = {
       fieldId: path,
-      label: path.split('.').pop() || path,
+      label: path.split(".").pop() || path,
       oldValue: String(oldValue),
-      newValue: String(newValue)
+      newValue: String(newValue),
     };
 
-    // Update pending changes
     const newPendingChanges = {
       ...pendingChanges,
-      [path]: changeRecord
+      [path]: changeRecord,
     };
 
     // If the new value is the same as the original value, remove it from pending changes
@@ -61,6 +60,7 @@ export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
       : await updateMeasure(currentMeasure);
 
     if (success) {
+      console.log("succesfully updated!");
       setEditing(false);
       setPendingChanges({});
       setShowConfirmation(false);
@@ -85,6 +85,11 @@ export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
 
   return (
     <div className="details-panel">
+      <DetailForm
+        measure={currentMeasure}
+        isEditing={isEditing}
+        onChange={handleChange}
+      />
       <DetailControls
         isNew={isNew}
         isBulkEditing={isEditing}
@@ -92,11 +97,6 @@ export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
         onEdit={toggleEditing}
         onSave={handleSaveRequest}
         onDiscard={handleDiscard}
-      />
-      <DetailForm
-        measure={currentMeasure}
-        isEditing={isEditing}
-        onChange={handleChange}
       />
       {showConfirmation && (
         <DetailConfirmation

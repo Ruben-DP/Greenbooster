@@ -16,7 +16,7 @@ export const TextField = React.memo(({
   value = '',   
   onChange,
   type = 'text',
-  required,
+  required = false,
   disabled,
   isEditing
 }: TextFieldProps) => (

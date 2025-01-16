@@ -1,0 +1,103 @@
+[
+  {
+    "name": "Binnen isolatie (zadeldak) met isolatieschuim (RC7)",
+    "heat_demand": {
+      "grongebonden": [
+        {
+          "value": "8",
+          "period": "1940-150"
+        },
+        {
+          "value": 22.13
+        },
+        {
+          "value": "123123"
+        },
+        {
+          "value": "123"
+        },
+        {
+          "value": "1231244"
+        }
+      ],
+      "portiek": [
+        {
+          "value": 35
+        },
+        {
+          "value": 43.97
+        },
+        {
+          "value": 22.39
+        },
+        {
+          "value": 22
+        },
+        {
+          "value": 6.18
+        }
+      ],
+      "gallerij": [
+        {
+          "value": 159.35
+        },
+        {
+          "value": 43.97
+        },
+        {
+          "value": 22.39
+        },
+        {
+          "value": 22.39
+        },
+        {
+          "value": 6.4
+        }
+      ]
+    },
+    "measure_prices": [
+      {
+        "name": "Geisoleerde dakplaat Unidek Reno 8.0",
+        "unit": "m2",
+        "calculation": [
+          {
+            "type": "variable",
+            "value": "AantalWoningen",
+            "position": 0
+          },
+          {
+            "type": "operator",
+            "value": "*",
+            "position": 1
+          },
+          {
+            "type": "variable",
+            "value": "Dakoppervlak",
+            "position": 2
+          }
+        ]
+      },
+      {
+        "name": "Tochstrips onder deuren",
+        "unit": "m2",
+        "calculation": [
+          {
+            "type": "variable",
+            "value": "AantalWoningen",
+            "position": 0
+          },
+          {
+            "type": "operator",
+            "value": "*",
+            "position": 1
+          },
+          {
+            "type": "variable",
+            "value": "Dakoppervlak",
+            "position": 2
+          }
+        ]
+      }
+    ]
+  }
+]
