@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import DetailContainer from "@/modules/details/DetailContainer";
+import DetailContainer from "@/modules/details/DetailContainer_old";
 import SearchContainer from "@/modules/search/SearchContainer";
 import DetailConfirmation from "@/modules/details/DetailConfirmation";
 import { useData } from "@/contexts/DataContext";

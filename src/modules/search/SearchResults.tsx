@@ -1,46 +1,53 @@
-"use client";
-
-import { Copy } from "lucide-react";
-import { Measure } from "@/types/measures";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useData } from "@/contexts/DataContext";
+import { useState } from "react";
 
-interface SearchResultProps {
-  searchList: Measure[];
+interface SearchResultProps<T> {
+  items: T[];
+  onSelect: (item: T) => void;
+  displayField: keyof T;
+  groupBy?: keyof T;
 }
 
-export default function SearchResults({ searchList }: SearchResultProps) {
-  const { selectMeasure } = useData();
-  const [expandedGroups, setExpandedGroups] = useState<{
-    [key: string]: boolean;
-  }>({});
+export default function SearchResults<T extends object>({
+  items,
+  onSelect,
+  displayField,
+  groupBy,
+}: SearchResultProps<T>) {
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    {}
+  );
 
-  useEffect(() => {
-    const initialExpandedState = searchList.reduce((acc, measure) => {
-      const group = measure.group || "Geen groep";
-      acc[group] = true; 
-      return acc;
-    }, {} as { [key: string]: boolean });
-    
-    setExpandedGroups(initialExpandedState);
-  }, [searchList]);
-
-  if (!searchList || searchList.length === 0) {
+  if (!items || items.length === 0) {
     return <div className="search-results__empty">Geen zoekresultaten</div>;
   }
 
-  const groupedMeasures = searchList.reduce(
-    (groups: { [key: string]: Measure[] }, measure) => {
-      const group = measure.group || "Geen groep";
-      if (!groups[group]) {
-        groups[group] = [];
-      }
-      groups[group].push(measure);
-      return groups;
-    },
-    {}
-  );
+  if (!groupBy) {
+    return (
+      <div className="search-results">
+        <div className="search-results__items">
+          {items.map((item, index) => (
+            <div
+              key={index}
+              onClick={() => onSelect(item)}
+              className="search-results__item"
+            >
+              <span>{String(item[displayField])}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const groupedItems = items.reduce((groups: Record<string, T[]>, item) => {
+    const groupValue = String(item[groupBy]) || "Geen groep";
+    if (!groups[groupValue]) {
+      groups[groupValue] = [];
+    }
+    groups[groupValue].push(item);
+    return groups;
+  }, {});
 
   const toggleGroup = (group: string) => {
     setExpandedGroups((prev) => ({
@@ -51,7 +58,7 @@ export default function SearchResults({ searchList }: SearchResultProps) {
 
   return (
     <div className="search-results">
-      {Object.entries(groupedMeasures).map(([group, measures]) => (
+      {Object.entries(groupedItems).map(([group, groupItems]) => (
         <div key={group} className="search-results__group">
           <div
             className="search-results__group-header"
@@ -59,18 +66,18 @@ export default function SearchResults({ searchList }: SearchResultProps) {
           >
             {expandedGroups[group] ? <ChevronUp /> : <ChevronDown />}
             <span className="search-results__group-name">
-              {group} ({measures.length})
+              {group} ({groupItems.length})
             </span>
           </div>
           {expandedGroups[group] && (
             <div className="search-results__items">
-              {measures.map((measure) => (
+              {groupItems.map((item, index) => (
                 <div
-                  key={measure._id}
-                  onClick={() => selectMeasure(measure)}
+                  key={index}
+                  onClick={() => onSelect(item)}
                   className="search-results__item"
                 >
-                  <span>{measure.name}</span>
+                  <span>{String(item[displayField])}</span>
                 </div>
               ))}
             </div>

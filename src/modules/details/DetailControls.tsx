@@ -1,6 +1,6 @@
 interface DetailControlsProps {
   isNew: boolean;
-  isBulkEditing: boolean;
+  isEditing: boolean;
   hasChanges: boolean;
   onEdit: () => void;
   onSave: () => void;
@@ -9,33 +9,53 @@ interface DetailControlsProps {
 
 export default function DetailControls({
   isNew,
-  isBulkEditing,
+  isEditing,
   hasChanges,
   onEdit,
   onSave,
   onDiscard,
 }: DetailControlsProps) {
-  return (
-    <div className="flex justify-between mb-4">
-      {!isNew && !hasChanges && (
+  if (!isEditing && !isNew) {
+    return (
+      <div className="detail-controls">
         <button
           onClick={onEdit}
-          className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-          disabled={isNew || hasChanges}
+          className="detail-controls__button detail-controls__button--edit"
         >
-          {isBulkEditing ? "Cancel editing" : "Edit"}
+          Edit
         </button>
-      )}
-      {isBulkEditing && hasChanges && (
-        <div className="flex gap-2">
-          <button onClick={onDiscard}>
-            {isNew ? "Clear input fields" : "Discard changes"}
+      </div>
+    );
+  }
+
+  return (
+    <div className="detail-controls">
+      <div className="detail-controls__buttons">
+        {hasChanges && (
+          <button
+            onClick={onDiscard}
+            className="detail-controls__button detail-controls__button--discard"
+          >
+            {isNew ? "Clear fields" : "Discard"}
           </button>
-          <button onClick={onSave}>
-            {isNew ? "Create database entry" : "Save changes"}
+        )}
+        {hasChanges && (
+          <button
+            onClick={onSave}
+            className="detail-controls__button detail-controls__button--save"
+          >
+            {isNew ? "Create" : "Save"}
           </button>
-        </div>
-      )}
+        )}
+        {!hasChanges && (
+          <button
+            onClick={onEdit}
+            className="detail-controls__button detail-controls__button--cancel"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </div>
   );
 }

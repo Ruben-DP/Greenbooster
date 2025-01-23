@@ -1,27 +1,57 @@
 "use client";
-import { useState } from "react";
-import DetailContainer from "@/modules/details/DetailContainer";
-import SearchContainer from "@/modules/search/SearchContainer";
+import { MeasureProvider, useMeasureData } from "@/contexts/DataContext";
+import SearchBar from "@/modules/search/SearchBar";
+import SearchResults from "@/modules/search/SearchResults";
+import { Plus } from "lucide-react";
+import Button from "@/modules/Button";
+import DetailHandler from "@/modules/details/DetailHandler";
 import DetailConfirmation from "@/modules/details/DetailConfirmation";
-import { useData } from "@/contexts/DataContext";
-import Header from "@/modules/header/Header";
-import { Toaster } from "sonner";
+import { useState } from "react";
 
-export default function Page() {
-  const { selectedMeasure, pendingChanges, selectMeasure } = useData();
+function PageContent() {
+  const {
+    selectedItem,
+    selectItem,
+    items,
+    isLoading,
+    isEditing,
+    pendingChanges,
+    searchItems,
+    createItem,
+    updateItem,
+    setIsEditing,
+    setPendingChanges,
+  } = useMeasureData();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (
     <>
       <div className="search-area">
-        <SearchContainer />
+        <div className="search-container">
+          <SearchBar onSearch={searchItems} isLoading={isLoading} />
+          <Button icon={Plus} onClick={() => selectItem({}, true)}>
+            Nieuw
+          </Button>
+        </div>
+        <SearchResults
+          items={items}
+          onSelect={selectItem}
+          displayField="name"
+          groupBy="group"
+        />
       </div>
 
-      {selectedMeasure && (
-        <DetailContainer
-          key={selectedMeasure._id}
-          isNew={!selectedMeasure._id}
-          measure={selectedMeasure}
+      {selectedItem && (
+        <DetailHandler
+          key={selectedItem._id}
+          isNew={!selectedItem._id}
+          item={selectedItem}
+          isEditing={isEditing}
+          pendingChanges={pendingChanges}
+          onEdit={setIsEditing}
+          onUpdate={updateItem}
+          onCreate={createItem}
+          onChanges={setPendingChanges}
         />
       )}
 
@@ -35,10 +65,18 @@ export default function Page() {
           onConfirm={async () => setShowConfirmation(false)}
           onCancel={() => {
             setShowConfirmation(false);
-            selectMeasure(null);
+            selectItem(null);
           }}
         />
       )}
     </>
+  );
+}
+
+export default function Page() {
+  return (
+    <MeasureProvider>
+      <PageContent />
+    </MeasureProvider>
   );
 }

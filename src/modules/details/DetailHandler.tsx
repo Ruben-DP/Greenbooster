@@ -1,35 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import DetailForm from "./DetailForm";
+import DetailForm from "../forms/MeasureForm";
 import DetailControls from "./DetailControls";
 import DetailConfirmation from "./DetailConfirmation";
-import { useData } from "@/contexts/DataContext";
 import { toast } from "sonner";
-import { Measure } from "@/types/measures";
-import { ChangeRecord } from "@/types/types";
 import { set } from "lodash";
+import MeasureForm from "../forms/MeasureForm";
 
 interface DetailHandlerProps {
   isNew: boolean;
-  measure: Measure;
+  item: any;
+  isEditing: boolean;
+  pendingChanges: Record<string, any>;
+  onEdit: (isEditing: boolean) => void;
+  onUpdate: (item: any) => Promise<boolean>;
+  onCreate: (item: any) => Promise<boolean>;
+  onChanges: (changes: Record<string, any>) => void;
 }
 
-export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
-  const { 
-    updateMeasure, 
-    createMeasure, 
-    setIsEditing, 
-    setPendingChanges,
-    isEditing,
-    pendingChanges 
-  } = useData();
-  
+export default function DetailHandler({ 
+  isNew, 
+  item,
+  isEditing,
+  pendingChanges,
+  onEdit,
+  onUpdate,
+  onCreate,
+  onChanges
+}: DetailHandlerProps) {
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [currentMeasure, setCurrentMeasure] = useState<Measure>(measure);
+  const [currentItem, setCurrentItem] = useState(item);
 
   const handleChange = (path: string, oldValue: any, newValue: any) => {
-    const changeRecord: ChangeRecord = {
+    const changeRecord = {
       fieldId: path,
       label: path.split(".").pop() || path,
       oldValue: String(oldValue),
@@ -44,46 +48,45 @@ export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
       newPendingChanges[path] = changeRecord;
     }
 
-    const updatedMeasure = { ...currentMeasure };
-    set(updatedMeasure, path, newValue);
-    setCurrentMeasure(updatedMeasure);
-    setPendingChanges(newPendingChanges);
+    const updatedItem = { ...currentItem };
+    set(updatedItem, path, newValue);
+    setCurrentItem(updatedItem);
+    onChanges(newPendingChanges);
   };
-
   const handleSaveRequest = () => setShowConfirmation(true);
-
+  
   const handleConfirmSave = async () => {
     const success = isNew
-      ? await createMeasure(currentMeasure)
-      : await updateMeasure(currentMeasure);
+      ? await onCreate(currentItem)
+      : await onUpdate(currentItem);
 
     if (success) {
-      setIsEditing(false);
-      setPendingChanges({});
+      onEdit(false);
+      onChanges({});
       setShowConfirmation(false);
       toast.success("Wijzigingen succesvol opgeslagen");
     }
   };
-
   const handleDiscard = () => {
-    setCurrentMeasure(measure);
-    setIsEditing(false);
-    setPendingChanges({});
+    setCurrentItem(item);
+    onEdit(false);
+    onChanges({});
     toast.info("Wijzigingen ongedaan gemaakt");
   };
 
   return (
     <div className="details-panel">
-      <DetailForm
-        measure={currentMeasure}
+      <MeasureForm
+        item={currentItem}
         isEditing={isEditing}
         onChange={handleChange}
+        pendingChanges={pendingChanges}
       />
       <DetailControls
         isNew={isNew}
-        isBulkEditing={isEditing}
+        isEditing={isEditing}
         hasChanges={Object.keys(pendingChanges).length > 0}
-        onEdit={() => setIsEditing(!isEditing)}
+        onEdit={() => onEdit(!isEditing)}
         onSave={handleSaveRequest}
         onDiscard={handleDiscard}
       />

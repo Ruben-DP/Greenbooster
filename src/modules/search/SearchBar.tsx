@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface SearchBarProps {
-  onSearch: (searchTerm: string) => void;  
+  onSearch: (searchTerm: string) => void;
   isLoading?: boolean;
 }
 
@@ -14,13 +14,13 @@ export default function SearchBar({
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    onSearch(""); 
+    onSearch("");
   }, []);
 
   const handleSearch = () => {
-    onSearch(searchTerm.trim()); 
+    onSearch(searchTerm.trim());
   };
-  
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSearch();
@@ -34,7 +34,7 @@ export default function SearchBar({
         <input
           type="text"
           className="search-bar__input"
-          placeholder="Zoek op naam" 
+          placeholder="Zoek op naam"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}

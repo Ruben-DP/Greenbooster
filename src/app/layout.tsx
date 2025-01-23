@@ -1,6 +1,5 @@
 import "../scss/main.scss";
 import { Inter } from "next/font/google";
-import { DataProvider } from "@/contexts/DataContext";
 import { Metadata } from "next";
 
 const inter = Inter({
@@ -20,9 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} antialiased`}>
-        <DataProvider>
           <main>{children}</main>
-        </DataProvider>
       </body>
     </html>
   );
