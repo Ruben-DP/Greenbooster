@@ -1,6 +1,4 @@
-// app/actions/variableActions.ts
 "use server";
-
 import clientPromise from "@/lib/mongoDB";
 
 export async function fetchVariables(): Promise<Array<{ variableName: string }>> {

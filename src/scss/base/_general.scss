@@ -3,6 +3,12 @@ body {
   position: relative;
   display: flex;
 }
+* {
+  box-sizing: border-box;
+}
+input[type="checkbox"] {
+  accent-color: var(--accent-color);
+}
 main {
   display: flex;
   width: 100%;

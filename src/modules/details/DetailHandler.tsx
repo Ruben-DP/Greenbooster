@@ -8,7 +8,7 @@ import { useData } from "@/contexts/DataContext";
 import { toast } from "sonner";
 import { Measure } from "@/types/measures";
 import { ChangeRecord } from "@/types/types";
-import { set, get } from "lodash";
+import { set } from "lodash";
 
 interface DetailHandlerProps {
   isNew: boolean;
@@ -16,14 +16,19 @@ interface DetailHandlerProps {
 }
 
 export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
-  const { state, updateMeasure, createMeasure, setEditing, setPendingChanges } =
-    useData();
-  const { isEditing, pendingChanges } = state.measures;
+  const { 
+    updateMeasure, 
+    createMeasure, 
+    setIsEditing, 
+    setPendingChanges,
+    isEditing,
+    pendingChanges 
+  } = useData();
+  
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [currentMeasure, setCurrentMeasure] = useState<Measure>(measure);
 
   const handleChange = (path: string, oldValue: any, newValue: any) => {
-    // Create a new change record
     const changeRecord: ChangeRecord = {
       fieldId: path,
       label: path.split(".").pop() || path,
@@ -31,28 +36,21 @@ export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
       newValue: String(newValue),
     };
 
-    const newPendingChanges = {
-      ...pendingChanges,
-      [path]: changeRecord,
-    };
-
-    // If the new value is the same as the original value, remove it from pending changes
+    const newPendingChanges = { ...pendingChanges };
+    
     if (oldValue === newValue) {
       delete newPendingChanges[path];
+    } else {
+      newPendingChanges[path] = changeRecord;
     }
 
-    // Update the current measure
     const updatedMeasure = { ...currentMeasure };
     set(updatedMeasure, path, newValue);
     setCurrentMeasure(updatedMeasure);
-
-    // Update pending changes in context
     setPendingChanges(newPendingChanges);
   };
 
-  const handleSaveRequest = () => {
-    setShowConfirmation(true);
-  };
+  const handleSaveRequest = () => setShowConfirmation(true);
 
   const handleConfirmSave = async () => {
     const success = isNew
@@ -60,27 +58,18 @@ export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
       : await updateMeasure(currentMeasure);
 
     if (success) {
-      console.log("succesfully updated!");
-      setEditing(false);
+      setIsEditing(false);
       setPendingChanges({});
       setShowConfirmation(false);
-      toast.success("Changes saved successfully");
+      toast.success("Wijzigingen succesvol opgeslagen");
     }
   };
 
   const handleDiscard = () => {
-    setCurrentMeasure(measure); // Reset to original measure
-    setEditing(false);
+    setCurrentMeasure(measure);
+    setIsEditing(false);
     setPendingChanges({});
-    toast.info("Changes discarded");
-  };
-
-  const handleCancelConfirmation = () => {
-    setShowConfirmation(false);
-  };
-
-  const toggleEditing = () => {
-    !isEditing ? setEditing(true) : setEditing(false);
+    toast.info("Wijzigingen ongedaan gemaakt");
   };
 
   return (
@@ -94,22 +83,20 @@ export default function DetailHandler({ isNew, measure }: DetailHandlerProps) {
         isNew={isNew}
         isBulkEditing={isEditing}
         hasChanges={Object.keys(pendingChanges).length > 0}
-        onEdit={toggleEditing}
+        onEdit={() => setIsEditing(!isEditing)}
         onSave={handleSaveRequest}
         onDiscard={handleDiscard}
       />
       {showConfirmation && (
         <DetailConfirmation
           changes={pendingChanges}
-          title={isNew ? "Confirm Creation" : "Confirm Changes"}
-          message={
-            isNew
-              ? "Are you sure you want to create this new entry?"
-              : "Please review the following changes before saving:"
-          }
-          confirm={isNew ? "Create" : "Save changes"}
+          title={isNew ? "Bevestig aanmaken" : "Bevestig wijzigingen"}
+          message={isNew 
+            ? "Weet je zeker dat je deze nieuwe invoer wilt aanmaken?" 
+            : "Controleer de volgende wijzigingen voordat je opslaat:"}
+          confirm={isNew ? "Aanmaken" : "Wijzigingen opslaan"}
           onConfirm={handleConfirmSave}
-          onCancel={handleCancelConfirmation}
+          onCancel={() => setShowConfirmation(false)}
         />
       )}
     </div>

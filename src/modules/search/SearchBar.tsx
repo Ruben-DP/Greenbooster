@@ -1,6 +1,6 @@
 "use client";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface SearchBarProps {
   onSearch: (searchTerm: string) => void;  
@@ -13,10 +13,14 @@ export default function SearchBar({
 }: SearchBarProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
+  useEffect(() => {
+    onSearch(""); 
+  }, []);
+
   const handleSearch = () => {
     onSearch(searchTerm.trim()); 
   };
-
+  
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSearch();
@@ -30,7 +34,7 @@ export default function SearchBar({
         <input
           type="text"
           className="search-bar__input"
-          placeholder="Search by name" 
+          placeholder="Zoek op naam" 
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}

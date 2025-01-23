@@ -1,5 +1,4 @@
 "use server";
-
 import clientPromise from "@/lib/mongoDB";
 import { ObjectId } from "mongodb";
 import { Measure } from "@/types/measures";
@@ -57,10 +56,8 @@ export async function updateMeasure(
     const collection = client
       .db("Greenbooster")
       .collection("retrofittingMeasures");
-
     const { _id, ...updateData } = measure;
 
-    // Use updateOne instead of findOneAndUpdate
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
       { $set: updateData }
@@ -68,20 +65,16 @@ export async function updateMeasure(
 
     console.log("Update operation result:", result);
 
-    // Check modifiedCount instead of checking result.value
+
     if (result.modifiedCount === 1) {
       return { success: true };
     }
-
-    // If no documents were modified
     if (result.matchedCount === 0) {
       return {
         success: false,
         error: "Document not found",
       };
     }
-
-    // If document was found but not modified
     return {
       success: false,
       error: "Document found but not modified",

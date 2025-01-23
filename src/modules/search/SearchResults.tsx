@@ -3,7 +3,7 @@
 import { Copy } from "lucide-react";
 import { Measure } from "@/types/measures";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useData } from "@/contexts/DataContext";
 
 interface SearchResultProps {
@@ -16,13 +16,23 @@ export default function SearchResults({ searchList }: SearchResultProps) {
     [key: string]: boolean;
   }>({});
 
+  useEffect(() => {
+    const initialExpandedState = searchList.reduce((acc, measure) => {
+      const group = measure.group || "Geen groep";
+      acc[group] = true; 
+      return acc;
+    }, {} as { [key: string]: boolean });
+    
+    setExpandedGroups(initialExpandedState);
+  }, [searchList]);
+
   if (!searchList || searchList.length === 0) {
-    return <div className="search-results__empty">No results found</div>;
+    return <div className="search-results__empty">Geen zoekresultaten</div>;
   }
 
   const groupedMeasures = searchList.reduce(
     (groups: { [key: string]: Measure[] }, measure) => {
-      const group = measure.group || "Other";
+      const group = measure.group || "Geen groep";
       if (!groups[group]) {
         groups[group] = [];
       }
@@ -48,7 +58,7 @@ export default function SearchResults({ searchList }: SearchResultProps) {
             onClick={() => toggleGroup(group)}
           >
             {expandedGroups[group] ? <ChevronUp /> : <ChevronDown />}
-            <span>
+            <span className="search-results__group-name">
               {group} ({measures.length})
             </span>
           </div>
@@ -61,16 +71,6 @@ export default function SearchResults({ searchList }: SearchResultProps) {
                   className="search-results__item"
                 >
                   <span>{measure.name}</span>
-                  {/* copy disabled */}
-                  {/* <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      selectMeasure({ ...measure, _id: '' });
-                    }}
-                    className="copy-button"
-                  >
-                    <Copy size={16} />
-                  </button> */}
                 </div>
               ))}
             </div>

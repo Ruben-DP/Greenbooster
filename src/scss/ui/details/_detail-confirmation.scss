@@ -65,7 +65,7 @@
         font-size: 0.875rem;
         
         &::before {
-          content: "Previous: ";
+          content: "Waarde: ";
           font-weight: 500;
           color: hsl(240 4% 46%);
         }
@@ -76,7 +76,7 @@
         font-size: 0.875rem;
         
         &::before {
-          content: "New: ";
+          content: "Veranderd naar: ";
           font-weight: 500;
           color: hsl(240 4% 46%);
         }

@@ -1,4 +1,4 @@
---font1 h1,
+h1,
 h2,
 h3,
 h4,
@@ -11,17 +11,18 @@ h6 {
   font-weight: 300;
   line-height: 1.2;
   margin-top: 0;
-  @media (max-width: $screen-lg-max) {
+
+  @media (max-width: 1200px) {  /* large devices */
     margin-top: 24px;
     margin-bottom: 24px;
   }
 
-  @media (max-width: $screen-md-max) {
+  @media (max-width: 992px) {   /* medium devices */
     margin-top: 22px;
     margin-bottom: 22px;
   }
 
-  @media (max-width: $screen-sm-max) {
+  @media (max-width: 768px) {   /* small devices */
     margin-top: 20px;
     margin-bottom: 20px;
   }
@@ -48,6 +49,7 @@ h4 {
   font-size: var(--font-size);
   font-weight: 300;
 }
+
 p {
   margin-bottom: 22px;
 }
@@ -58,6 +60,7 @@ ul {
   list-style: disc;
   font-size: clamp(14px, 2vw, 18px);
   color: var(--paragraph-color);
+  
   li {
     font-family: var(--font1);
     list-style-position: inside;

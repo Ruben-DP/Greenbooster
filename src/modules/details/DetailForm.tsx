@@ -8,13 +8,10 @@ interface DetailFormProps {
   measure: Measure;
   isEditing: boolean;
   onChange?: (path: string, oldValue: any, newValue: any) => void;
-  // const { list: variables } = state.variables;
 }
 
 const DetailForm = ({ measure, isEditing, onChange }: DetailFormProps) => {
-  const { state } = useData();
-  const { pendingChanges } = state.measures;
-  const { list: variables } = state.variables;
+  const { pendingChanges, variables } = useData();
 
   if (!measure) return null;
 
@@ -24,73 +21,60 @@ const DetailForm = ({ measure, isEditing, onChange }: DetailFormProps) => {
   };
 
   const handleChange = (path: string, oldValue: any, newValue: any) => {
-    if (onChange) {
-      onChange(path, oldValue, newValue);
-    }
+    onChange?.(path, oldValue, newValue);
   };
 
   return (
     <div className="detail-form">
-      {/* Basic Info */}
       <div className="detail-form__section">
         <div className="detail-form__header">
           {!isEditing ? (
             <h3>{measure.name}</h3>
           ) : (
             <TextField
-              label="Name:"
+              label="Naam:"
               value={getCurrentValue("name", measure.name)}
               type="text"
               required={true}
               isEditing={isEditing}
-              onChange={(newValue) =>
-                handleChange(
-                  "name",
-                  getCurrentValue("name", measure.name),
-                  newValue
-                )
-              }
+              onChange={(newValue) => handleChange(
+                "name",
+                getCurrentValue("name", measure.name),
+                newValue
+              )}
             />
           )}
         </div>
 
-        {/* Heat Demand */}
         {measure.heat_demand && (
           <>
             <div className="detail-form__group-header">
-              <div>Heat Demand</div>
+              <div>Warmtebehoefte</div>
             </div>
             <div className="heat-demand">
               <div className="detail-form__group">
                 {Object.entries(measure.heat_demand).map(([key, values]) => (
                   <div key={key} className="detail-form__group-content">
                     <div className="detail-form__subheading">{key}</div>
-                    {Array.isArray(values) &&
-                      values.map((item, index) => {
-                        if (!item) return null;
+                    {Array.isArray(values) && values.map((item, index) => {
+                      if (!item) return null;
+                      const path = `heat_demand.${key}[${index}].value`;
+                      const currentValue = getCurrentValue(path, item.value);
+                      const period = item.period || `Period ${index + 1}`;
 
-                        const path = `heat_demand.${key}[${index}].value`;
-                        const currentValue = getCurrentValue(path, item.value);
-                        const period = item.period || `Period ${index + 1}`;
-
-                        return (
-                          <div
-                            key={`${key}-${index}`}
-                            className="detail-form__field"
-                          >
-                            <TextField
-                              label={period}
-                              value={String(currentValue)}
-                              type="number"
-                              required={true}
-                              isEditing={isEditing}
-                              onChange={(newValue) =>
-                                handleChange(path, currentValue, newValue)
-                              }
-                            />
-                          </div>
-                        );
-                      })}
+                      return (
+                        <div key={`${key}-${index}`} className="detail-form__field">
+                          <TextField
+                            label={period}
+                            value={String(currentValue)}
+                            type="number"
+                            required={true}
+                            isEditing={isEditing}
+                            onChange={(newValue) => handleChange(path, currentValue, newValue)}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 ))}
               </div>
@@ -98,101 +82,66 @@ const DetailForm = ({ measure, isEditing, onChange }: DetailFormProps) => {
           </>
         )}
 
-        {/* Measure Prices */}
         {measure.measure_prices && (
           <>
             <div className="detail-form__group-header">
-              <div>Price calculation</div>
+              <div>Prijs berekening</div>
             </div>
             <div className="detail-form__group has-subgroups">
-              {Array.isArray(measure.measure_prices) &&
-                measure.measure_prices.map((item, index) => {
-                  if (!item) return null;
+              {Array.isArray(measure.measure_prices) && measure.measure_prices.map((item, index) => {
+                if (!item) return null;
+                const path = `measure_prices[${index}].name`;
+                const name = item.name || `Maatregel ${index + 1} (naamloos)`;
 
-                  const path = `measure_prices[${index}].name`;
-                  const name = item.name || `Maatregel ${index + 1} (naamloos)`;
-
-                  return (
-                    <div key={`price-${index}`}>
-                      <div className="detail-form__subheading">
-                        <TextField
-                          label={"Maatregel"}
-                          value={name}
-                          type="text"
-                          required={false}
-                          isEditing={isEditing}
-                          onChange={(newValue) =>
-                            handleChange(path, name, newValue)
-                          }
-                        />
-                      </div>
-                      {/* Calculation formula display */}
-                      <div>
-                        <strong>Calculation</strong>
-                      </div>
-                      <div className="detail-form__calculation">
-                        {Array.isArray(item.calculation) &&
-                          item.calculation.map((formula, valueIndex) => {
-                            if (!formula) return null;
-                            const valuePath = `measure_prices[${index}].calculation[${valueIndex}].value`;
-                            if (formula.type === "variable") {
-                              return (
-                                <div
-                                  key={`price-${index}-value-${valueIndex}`}
-                                  className="detail-form__field"
-                                >
-                                  <SelectField
-                                    label={formula.value}
-                                    value={String(
-                                      getCurrentValue(valuePath, formula.value)
-                                    )}
-                                    options={variables.map(
-                                      (v) => v.variableName
-                                    )} // Just map the variableName
-                                    required={false}
-                                    isEditing={isEditing}
-                                    onChange={(newValue) =>
-                                      handleChange(
-                                        valuePath,
-                                        formula.value,
-                                        newValue
-                                      )
-                                    }
-                                  />
-                                </div>
-                              );
-                            } else if (formula.type === "operator") {
-                              return (
-                                <div
-                                  key={`price-${index}-operator-${valueIndex}`}
-                                  className="detail-form__field"
-                                >
-                                  <SelectField
-                                    label={""}
-                                    value={String(
-                                      getCurrentValue(valuePath, formula.value)
-                                    )}
-                                    options={["-", "+", "*", "/"]}
-                                    optionText={"Select an operator"}
-                                    required={false}
-                                    isEditing={isEditing}
-                                    onChange={(newValue) =>
-                                      handleChange(
-                                        valuePath,
-                                        formula.value,
-                                        newValue
-                                      )
-                                    }
-                                  />
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
-                      </div>
+                return (
+                  <div key={`price-${index}`} className="has-subgroups">
+                    <div className="detail-form__subheading">
+                      <TextField
+                        label="Maatregel"
+                        value={name}
+                        type="text"
+                        required={false}
+                        isEditing={isEditing}
+                        onChange={(newValue) => handleChange(path, name, newValue)}
+                      />
                     </div>
-                  );
-                })}
+                    <div>
+                      <strong>Berekening</strong>
+                    </div>
+                    <div className="detail-form__calculation">
+                      {Array.isArray(item.calculation) && item.calculation.map((formula, valueIndex) => {
+                        if (!formula) return null;
+                        const valuePath = `measure_prices[${index}].calculation[${valueIndex}].value`;
+                        
+                        return formula.type === "variable" ? (
+                          <div key={`price-${index}-value-${valueIndex}`} className="detail-form__field">
+                            <SelectField
+                              label={formula.value}
+                              value={String(getCurrentValue(valuePath, formula.value))}
+                              options={variables.map(v => v.variableName)}
+                              required={false}
+                              isEditing={isEditing}
+                              onChange={(newValue) => handleChange(valuePath, formula.value, newValue)}
+                            />
+                          </div>
+                        ) : formula.type === "operator" ? (
+                          <div key={`price-${index}-operator-${valueIndex}`} className="detail-form__field">
+                            <SelectField
+                              label=""
+                              value={String(getCurrentValue(valuePath, formula.value))}
+                              options={["-", "+", "*", "/"]}
+                              optionText="Select an operator"
+                              required={false}
+                              isEditing={isEditing}
+                              onChange={(newValue) => handleChange(valuePath, formula.value, newValue)}
+                            />
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </>
         )}

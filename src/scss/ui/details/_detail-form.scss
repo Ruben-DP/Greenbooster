@@ -14,7 +14,7 @@
   &__group-header {
     * {
       font-weight: bold;
-      text-transform: capitalize;
+      // text-transform: capitalize;
       margin-bottom: 1em;
       font-size: 1.1em;
     }
@@ -27,6 +27,9 @@
     font-weight: bold;
     text-transform: capitalize;
     margin-bottom: 1em;
+    label {
+      display: none;
+    }
   }
   &__group {
     display: flex;
@@ -84,6 +87,11 @@
   .select-field {
     width: 100%;
   }
+  .form-field {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+  }
   input,
   select {
     width: 100%;
@@ -91,7 +99,7 @@
     border: 1px solid #e5e7eb;
     border-radius: 4px;
     font-size: 1rem;
-
+    background: #f9f9f9;
     &:focus {
       outline: none;
       border-color: #2563eb;

@@ -1,261 +1,134 @@
 "use client";
-
 import { Measure } from "@/types/measures";
-import { createContext, useContext, useReducer, ReactNode, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import { ChangeRecord } from "@/types/types";
 import {
-  searchMeasures,
-  createMeasure,
-  updateMeasure,
+  searchMeasures as searchMeasuresAPI,
+  createMeasure as createMeasureAPI,
+  updateMeasure as updateMeasureAPI,
 } from "@/app/actions/measureActions";
 import { fetchVariables } from "@/app/actions/variableActions";
 
-interface DataState {
-  measures: {
-    list: Measure[];
-    selected: Measure | null;
-    isLoading: boolean;
-    error: string | null;
-    isEditing: boolean;
-    pendingChanges: Record<string, ChangeRecord>;
-  };
-  variables: {
-    list: Array<{ variableName: string }>;
-    isLoading: boolean;
-    error: string | null;
-  };
-  startEditing?: boolean;
-}
-
-type DataAction =
-  | { type: "SET_MEASURES"; payload: Measure[] }
-  | { type: "SET_SELECTED_MEASURE"; payload: Measure | null }
-  | { type: "SET_LOADING"; payload: boolean }
-  | { type: "SET_ERROR"; payload: string | null }
-  | { type: "SET_EDITING"; payload: boolean }
-  | { type: "SET_PENDING_CHANGES"; payload: Record<string, ChangeRecord> }
-  | { type: "SET_VARIABLES"; payload: Array<{ name: string; value: string }> };
-
 interface DataContextType {
-  state: DataState;
+  measures: Measure[];
+  selectedMeasure: Measure | null;
+  isLoading: boolean;
+  error: string | null;
+  isEditing: boolean;
+  pendingChanges: Record<string, ChangeRecord>;
+  variables: Array<{ variableName: string }>;
   searchMeasures: (searchTerm?: string) => Promise<void>;
   selectMeasure: (measure: Measure | null, startEditing?: boolean) => void;
   createMeasure: (measure: Measure) => Promise<boolean>;
   updateMeasure: (measure: Measure) => Promise<boolean>;
-  setEditing: (isEditing: boolean) => void;
+  setIsEditing: (isEditing: boolean) => void;
   setPendingChanges: (changes: Record<string, ChangeRecord>) => void;
 }
-
 const DataContext = createContext<DataContextType | null>(null);
 
-const initialState: DataState = {
-  measures: {
-    list: [],
-    selected: null,
-    isLoading: false,
-    error: null,
-    isEditing: false,
-    pendingChanges: {},
-  },
-  variables: {
-    list: [],
-    isLoading: false,
-    error: null
-  }
-};
-
-function dataReducer(state: DataState, action: DataAction): DataState {
-  console.log("Reducer Action:", action.type);
-
-  switch (action.type) {
-    case "SET_MEASURES":
-      return {
-        ...state,
-        measures: {
-          ...state.measures,
-          list: action.payload,
-        },
-      };
-    case "SET_SELECTED_MEASURE":
-      return {
-        ...state,
-        measures: {
-          ...state.measures,
-          selected: action.payload,
-          isEditing: action.payload === null ? false : state.measures.isEditing,
-          pendingChanges:
-            action.payload === null ? {} : state.measures.pendingChanges,
-        },
-      };
-    case "SET_LOADING":
-      return {
-        ...state,
-        measures: {
-          ...state.measures,
-          isLoading: action.payload,
-        },
-      };
-    case "SET_ERROR":
-      return {
-        ...state,
-        measures: {
-          ...state.measures,
-          error: action.payload,
-        },
-      };
-    case "SET_EDITING":
-      return {
-        ...state,
-        measures: {
-          ...state.measures,
-          isEditing: action.payload,
-          pendingChanges: action.payload ? state.measures.pendingChanges : {},
-        },
-      };
-
-    case "SET_PENDING_CHANGES":
-      return {
-        ...state,
-        measures: {
-          ...state.measures,
-          pendingChanges: action.payload,
-        },
-      };
-    case "SET_VARIABLES":
-      return {
-        ...state,
-        variables: {
-          ...state.variables,
-          list: action.payload,
-        },
-      };
-    default:
-      return state;
-  }
-}
-
+//catches actions and manages states, then fires the actions serverside trough /actions
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(dataReducer, initialState);
+  const [measures, setMeasures] = useState<Measure[]>([]);
+  const [selectedMeasure, setSelectedMeasure] = useState<Measure | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [pendingChanges, setPendingChanges] = useState<
+    Record<string, ChangeRecord>
+  >({});
+  const [variables, setVariables] = useState<Array<{ variableName: string }>>(
+    []
+  );
 
-  const handleSearchMeasures = async (searchTerm?: string) => {
-    dispatch({ type: "SET_LOADING", payload: true });
+  const searchMeasures = async (searchTerm?: string) => {
+    setIsLoading(true);
     try {
-      const results = await searchMeasures(searchTerm);
-      dispatch({ type: "SET_MEASURES", payload: results });
+      const results = await searchMeasuresAPI(searchTerm);
+      setMeasures(results);
+      setError(null);
     } catch (error) {
-      console.error("Search error:", error);
-      dispatch({
-        type: "SET_ERROR",
-        payload: error instanceof Error ? error.message : "Search failed",
-      });
+      setError(error instanceof Error ? error.message : "Search failed");
     } finally {
-      dispatch({ type: "SET_LOADING", payload: false });
+      setIsLoading(false);
     }
   };
 
-  const selectMeasure = (
-    measure: Measure | null,
-    startEditing: boolean = false
-  ) => {
-    dispatch({ type: "SET_SELECTED_MEASURE", payload: measure });
-    dispatch({ type: "SET_EDITING", payload: startEditing });
+  const selectMeasure = (measure: Measure | null, startEditing = false) => {
+    setSelectedMeasure(measure);
+    setIsEditing(startEditing);
+    if (!measure) setPendingChanges({});
   };
 
-  const handleCreateMeasure = async (measure: Measure): Promise<boolean> => {
-    dispatch({ type: "SET_LOADING", payload: true });
+  const createMeasure = async (measure: Measure): Promise<boolean> => {
+    setIsLoading(true);
     try {
-      const result = await createMeasure(measure);
+      const result = await createMeasureAPI(measure);
       if (result.success) {
-        await handleSearchMeasures();
+        await searchMeasures();
+        setError(null);
         return true;
       }
-      dispatch({
-        type: "SET_ERROR",
-        payload: result.error || "Creation failed",
-      });
+      setError(result.error || "Creation failed");
       return false;
     } finally {
-      dispatch({ type: "SET_LOADING", payload: false });
+      setIsLoading(false);
     }
   };
 
-  const handleUpdateMeasure = async (measure: Measure): Promise<boolean> => {
+  const updateMeasure = async (measure: Measure): Promise<boolean> => {
     if (!measure._id) {
-      console.error("Update attempted without measure ID");
-      dispatch({ type: "SET_ERROR", payload: "Missing measure ID" });
+      setError("Missing measure ID");
       return false;
     }
 
-    dispatch({ type: "SET_LOADING", payload: true });
-
+    setIsLoading(true);
     try {
-      const result = await updateMeasure(measure._id, measure);
-
-      if (!result.success) {
-        console.error("Update failed:", result.error);
-        dispatch({
-          type: "SET_ERROR",
-          payload: result.error || "Failed to update measure",
-        });
-        return false;
+      const result = await updateMeasureAPI(measure._id, measure);
+      if (result.success) {
+        await searchMeasures();
+        setError(null);
+        return true;
       }
-
-      try {
-        await handleSearchMeasures();
-      } catch (searchError) {
-        console.error("Failed to refresh measures after update:", searchError);
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Critical update error:", error);
-      dispatch({
-        type: "SET_ERROR",
-        payload:
-          error instanceof Error
-            ? error.message
-            : "Unexpected error during update",
-      });
+      setError(result.error || "Update failed");
       return false;
     } finally {
-      dispatch({ type: "SET_LOADING", payload: false });
+      setIsLoading(false);
     }
   };
 
-  const setEditing = (isEditing: boolean) => {
-    dispatch({ type: "SET_EDITING", payload: isEditing });
-  };
-
-  const setPendingChanges = (changes: Record<string, ChangeRecord>) => {
-    dispatch({ type: "SET_PENDING_CHANGES", payload: changes });
-  };
-
-  const loadVariables = async () => {
-    dispatch({ type: "SET_LOADING", payload: true });
-    try {
-      const variables = await fetchVariables();
-      dispatch({ type: "SET_VARIABLES", payload: variables });
-    } catch (error) {
-      console.error("Failed to load variables:", error);
-    } finally {
-      dispatch({ type: "SET_LOADING", payload: false });
-    }
-  };
-
-  // Load variables when provider mounts
   useEffect(() => {
+    const loadVariables = async () => {
+      try {
+        const vars = await fetchVariables();
+        setVariables(vars);
+      } catch (error) {
+        console.error("Failed to load variables:", error);
+      }
+    };
     loadVariables();
   }, []);
 
   return (
     <DataContext.Provider
       value={{
-        state,
-        searchMeasures: handleSearchMeasures,
+        measures,
+        selectedMeasure,
+        isLoading,
+        error,
+        isEditing,
+        pendingChanges,
+        variables,
+        searchMeasures,
         selectMeasure,
-        createMeasure: handleCreateMeasure,
-        updateMeasure: handleUpdateMeasure,
-        setEditing,
+        createMeasure,
+        updateMeasure,
+        setIsEditing,
         setPendingChanges,
       }}
     >

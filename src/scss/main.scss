@@ -1,39 +1,36 @@
-$ignore-deprecation-warnings: true;
-// scss-docs-start
-
 // abstracts
-@import "abstracts/variables";
-@import "abstracts/functions";
-@import "abstracts/mixins";
+@use "abstracts/variables";
+@use "abstracts/functions";
+@use "abstracts/mixins";
 
 // animations
-// @import "animations/animations";
+// @use "animations/animations";
 
 // base
-@import "base/typography";
-@import "base/reset";
-@import "base/general";
-//form
+@use "base/typography";
+@use "base/reset";
+@use "base/general";
 
-// modules
+// ui components
+@use "ui/footer";
+@use "ui/header";
+@use "ui/menu-link";
+@use "ui/search-area";
+@use "ui/search-bar";
+@use "ui/search-results";
 
-//ui
-@import "ui/footer";
-@import "ui/header";
-@import "ui/menu-link";
-@import "ui/search-area";
-@import "ui/search-bar";
-@import "ui/search-results";
+// frontend components
+@use "ui/frontend/hero";
+@use "ui/frontend/project-form";
+@use "ui/frontend/step";
 
+// details components
+@use "ui/details-panel";
+@use "ui/details/detail-confirmation";
+@use "ui/details/detail-form";
 
-@import "ui/details-panel";
-@import "ui/details/detail-confirmation";
-@import "ui/details/detail-form";
+@use "ui/form-field";
+@use "ui/buttons";
 
-@import "ui/form-field";
-
-
-
-@import "ui/buttons";
 // shame
-@import "shame";
+@use "shame";

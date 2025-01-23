@@ -4,10 +4,11 @@ import DetailContainer from "@/modules/details/DetailContainer";
 import SearchContainer from "@/modules/search/SearchContainer";
 import DetailConfirmation from "@/modules/details/DetailConfirmation";
 import { useData } from "@/contexts/DataContext";
+import Header from "@/modules/header/Header";
+import { Toaster } from "sonner";
 
-export default function MeasuresPage() {
-  const { state, selectMeasure } = useData();
-  const { selected: measure, pendingChanges } = state.measures;
+export default function Page() {
+  const { selectedMeasure, pendingChanges, selectMeasure } = useData();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (
@@ -16,24 +17,22 @@ export default function MeasuresPage() {
         <SearchContainer />
       </div>
 
-      {measure && (
+      {selectedMeasure && (
         <DetailContainer
-          key={measure._id}
-          isNew={!measure._id}
-          measure={measure}
+          key={selectedMeasure._id}
+          isNew={!selectedMeasure._id}
+          measure={selectedMeasure}
         />
       )}
 
       {showConfirmation && (
         <DetailConfirmation
-          title="Unsaved Changes"
-          message="You have unsaved changes. Would you like to save them before continuing?"
-          confirm="Save and Continue"
-          cancel="Discard Changes"
+          title="Niet-opgeslagen wijzigingen"
+          message="Er zijn niet-opgeslagen wijzigingen. Wil je deze opslaan voordat je verdergaat?"
+          confirm="Opslaan en doorgaan"
+          cancel="Wijzigingen negeren"
           changes={pendingChanges}
-          onConfirm={async () => {
-            setShowConfirmation(false);
-          }}
+          onConfirm={async () => setShowConfirmation(false)}
           onCancel={() => {
             setShowConfirmation(false);
             selectMeasure(null);

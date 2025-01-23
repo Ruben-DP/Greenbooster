@@ -8,9 +8,7 @@ $transition-default: 0.2s ease;
 $border-radius-lg: 8px;
 $border-radius-md: 6px;
 
-.search-area {
-  width: 458px;
-}
+
 
 .search-results {
   display: flex;
@@ -21,6 +19,10 @@ $border-radius-md: 6px;
     padding: 16px;
     text-align: center;
     color: $color-gray-500;
+  }
+
+  &__group-name {
+    text-transform: capitalize;
   }
 
   &__group {

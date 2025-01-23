@@ -42,7 +42,9 @@ export default function SearchHandler({
     if (searchTerm.trim()) {
       setIsLoading(true);
       try {
+
         const result = await searchData(type, projection, searchTerm.trim());
+        
         if (result.success && result.results) {
           onFilter(result.results);
           console.log(

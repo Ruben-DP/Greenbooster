@@ -1,8 +1,6 @@
 import "../scss/main.scss";
 import { Inter } from "next/font/google";
 import { DataProvider } from "@/contexts/DataContext";
-import Header from "@/modules/header/Header";
-import { Toaster } from "sonner";
 import { Metadata } from "next";
 
 const inter = Inter({
@@ -23,15 +21,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} antialiased`}>
         <DataProvider>
-          <Header />
           <main>{children}</main>
         </DataProvider>
-        <Toaster
-          position="bottom-right"
-          expand={false}
-          richColors
-          closeButton
-        />
       </body>
     </html>
   );
