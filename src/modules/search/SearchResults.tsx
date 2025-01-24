@@ -1,12 +1,22 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
+type NestedKeys<T, Prefix extends string = ''> = {
+  [K in keyof T]: T[K] extends object
+    ? `${Prefix}${string & K}` | `${Prefix}${string & K}.${NestedKeys<T[K], ''>}`
+    : `${Prefix}${string & K}`
+}[keyof T];
+
 interface SearchResultProps<T> {
   items: T[];
   onSelect: (item: T) => void;
-  displayField: keyof T;
+  displayField: NestedKeys<T>;
   groupBy?: keyof T;
 }
+
+const getNestedValue = <T extends object>(obj: T, path: string): any => {
+  return path.split(".").reduce((acc, part) => acc?.[part], obj);
+};
 
 export default function SearchResults<T extends object>({
   items,
@@ -32,7 +42,7 @@ export default function SearchResults<T extends object>({
               onClick={() => onSelect(item)}
               className="search-results__item"
             >
-              <span>{String(item[displayField])}</span>
+              <span>{String(getNestedValue(item, displayField))}</span>
             </div>
           ))}
         </div>
@@ -77,7 +87,7 @@ export default function SearchResults<T extends object>({
                   onClick={() => onSelect(item)}
                   className="search-results__item"
                 >
-                  <span>{String(item[displayField])}</span>
+                  <span>{String(getNestedValue(item, displayField))}</span>
                 </div>
               ))}
             </div>

@@ -7,27 +7,30 @@ import DetailConfirmation from "./DetailConfirmation";
 import { toast } from "sonner";
 import { set } from "lodash";
 import MeasureForm from "../forms/MeasureForm";
+import VariableForm from "../forms/VariableForm";
 
 interface DetailHandlerProps {
   isNew: boolean;
   item: any;
   isEditing: boolean;
   pendingChanges: Record<string, any>;
+  formType: "measures" | "variables" | "woningen" | "types";
   onEdit: (isEditing: boolean) => void;
   onUpdate: (item: any) => Promise<boolean>;
   onCreate: (item: any) => Promise<boolean>;
   onChanges: (changes: Record<string, any>) => void;
 }
 
-export default function DetailHandler({ 
-  isNew, 
+export default function DetailHandler({
+  isNew,
   item,
   isEditing,
   pendingChanges,
+  formType,
   onEdit,
   onUpdate,
   onCreate,
-  onChanges
+  onChanges,
 }: DetailHandlerProps) {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [currentItem, setCurrentItem] = useState(item);
@@ -41,7 +44,7 @@ export default function DetailHandler({
     };
 
     const newPendingChanges = { ...pendingChanges };
-    
+
     if (oldValue === newValue) {
       delete newPendingChanges[path];
     } else {
@@ -54,7 +57,7 @@ export default function DetailHandler({
     onChanges(newPendingChanges);
   };
   const handleSaveRequest = () => setShowConfirmation(true);
-  
+
   const handleConfirmSave = async () => {
     const success = isNew
       ? await onCreate(currentItem)
@@ -76,12 +79,22 @@ export default function DetailHandler({
 
   return (
     <div className="details-panel">
-      <MeasureForm
-        item={currentItem}
-        isEditing={isEditing}
-        onChange={handleChange}
-        pendingChanges={pendingChanges}
-      />
+      {formType == "measures" && (
+        <MeasureForm
+          item={currentItem}
+          isEditing={isEditing}
+          onChange={handleChange}
+          pendingChanges={pendingChanges}
+        />
+      )}
+      {formType == "variables" && (
+        <VariableForm
+          item={currentItem}
+          isEditing={isEditing}
+          onChange={handleChange}
+          pendingChanges={pendingChanges}
+        />
+      )}
       <DetailControls
         isNew={isNew}
         isEditing={isEditing}
@@ -90,13 +103,16 @@ export default function DetailHandler({
         onSave={handleSaveRequest}
         onDiscard={handleDiscard}
       />
+
       {showConfirmation && (
         <DetailConfirmation
           changes={pendingChanges}
           title={isNew ? "Bevestig aanmaken" : "Bevestig wijzigingen"}
-          message={isNew 
-            ? "Weet je zeker dat je deze nieuwe invoer wilt aanmaken?" 
-            : "Controleer de volgende wijzigingen voordat je opslaat:"}
+          message={
+            isNew
+              ? "Weet je zeker dat je deze nieuwe invoer wilt aanmaken?"
+              : "Controleer de volgende wijzigingen voordat je opslaat:"
+          }
           confirm={isNew ? "Aanmaken" : "Wijzigingen opslaan"}
           onConfirm={handleConfirmSave}
           onCancel={() => setShowConfirmation(false)}

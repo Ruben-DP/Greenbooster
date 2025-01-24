@@ -1,0 +1,109 @@
+.form {
+  $spacing-sm: 8px;
+  $spacing-md: 16px;
+  $spacing-lg: 24px;
+  $border-color: #edeef1;
+  $bg-color-light: #f6f6f8;
+  $border-radius: 12px;
+  width:100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &__grid {
+    display: flex;
+    gap: $spacing-md;
+  }
+
+  &__measures {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    background: $bg-color-light;
+    padding: $spacing-md;
+    border-radius: $border-radius;
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    min-width: 240px;
+    .form-field {
+      min-height: 30px;
+    }
+  }
+
+  &__calculation {
+    display: flex;
+    gap: $spacing-md;
+    align-items: center;
+    flex-wrap: wrap;
+    label {
+      display: none;
+    }
+  }
+  &__card {
+    border: 1px solid $border-color;
+    padding: $spacing-md;
+    border-radius: $border-radius;
+    background: white;
+  }
+  &__heading {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: $spacing-md;
+  }
+
+  &__subheading {
+    font-weight: bold;
+    text-transform: capitalize;
+    margin-bottom: $spacing-md;
+
+    label {
+      display: none;
+    }
+  }
+  input,
+  select {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 1rem;
+    background: #f9f9f9;
+
+    &:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+  }
+
+  // Buttons
+  .button-container {
+    display: flex;
+    width: 100%;
+    justify-content: cente;
+  }
+  .button {
+    height: 30px;
+    padding: 0 $spacing-md;
+    border-radius: 4px;
+    &--secondary {
+      background: transparent;
+      border: 1px solid currentColor;
+    }
+  }
+
+  // Utility classes
+  .text-field,
+  .select-field {
+    width: 100%;
+  }
+}

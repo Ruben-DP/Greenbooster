@@ -1,41 +1,46 @@
-import React from 'react';
-import BaseField, { ReadOnlyContent } from './BaseField';
+import React from "react";
 
 interface TextFieldProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  type?: 'text' | 'email' | 'number' | 'tel';
+  type?: "text" | "email" | "number" | "tel";
   required?: boolean;
   disabled?: boolean;
   isEditing?: boolean;
 }
 
-export const TextField = React.memo(({
+export function TextField({
   label,
-  value = '',   
+  value = "",
   onChange,
-  type = 'text',
+  type = "text",
   required = false,
   disabled,
-  isEditing
-}: TextFieldProps) => (
-  <BaseField label={label} required={required}>
-    {isEditing ? (
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
-        className="input-base"
-        required={required}
-        disabled={disabled}
-        autoFocus={isEditing}
-      />
-    ) : (
-      <ReadOnlyContent>{value}</ReadOnlyContent>
-    )}
-  </BaseField>
-));
-
-TextField.displayName = 'TextField';
+  isEditing,
+}: TextFieldProps) {
+  return (
+    <div className="form-field">
+      <label className="field-label">
+        {label}
+        {isEditing && required && <span className="required-mark"> *</span>}
+      </label>
+      {isEditing ? (
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+          className="input-base"
+          required={required}
+          disabled={disabled}
+          autoFocus={isEditing}
+        />
+      ) : (
+        <div className="input-read-only">
+          {value || <span className="empty-reference">-</span>}
+        </div>
+      )}
+    </div>
+  );
+}

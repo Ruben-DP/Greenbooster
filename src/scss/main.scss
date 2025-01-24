@@ -27,8 +27,10 @@
 // details components
 @use "ui/details-panel";
 @use "ui/details/detail-confirmation";
-@use "ui/details/detail-form";
 @use "ui/details/detail-controls";
+
+//forms
+@use "ui/forms/measure-form";
 
 
 @use "ui/form-field";

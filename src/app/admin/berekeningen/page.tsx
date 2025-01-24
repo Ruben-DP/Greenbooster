@@ -1,29 +1,26 @@
 "use client";
-import { useState } from "react";
-import DetailContainer from "@/modules/details/DetailContainer_old";
-import DetailConfirmation from "@/modules/details/DetailConfirmation";
-import {
-  useVariableData,
-  VariableProvider,
-} from "@/contexts/DataContext";
+import { useVariableData, VariableProvider } from "@/contexts/DataContext";
 import SearchBar from "@/modules/search/SearchBar";
 import SearchResults from "@/modules/search/SearchResults";
 import { Plus } from "lucide-react";
 import Button from "@/modules/Button";
-
-const emptyVariable = {
-  _id: "",
-  variableName: "",
-};
+import DetailHandler from "@/modules/details/DetailHandler";
+import DetailConfirmation from "@/modules/details/DetailConfirmation";
+import { useState } from "react";
 
 function PageContent() {
   const {
     selectedItem,
-    pendingChanges,
     selectItem,
     items,
     isLoading,
+    isEditing,
+    pendingChanges,
     searchItems,
+    createItem,
+    updateItem,
+    setIsEditing,
+    setPendingChanges,
   } = useVariableData();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -32,7 +29,7 @@ function PageContent() {
       <div className="search-area">
         <div className="search-container">
           <SearchBar onSearch={searchItems} isLoading={isLoading} />
-          <Button icon={Plus} onClick={() => selectItem(emptyVariable, true)}>
+          <Button icon={Plus} onClick={() => selectItem({}, true)}>
             Nieuw
           </Button>
         </div>
@@ -40,14 +37,22 @@ function PageContent() {
           items={items}
           onSelect={selectItem}
           displayField="variableName"
+          groupBy=""
         />
       </div>
 
-      {/* {selectedItem && (
-        <DetailContainer
+      {selectedItem && (
+        <DetailHandler
           key={selectedItem._id}
           isNew={!selectedItem._id}
-          measure={selectedItem}
+          item={selectedItem}
+          formType="variables"
+          isEditing={isEditing}
+          pendingChanges={pendingChanges}
+          onEdit={setIsEditing}
+          onUpdate={updateItem}
+          onCreate={createItem}
+          onChanges={setPendingChanges}
         />
       )}
 
@@ -64,10 +69,11 @@ function PageContent() {
             selectItem(null);
           }}
         />
-      )} */}
+      )}
     </>
   );
 }
+
 
 export default function Page() {
   return (

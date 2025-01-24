@@ -130,3 +130,9 @@ export const { DataProvider: MeasureProvider, useData: useMeasureData } =
 
 export const { DataProvider: VariableProvider, useData: useVariableData } =
   createDataContext("variables");
+
+export const { DataProvider: WoningenProvider, useData: useWoningenData } =
+  createDataContext("woningen");
+
+  export const { DataProvider: TypesProvider, useData: useTypesData } =
+  createDataContext("types");

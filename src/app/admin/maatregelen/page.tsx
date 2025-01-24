@@ -47,6 +47,7 @@ function PageContent() {
           isNew={!selectedItem._id}
           item={selectedItem}
           isEditing={isEditing}
+          formType="measures"
           pendingChanges={pendingChanges}
           onEdit={setIsEditing}
           onUpdate={updateItem}
