@@ -25,6 +25,7 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | null>(null);
 
 function createDataContext(collectionName: string) {
+  
   function DataProvider({ children }: { children: ReactNode }) {
     const [items, setItems] = useState<Item[]>([]);
     const [selectedItem, setSelectedItem] = useState<Item | null>(null);

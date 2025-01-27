@@ -4,25 +4,19 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import { createWoning } from "@/app/actions/woningActions";
 import { toast } from "sonner";
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <button type="submit" className="project-form__button" disabled={pending}>
-      {pending ? "Bezig met opslaan..." : "Opslaan"}
-      <ArrowRight size={20} />
-    </button>
-  );
-}
+import { useRouter } from "next/router";
 
 export default function ProjectForm() {
+  const { pending } = useFormStatus();
+
   async function handleSubmit(formData: FormData) {
     const result = await createWoning(formData);
 
     console.log("here is the result:", result);
     if (result.success) {
       toast.success("Woning succesvol opgeslagen");
+      window.location.href = '/kosten-berekening';
+
     } else {
       toast.error(result.error || "Er is iets misgegaan");
     }
@@ -161,20 +155,24 @@ export default function ProjectForm() {
             </div>
             <div className="project-form__field">
               <label htmlFor="diepte">Diepte</label>
-              <input type="text" id="diepte" name="diepte" /> 
+              <input type="text" id="diepte" name="diepte" />
             </div>
           </div>
         </div>
 
         <div className="project-form__submit">
-          <button
-            type="button"
-            className="project-form__button project-form__button--secondary"
-          >
+          <button className="project-form__button project-form__button--secondary">
             <ArrowLeft size={20} />
             Terug
           </button>
-          <SubmitButton />
+          <button
+            type="submit"
+            className="project-form__button"
+            disabled={pending}
+          >
+            {pending ? "Bezig met opslaan..." : "Opslaan"}
+            <ArrowRight size={20} />
+          </button>
         </div>
       </form>
     </section>

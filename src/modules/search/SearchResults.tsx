@@ -1,10 +1,12 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
-type NestedKeys<T, Prefix extends string = ''> = {
+type NestedKeys<T, Prefix extends string = ""> = {
   [K in keyof T]: T[K] extends object
-    ? `${Prefix}${string & K}` | `${Prefix}${string & K}.${NestedKeys<T[K], ''>}`
-    : `${Prefix}${string & K}`
+    ?
+        | `${Prefix}${string & K}`
+        | `${Prefix}${string & K}.${NestedKeys<T[K], "">}`
+    : `${Prefix}${string & K}`;
 }[keyof T];
 
 interface SearchResultProps<T> {
