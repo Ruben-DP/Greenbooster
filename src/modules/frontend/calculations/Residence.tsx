@@ -74,6 +74,7 @@ export default function Residence({
       const response = await searchDocuments<any>("woningen", id, "_id");
       if (Array.isArray(response) && response.length > 0) {
         const residence = response[0];
+        console.log("Selected woning:", residence); // Simple log of the entire woning object
         const flattened = flattenObject(residence);
         setFlattenedData(flattened);
         selectedResidence(flattened);

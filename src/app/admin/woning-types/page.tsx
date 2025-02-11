@@ -40,7 +40,7 @@ function PageContent() {
           items={items}
           onSelect={selectItem}
           displayField="name"
-          groupBy="group"
+          // groupBy="group"
         />
       </div>
 

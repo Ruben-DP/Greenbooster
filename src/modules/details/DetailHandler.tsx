@@ -9,6 +9,7 @@ import { set } from "lodash";
 import MeasureForm from "../forms/MeasureForm";
 import VariableForm from "../forms/VariableForm";
 import ResidenceForm from "../forms/ResidenceForm";
+import TypeForm from "../forms/TypeForm";
 
 interface DetailHandlerProps {
   isNew: boolean;
@@ -96,8 +97,16 @@ export default function DetailHandler({
           pendingChanges={pendingChanges}
         />
       )}
-        {formType == "woningen" && (
+      {formType == "woningen" && (
         <ResidenceForm
+          item={currentItem}
+          isEditing={isEditing}
+          onChange={handleChange}
+          pendingChanges={pendingChanges}
+        />
+      )}
+      {formType === "types" && (
+        <TypeForm
           item={currentItem}
           isEditing={isEditing}
           onChange={handleChange}
