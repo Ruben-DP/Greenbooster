@@ -1,20 +1,29 @@
 // lib/mongodb.ts
-import { MongoClient } from 'mongodb';
+import { MongoClient } from "mongodb";
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
 }
 
 const uri = process.env.MONGODB_URI;
+// const options = {
+//   maxPoolSize: 10,
+//   minPoolSize: 5,
+// };
+
+//temporary mobile hotspot connection
 const options = {
   maxPoolSize: 10,
   minPoolSize: 5,
+  ssl: true,
+  tls: true,
+  tlsAllowInvalidCertificates: true,
 };
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   const globalWithMongo = global as typeof globalThis & {
     _mongoClientPromise?: Promise<MongoClient>;
   };

@@ -45,7 +45,6 @@ const DEFAULT_DATA = {
   ],
 } satisfies Partial<FormData>;
 
-
 const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
   if (!item) return null;
 
@@ -201,37 +200,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                           )
                         }
                       />
-                      // work in progress
-                      // <SearchSelect
-                      //   label="Variabele"
-                      //   value={String(
-                      //     getValue(
-                      //       `measure_prices[${idx}].calculation[${valIdx}].value`,
-                      //       formula.value
-                      //     )
-                      //   )}
-                      //   dynamicOptions={{
-                      //     collection: "variables",
-                      //     displayField: "variableName",
-                      //     referenceFields: ["calculation", "type"],
-                      //   }}
-                      //   placeholder="Zoek een variabele..."
-                      //   required={false}
-                      //   isEditing={isEditing}
-                      //   onChange={(value, id, referenceData) =>
-                      //     handleChange(
-                      //       `measure_prices[${idx}].calculation[${valIdx}]`,
-                      //       formula,
-                      //       {
-                      //         ...formula,
-                      //         value,
-                      //         id,
-                      //         relatedCalculation: referenceData?.calculation,
-                      //         variableType: referenceData?.type,
-                      //       }
-                      //     )
-                      //   }
-                      // />
+
                     )}
                   </div>
                 ))}

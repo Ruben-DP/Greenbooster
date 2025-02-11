@@ -23,11 +23,11 @@ export default function Header() {
       }}
     >
       <MenuLink title="Maatregelen" url="/admin/maatregelen" icon={HousePlug} />
-      <MenuLink
+      {/* <MenuLink
         title="Berekeningen"
         url="/admin/berekeningen"
         icon={Calculator}
-      />
+      /> */}
       <MenuLink title="Woning types" url="/admin/woning-types" icon={House} />
       <MenuLink
         title="Opgeslagen woningen"

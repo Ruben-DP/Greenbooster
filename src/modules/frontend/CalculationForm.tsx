@@ -1,23 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { useFormStatus } from "react-dom";
-import { toast } from "sonner";
 import Budget from "./calculations/Budget";
 
 import MeasureList from "./calculations/MeasureList";
 import { MeasureProvider } from "@/contexts/DataContext";
-import SelectedMeasures from "./calculations/SelectedMeasure";
+import Actions from "./calculations/Actions";
+import Stats from "./calculations/Stats";
+import Residence from "./calculations/Residence";
 
 function PageContent() {
-  const [selectedMeasures, setSelectedMeasures] = useState();
-
+  const [residenceData, setResidenceData] = useState(null);
 
   return (
     <section className="calculation-form">
-      <Budget/>
-      <SelectedMeasures/>
-      <MeasureList/>
+      <div className="inner-content container">
+        <Budget />
+        <Residence selectedResidence={setResidenceData} />
+        <Stats />
+        <Actions />
+      </div>
+      <div className="container">
+        <MeasureList residenceData={residenceData} />
+      </div>
     </section>
   );
 }

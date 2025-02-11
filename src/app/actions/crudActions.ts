@@ -8,6 +8,7 @@ interface DatabaseResult<T> {
   error?: string;
 }
 
+
 export async function searchDocuments<T>(
   collectionName: string,
   searchTerm?: string,
@@ -17,9 +18,19 @@ export async function searchDocuments<T>(
     const client = await clientPromise;
     const collection = client.db("Greenbooster").collection(collectionName);
 
-    const query = searchTerm
-      ? { [searchField]: { $regex: searchTerm, $options: "i" } }
-      : {};
+    let query = {};
+    
+    if (searchTerm) {
+      if (searchField === "_id") {
+        try {
+          query = { _id: new ObjectId(searchTerm) };
+        } catch (error) {
+          return [];
+        }
+      } else {
+        query = { [searchField]: { $regex: searchTerm, $options: "i" } };
+      }
+    }
 
     const docs = await collection.find(query).toArray();
     return docs.map((doc) => ({

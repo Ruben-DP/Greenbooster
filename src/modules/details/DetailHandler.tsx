@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { set } from "lodash";
 import MeasureForm from "../forms/MeasureForm";
 import VariableForm from "../forms/VariableForm";
+import ResidenceForm from "../forms/ResidenceForm";
 
 interface DetailHandlerProps {
   isNew: boolean;
@@ -89,6 +90,14 @@ export default function DetailHandler({
       )}
       {formType == "variables" && (
         <VariableForm
+          item={currentItem}
+          isEditing={isEditing}
+          onChange={handleChange}
+          pendingChanges={pendingChanges}
+        />
+      )}
+        {formType == "woningen" && (
+        <ResidenceForm
           item={currentItem}
           isEditing={isEditing}
           onChange={handleChange}

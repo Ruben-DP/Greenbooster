@@ -1,9 +1,11 @@
 .step {
   display: flex;
   justify-content: center;
-  padding: 60px;
+  padding: 32px;
+  padding-bottom: 24px;
   position: relative;
   &__no {
+    text-decoration: none;
     display: flex;
     align-items: center;
     flex-direction: column;
