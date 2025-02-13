@@ -115,7 +115,8 @@ export default function MeasureList({ residenceData }: MeasureListProps) {
             {groupItems.map((measure, index) => (
               <div key={`${measure.name}-${index}`} className="measure__name">
                 <div>{measure.name}</div>
-                {measure.measure_prices?.map((price, priceIndex) => (
+                <div className="price">€ 17.389,-</div>
+                {/* {measure.measure_prices?.map((price, priceIndex) => (
                   <div key={`${measure.name}-price-${priceIndex}`}>
                     {price.name && <div>Prijs: {price.name}</div>}
                     {price.calculation && selectedResidence && (
@@ -143,7 +144,7 @@ export default function MeasureList({ residenceData }: MeasureListProps) {
                       </div>
                     )}
                   </div>
-                ))}
+                ))} */}
               </div>
             ))}
           </div>

@@ -27,8 +27,7 @@
 @use "ui/frontend/budget";
 @use "ui/frontend/tile";
 @use "ui/frontend/type-form";
-
-
+@use "ui/frontend/cost-form";
 
 
 
@@ -38,11 +37,15 @@
 @use "ui/details/detail-confirmation";
 @use "ui/details/detail-controls";
 
+
 //forms
 @use "ui/forms/measure-form";
 
 
 @use "ui/form-field";
+@use "ui/forms/residence-form";
+
+
 @use "ui/buttons";
 
 // shame

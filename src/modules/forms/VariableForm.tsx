@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { SelectField } from "../fields/SelectField";
-import { useVariableData } from "@/contexts/DataContext";
 import { TextField } from "../fields/TextField";
-
 
 type FormData = {
   variableName: string;
@@ -28,20 +26,14 @@ const DEFAULT_DATA = {
   ],
 };
 
-// exact name of the variable as stored by the frontend form
-const STATIC_VARIABLES = ["aantalWoningen", "dakOppvervlak"];
+// All available variables
+const AVAILABLE_VARIABLES = [
+  "aantalWoningen",
+  "dakOppvervlak",
+  // Add more variables here as needed
+];
 
 const VariableForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
-  const { items } = useVariableData();
-  const [allVariables, setAllVariables] = useState<string[]>([]);
-
-  useEffect(() => {
-    const existingVariables = items.map((item: any) => item.variableName);
-    // Filter out current variable to prevent self-reference
-    const filteredVariables = existingVariables.filter(v => v !== item.variableName);
-    setAllVariables([...STATIC_VARIABLES, ...filteredVariables]);
-  }, [items]);
-
   const getValue = (path: string, original: any) =>
     pendingChanges[path]?.newValue ?? original;
 
@@ -63,19 +55,22 @@ const VariableForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
     handleChange("calculation", data.calculation, updatedCalculation);
   };
 
+  // Filter out the current variable to prevent self-reference
+  const availableVariables = AVAILABLE_VARIABLES.filter(v => v !== data.variableName);
+
   return (
     <div className="form">
       <div className="form__section">
-      <TextField
-            label="Variabele"
-            value={getValue("variableName", data.variableName)}
-            type="text"
-            required={true}
-            isEditing={isEditing}
-            onChange={(next) => 
-              handleChange("variableName", data.variableName, next)
-            }
-          />
+        <TextField
+          label="Variabele"
+          value={getValue("variableName", data.variableName)}
+          type="text"
+          required={true}
+          isEditing={isEditing}
+          onChange={(next) => 
+            handleChange("variableName", data.variableName, next)
+          }
+        />
 
         <div className="form__calculation">
           {data.calculation.map((formula, idx) => (
@@ -94,7 +89,7 @@ const VariableForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                 <SelectField
                   label="Variabele"
                   value={String(getValue(`calculation[${idx}].value`, formula.value))}
-                  options={allVariables}
+                  options={availableVariables}
                   optionText="Kies variabele"
                   required={false}
                   isEditing={isEditing}

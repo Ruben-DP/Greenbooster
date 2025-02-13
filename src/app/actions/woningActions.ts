@@ -2,7 +2,7 @@
 "use server";
 import clientPromise from "@/lib/mongoDB";
 import { revalidatePath } from "next/cache";
-import { berekenAfgeleideWaarden } from "./rekenblad";
+// import { berekenAfgeleideWaarden } from "./rekenblad";
 
 export async function createWoning(formData: FormData) {
   try {
@@ -32,10 +32,21 @@ export async function createWoning(formData: FormData) {
         huidigVerbruik: Number(formData.get("huidigVerbruik")),
         huidigEnergieprijs: Number(formData.get("huidigEnergieprijs")),
       },
-      typeId: typeId, // Store the type reference
+      typeId: typeId,
       isGrondgebonden: formData.get("grondgebonden") === "true",
       isPortiekflat: formData.get("portiekflat") === "true",
       isGalerieflat: formData.get("galerieflat") === "true",
+      dimensions: {
+        breed: formData.get("breed"),
+        diepte: formData.get("diepte"),
+        goothoogte: formData.get("goothoogte"),
+        nokhoogte: formData.get("nokhoogte"),
+        aantalwoningen: formData.get("aantalwoningen"),
+        kopgevels: formData.get("kopgevels"),
+        breedtecomplex: formData.get("breedtecomplex"),
+        portieken: formData.get("portieken"),
+        bouwlagen: formData.get("bouwlagen")
+      }
     };
 
     const result = await collection.insertOne(woningData);

@@ -1,56 +1,115 @@
 import { searchDocuments } from "@/app/actions/crudActions";
 import { useEffect, useState } from "react";
+import { Woning, WoningType } from "@/types/woningen";
 
-function flattenObject(obj: any): Record<string, any> {
-  if (!obj || typeof obj !== 'object') {
-    return {};
-  }
-  const safeObj = { ...obj };
-  const result: Record<string, any> = {};
-  try {
-    for (const key in safeObj) {
-      const value = safeObj[key];
-      if (value && typeof value === 'object' && !Array.isArray(value)) {
-        const flattened = flattenObject(value);
-        Object.assign(result, flattened);
-      } else {
-        result[key] = value;
-      }
-    }
-  } catch (error) {
-    console.error('Error flattening object:', error);
-    return {};
-  }
-  return result;
+interface ProjectInformation {
+  projectNumber: string;
+  complexName: string;
+  aantalVHE: number;
+  adres: string;
+  postcode: string;
+  plaats: string;
+  renovatieJaar: number;
+  bouwPeriode: string;
+}
+
+interface EnergyDetails {
+  huidigLabel: string;
+  huidigEnergie: number;
+  voorkostenScenario: string;
+  nieuwLabel: string;
+  labelStappen: string;
+  huidigVerbruik: number;
+  huidigEnergieprijs: number;
 }
 
 interface Woning {
   _id: string;
-  projectInformation: {
-    adres: string;
-    huisnummer?: string;
+  projectInformation: ProjectInformation;
+  energyDetails: EnergyDetails;
+  typeId: string;
+  isGrondgebonden: boolean;
+  isPortiekflat: boolean;
+  isGalerieflat: boolean;
+}
+
+interface RoomDimensions {
+  breedte?: number;
+  hoogte?: number;
+}
+
+interface WoningType {
+  _id: string;
+  naam: string;
+  voorGevelKozijnen: {
+    voordeur: RoomDimensions;
+    toilet: RoomDimensions;
+    woonkamer: RoomDimensions;
+    slaapkamer: RoomDimensions;
   };
+  achterGevelKozijnen: {
+    achterdeur: RoomDimensions;
+    keuken: RoomDimensions;
+    woonkamer: RoomDimensions;
+    slaapkamer1: RoomDimensions;
+    slaapkamer2: RoomDimensions;
+  };
+  ruimten: {
+    woonkamer: RoomDimensions;
+    achterkamer: RoomDimensions;
+    slaapkamer: RoomDimensions;
+    slaapkamer2: RoomDimensions;
+    keuken: RoomDimensions;
+    badkamer: RoomDimensions;
+    hal: RoomDimensions;
+    toilet: RoomDimensions;
+  };
+}
+
+interface ResidenceProps {
+  selectedResidence: (residence: Woning, type: WoningType) => void;
 }
 
 export default function Residence({
   selectedResidence,
-}: {
-  selectedResidence: (data: any) => void;
-}) {
+  onTypeSelect,
+}: ResidenceProps) {
   const [woningen, setWoningen] = useState<Woning[]>([]);
-  const [flattenedData, setFlattenedData] = useState<any>(null);
+  const [selectedWoning, setSelectedWoning] = useState<Woning | null>(null);
+  const [typeDetails, setTypeDetails] = useState<WoningType | null>(null);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch all woningen
+  const fetchTypeDetails = async (typeId: string) => {
+    if (!typeId) return;
+
+    try {
+      const response = await searchDocuments<WoningType>(
+        "types",
+        typeId,
+        "_id"
+      );
+      if (Array.isArray(response) && response.length > 0) {
+        const typeData = response[0];
+        setTypeDetails(typeData);
+        // Pass type data up to parent
+        if (onTypeSelect) {
+          onTypeSelect(typeData);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch type details:", error);
+      setError("Failed to load type details");
+    }
+  };
+
   const fetchWoningen = async () => {
     try {
       const response = await searchDocuments<Woning>("woningen");
       if (Array.isArray(response)) {
         setWoningen(response);
-        // Select first woning by default if none selected
         if (!selectedId && response.length > 0) {
           setSelectedId(response[0]._id);
           await fetchWoning(response[0]._id);
@@ -64,20 +123,27 @@ export default function Residence({
     }
   };
 
-  // Fetch specific woning details
   const fetchWoning = async (id: string) => {
-    if (!id) {
-      console.error("No ID provided");
-      return;
-    }
+    if (!id) return;
+
     try {
-      const response = await searchDocuments<any>("woningen", id, "_id");
+      const response = await searchDocuments<Woning>("woningen", id, "_id");
       if (Array.isArray(response) && response.length > 0) {
         const residence = response[0];
-        console.log("Selected woning:", residence); // Simple log of the entire woning object
-        const flattened = flattenObject(residence);
-        setFlattenedData(flattened);
-        selectedResidence(flattened);
+        setSelectedWoning(residence);
+
+        if (residence.typeId) {
+          const typeResponse = await searchDocuments<WoningType>(
+            "types",
+            residence.typeId,
+            "_id"
+          );
+          if (Array.isArray(typeResponse) && typeResponse.length > 0) {
+            const typeData = typeResponse[0];
+            setTypeDetails(typeData);
+            selectedResidence(residence, typeData);
+          }
+        }
       }
     } catch (error) {
       console.error("Failed to fetch residence:", error);
@@ -95,53 +161,46 @@ export default function Residence({
     initializeData();
   }, [hasInitialized]);
 
-  const handleResidenceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleResidenceChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const newId = event.target.value;
     setSelectedId(newId);
     fetchWoning(newId);
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!woningen.length) {
-    return <div>No woningen found</div>;
-  }
-
-  // Format address for display
-  const formatAddress = (woning: Woning) => {
-    const address = woning.projectInformation?.adres || 'Unknown address';
-    return address;
-  };
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!woningen.length) return <div>No woningen found</div>;
 
   return (
     <div className="residence tile">
       <div className="residence__header">
-        <div className="residence__title">
-          <h3>Woning:</h3>
+        <h4 className="residence__title">Woning:</h4>
+        <div className="residence__street">
+          {selectedWoning?.projectInformation.adres}
         </div>
         <div className="residence__button">
-          <select 
-            value={selectedId}
-            onChange={handleResidenceChange}
-          >
+          <select value={selectedId} onChange={handleResidenceChange}>
             {woningen.map((woning) => (
               <option key={woning._id} value={woning._id}>
-                {formatAddress(woning)}
+                {woning.projectInformation.adres}
               </option>
             ))}
           </select>
         </div>
       </div>
-      <div className="residence__street">
-        {flattenedData?.adres && flattenedData.adres}
+
+      <div className="residence__type">
+        <span>WoningType: </span>
+        {selectedWoning?.isPortiekflat
+          ? "Portiekflat"
+          : selectedWoning?.isGalerieflat
+          ? "Galerieflat"
+          : selectedWoning?.isGrondgebonden
+          ? "Grondgebonden"
+          : ""}
       </div>
-      <div className="residence__type">{flattenedData?.typeFlat}</div>
     </div>
   );
 }

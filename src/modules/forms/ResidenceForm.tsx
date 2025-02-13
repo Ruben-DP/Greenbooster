@@ -26,7 +26,7 @@ const ResidenceForm = ({
     onChange?.(path, old, next);
 
   return (
-    <div className="form">
+    <div className="form residence-form">
       <div className="form__section">
         <h4 className="form__heading">Project informatie</h4>
         <div className="form__fields">
@@ -165,7 +165,8 @@ const ResidenceForm = ({
             }
           />
         </div>
-
+      </div>
+      <div className="form__section">
         <h4 className="form__heading">Energie details</h4>
         <div className="form__fields">
           <TextField
@@ -288,7 +289,8 @@ const ResidenceForm = ({
             }
           />
         </div>
-
+      </div>
+      <div className="form__section">
         <h4 className="form__heading">Type & Afmetingen</h4>
         <div className="form__fields">
           <ReferenceField
@@ -297,7 +299,7 @@ const ResidenceForm = ({
             onChange={handleChange}
             path="typeId"
             collection="types"
-            displayField="name"
+            displayField="naam"
             required
             isEditing={isEditing}
           />
@@ -327,6 +329,147 @@ const ResidenceForm = ({
             isEditing={isEditing}
             onChange={(next) =>
               handleChange("type.isGalerieflat", item.type?.isGalerieflat, next)
+            }
+          />
+        </div>
+        <h4 className="form__heading">Afmetingen</h4>
+        <div className="form__fields">
+          <TextField
+            label="Breed"
+            value={String(getValue("dimensions.breed", item.dimensions?.breed))}
+            type="text"
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange("dimensions.breed", item.dimensions?.breed, next)
+            }
+          />
+          <TextField
+            label="Diepte"
+            value={String(
+              getValue("dimensions.diepte", item.dimensions?.diepte)
+            )}
+            type="text"
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange("dimensions.diepte", item.dimensions?.diepte, next)
+            }
+          />
+          <TextField
+            label="Goothoogte"
+            value={String(
+              getValue("dimensions.goothoogte", item.dimensions?.goothoogte)
+            )}
+            type="text"
+            required={true}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange(
+                "dimensions.goothoogte",
+                item.dimensions?.goothoogte,
+                next
+              )
+            }
+          />
+          <TextField
+            label="Nokhoogte"
+            value={String(
+              getValue("dimensions.nokhoogte", item.dimensions?.nokhoogte)
+            )}
+            type="text"
+            required={true}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange(
+                "dimensions.nokhoogte",
+                item.dimensions?.nokhoogte,
+                next
+              )
+            }
+          />
+          <TextField
+            label="Aantal woningen"
+            value={String(
+              getValue(
+                "dimensions.aantalwoningen",
+                item.dimensions?.aantalwoningen
+              )
+            )}
+            type="text"
+            required={true}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange(
+                "dimensions.aantalwoningen",
+                item.dimensions?.aantalwoningen,
+                next
+              )
+            }
+          />
+          <TextField
+            label="Aantal Kopgevels"
+            value={String(
+              getValue("dimensions.kopgevels", item.dimensions?.kopgevels)
+            )}
+            type="text"
+            required={true}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange(
+                "dimensions.kopgevels",
+                item.dimensions?.kopgevels,
+                next
+              )
+            }
+          />
+          <TextField
+            label="Totale breedte complex"
+            value={String(
+              getValue(
+                "dimensions.breedtecomplex",
+                item.dimensions?.breedtecomplex
+              )
+            )}
+            type="text"
+            required={true}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange(
+                "dimensions.breedtecomplex",
+                item.dimensions?.breedtecomplex,
+                next
+              )
+            }
+          />
+          <TextField
+            label="Aantal portieken"
+            value={String(
+              getValue("dimensions.portieken", item.dimensions?.portieken)
+            )}
+            type="text"
+            required={true}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange(
+                "dimensions.portieken",
+                item.dimensions?.portieken,
+                next
+              )
+            }
+          />
+          <TextField
+            label="Bouwlagen"
+            value={String(
+              getValue("dimensions.bouwlagen", item.dimensions?.bouwlagen)
+            )}
+            type="text"
+            required={true}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange(
+                "dimensions.bouwlagen",
+                item.dimensions?.bouwlagen,
+                next
+              )
             }
           />
         </div>

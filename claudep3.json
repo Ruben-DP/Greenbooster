@@ -1,0 +1,146 @@
+[
+    {
+      "name": "HR++ beglazing",
+      "group": "kozijnen",
+      "measure_prices": [
+        {
+          "name": "HR++ glas",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "GlasOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 140
+        },
+        {
+          "name": "Vervangen stopverf/kit",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "AantalKozijnen",
+              "position": 2
+            }
+          ],
+          "price": 35
+        }
+      ]
+    },
+    {
+      "name": "Triple beglazing",
+      "group": "kozijnen",
+      "measure_prices": [
+        {
+          "name": "Triple glas",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "GlasOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 180
+        },
+        {
+          "name": "Aanpassen kozijnsponning",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "AantalKozijnen",
+              "position": 2
+            }
+          ],
+          "price": 75
+        }
+      ]
+    },
+    {
+      "name": "Isolatie berging",
+      "group": "bergingen",
+      "measure_prices": [
+        {
+          "name": "Isolatiepanelen wand",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "WandOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 45
+        },
+        {
+          "name": "Isolatie plafond",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "PlafondOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 38
+        }
+      ]
+    }
+  ]

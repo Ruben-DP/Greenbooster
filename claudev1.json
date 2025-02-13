@@ -1,0 +1,170 @@
+[
+    {
+      "_id": { "$oid": "678903be959f6a875472dc13" },
+      "name": "Binnen isolatie (zadeldak) met PIR-platen (RC6)",
+      "group": "dak",
+      "measure_prices": [
+        {
+          "name": "Geisoleerde dakplaat Unidek Reno 8.0",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "Dakoppervlak",
+              "position": 2
+            }
+          ],
+          "price": 76
+        },
+        {
+          "name": "Extra oppervlakte ivm overstek, 5%",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "Dakoppervlak",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "/",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "5%",
+              "position": 2
+            }
+          ],
+          "price": 76
+        },
+        {
+          "name": "Inzagen dakbeschot ivm brand",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "LengteDakvlak",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 2
+            }
+          ],
+          "price": 9.95
+        },
+        {
+          "name": "Panlatten",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "BreedteWoning",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "2",
+              "position": 2
+            }
+          ],
+          "price": 8.95
+        }
+      ]
+    },
+    {
+      "_id": { "$oid": "67addb579cd4c22a604d6f19" },
+      "name": "Unidek dakpanelen + nieuwe dakpannen (RC8)",
+      "group": "dak",
+      "measure_prices": [
+        {
+          "name": "Geisoleerde dakplaat Unidek Reno 8.0",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "Dakoppervlak",
+              "position": 2
+            }
+          ],
+          "price": 76
+        },
+        {
+          "name": "Extra oppervlakte ivm overstek, 5%",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "Dakoppervlak",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "/",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "5%",
+              "position": 2
+            }
+          ],
+          "price": 76
+        }
+      ]
+    },
+    {
+      "_id": { "$oid": "67addb579cd4c22a604d6f20" },
+      "name": "Suprafil isolatie gevel",
+      "group": "gevel buiten",
+      "measure_prices": [
+        {
+          "name": "Suprafil",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "GevelOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 30
+        }
+      ]
+    }
+  ]

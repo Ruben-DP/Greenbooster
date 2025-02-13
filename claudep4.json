@@ -1,0 +1,198 @@
+[
+    {
+      "name": "Zonnepanelen systeem",
+      "group": "opwek",
+      "measure_prices": [
+        {
+          "name": "Zonnepanelen 400Wp All-Black",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalPanelen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 2
+            }
+          ],
+          "price": 450
+        },
+        {
+          "name": "Omvormer 3000W",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            }
+          ],
+          "price": 850
+        },
+        {
+          "name": "Montagesysteem schuin dak",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalPanelen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 2
+            }
+          ],
+          "price": 65
+        }
+      ]
+    },
+    {
+      "name": "Zonneboiler systeem",
+      "group": "opwek",
+      "measure_prices": [
+        {
+          "name": "Zonneboiler 150L",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            }
+          ],
+          "price": 2850
+        },
+        {
+          "name": "Collector",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            }
+          ],
+          "price": 750
+        }
+      ]
+    },
+    {
+      "name": "Mechanische ventilatie",
+      "group": "ventilatie",
+      "measure_prices": [
+        {
+          "name": "Mechanische ventilatie box",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            }
+          ],
+          "price": 450
+        },
+        {
+          "name": "Afzuigventielen",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "AantalVentielen",
+              "position": 2
+            }
+          ],
+          "price": 35
+        },
+        {
+          "name": "Kanalen en doorvoeren",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            }
+          ],
+          "price": 650
+        }
+      ]
+    },
+    {
+      "name": "WTW ventilatie",
+      "group": "ventilatie",
+      "measure_prices": [
+        {
+          "name": "WTW unit",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            }
+          ],
+          "price": 2250
+        },
+        {
+          "name": "Kanalen toevoer",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            }
+          ],
+          "price": 850
+        },
+        {
+          "name": "Kanalen afvoer",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            }
+          ],
+          "price": 850
+        },
+        {
+          "name": "Ventielen",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "AantalVentielen",
+              "position": 2
+            }
+          ],
+          "price": 45
+        }
+      ]
+    }
+  ]

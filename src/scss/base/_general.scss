@@ -54,3 +54,9 @@ ul {
     color: var(--paragraph-dark);
   }
 }
+
+.flex-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

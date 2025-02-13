@@ -1,0 +1,236 @@
+[
+    {
+      "name": "Tonzon isolatie",
+      "group": "vloeren",
+      "measure_prices": [
+        {
+          "name": "Tonzon isolatie",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "VloerOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 33
+        },
+        {
+          "name": "PIF folie vloer",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "VloerOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 35
+        },
+        {
+          "name": "PIF folie - randen - 30cm",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "VloerOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 35
+        }
+      ]
+    },
+    {
+      "name": "PIF folie vloerisolatie",
+      "group": "vloeren",
+      "measure_prices": [
+        {
+          "name": "PIF folie - vloer",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "VloerOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 28
+        },
+        {
+          "name": "PIF folie - randen - 30cm",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "VloerOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 35
+        }
+      ]
+    },
+    {
+      "name": "Voorzetwand isolatie systeem",
+      "group": "gevel binnen",
+      "measure_prices": [
+        {
+          "name": "Gipsplaatwand met steenwol isolatie",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "GevelOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 85
+        },
+        {
+          "name": "Afwerking hoeken en naden",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "GevelOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 15
+        },
+        {
+          "name": "Vensterbank verlengen",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "AantalKozijnen",
+              "position": 2
+            }
+          ],
+          "price": 45
+        }
+      ]
+    },
+    {
+      "name": "Renovlies gevelafwerking",
+      "group": "gevel binnen",
+      "measure_prices": [
+        {
+          "name": "Renovlies aanbrengen",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "GevelOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 28
+        },
+        {
+          "name": "Sauswerk",
+          "calculation": [
+            {
+              "type": "variable",
+              "value": "AantalWoningen",
+              "position": 0
+            },
+            {
+              "type": "operator",
+              "value": "*",
+              "position": 1
+            },
+            {
+              "type": "variable",
+              "value": "GevelOppervlak",
+              "position": 2
+            }
+          ],
+          "price": 22
+        }
+      ]
+    }
+  ]

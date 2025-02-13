@@ -39,7 +39,7 @@ function PageContent() {
         <SearchResults
           items={items}
           onSelect={selectItem}
-          displayField="name"
+          displayField="naam"
           // groupBy="group"
         />
       </div>

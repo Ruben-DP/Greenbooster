@@ -36,10 +36,10 @@ export default function Header() {
       />
       <div style={{ marginTop: "auto", width: "100%" }}>
         <a
-          style={{ fontSize: "20px", marginBottom: "16px", display: "block" }}
+          style={{ marginBottom: "16px", display: "block", textDecoration: "none" }}
           href="/"
         >
-          Back to site
+          Naar voorkant
         </a>
         <ThemeControls />
       </div>

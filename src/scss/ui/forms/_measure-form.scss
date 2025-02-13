@@ -5,14 +5,31 @@
   $border-color: #edeef1;
   $bg-color-light: #f6f6f8;
   $border-radius: 12px;
-  width:100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
   &__section {
     display: flex;
     flex-direction: column;
-    gap: $spacing-lg;
+    gap: 1.5em;
+    .title {
+      height: 40px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      label {
+        display: none;
+      }
+      .input-read-only,
+      input {
+        font-size: 24px;
+        font-weight: 400;
+      }
+      input {
+        max-width: 100%;
+      }
+    }
   }
 
   &__grid {
@@ -24,8 +41,6 @@
     display: flex;
     flex-direction: column;
     gap: $spacing-sm;
-    background: $bg-color-light;
-    padding: $spacing-md;
     border-radius: $border-radius;
   }
 
@@ -53,11 +68,30 @@
     padding: $spacing-md;
     border-radius: $border-radius;
     background: white;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    > div {
+      min-height: 32px;
+    }
+
+    .card-title {
+      .form-field {
+        display: flex;
+        justify-content: flex-start;
+        .input-read-only {
+          font-weight: 500;
+        }
+        input {
+          max-width: 50%;
+        }
+      }
+    }
   }
   &__heading {
     font-size: 1.1em;
     font-weight: bold;
-    margin-bottom: $spacing-md;
+    margin-bottom: 0;
   }
 
   &__subheading {
@@ -69,6 +103,7 @@
       display: none;
     }
   }
+
   input,
   select {
     width: 100%;
@@ -106,4 +141,13 @@
   .select-field {
     width: 100%;
   }
+}
+
+.detail-controls {
+  margin-top: 16px;
+}
+
+.grouped-between {
+  display: flex;
+  justify-content: space-between;
 }

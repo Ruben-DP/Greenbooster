@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type NestedKeys<T, Prefix extends string = ""> = {
   [K in keyof T]: T[K] extends object
@@ -26,9 +26,19 @@ export default function SearchResults<T extends object>({
   displayField,
   groupBy,
 }: SearchResultProps<T>) {
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-    {}
-  );
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!items || !groupBy) return;
+
+    const groups = items.reduce((acc: Record<string, boolean>, item) => {
+      const groupValue = String(item[groupBy]) || "Geen groep";
+      acc[groupValue] = true;
+      return acc;
+    }, {});
+
+    setExpandedGroups(groups);
+  }, [items, groupBy]);
 
   if (!items || items.length === 0) {
     return <div className="search-results__empty">Geen zoekresultaten</div>;

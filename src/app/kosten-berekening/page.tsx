@@ -1,6 +1,5 @@
-import CalculationForm from "@/modules/frontend/CalculationForm";
+import CostForm from "@/modules/frontend/CostForm";
 import Hero from "@/modules/frontend/Hero";
-import ProjectForm from "@/modules/frontend/Projectform";
 import Step from "@/modules/frontend/Step";
 import { Toaster } from "sonner";
 
@@ -10,7 +9,7 @@ export default function Page() {
       <div className="page-wrapper" style={{ width: "100%", height: "100%" }}>
         <Hero title="Kosten berekening" imageUrl="/images/portiekwoning.webp" />
         <Step step={2} />
-        <CalculationForm />
+        <CostForm />
         <Toaster
           position="bottom-right"
           expand={false}
