@@ -81,6 +81,14 @@ export default function DetailHandler({
 
   return (
     <div className="details-panel">
+          <DetailControls
+        isNew={isNew}
+        isEditing={isEditing}
+        hasChanges={Object.keys(pendingChanges).length > 0}
+        onEdit={() => onEdit(!isEditing)}
+        onSave={handleSaveRequest}
+        onDiscard={handleDiscard}
+      />
       {formType == "measures" && (
         <MeasureForm
           item={currentItem}
@@ -113,14 +121,7 @@ export default function DetailHandler({
           pendingChanges={pendingChanges}
         />
       )}
-      <DetailControls
-        isNew={isNew}
-        isEditing={isEditing}
-        hasChanges={Object.keys(pendingChanges).length > 0}
-        onEdit={() => onEdit(!isEditing)}
-        onSave={handleSaveRequest}
-        onDiscard={handleDiscard}
-      />
+  
 
       {showConfirmation && (
         <DetailConfirmation

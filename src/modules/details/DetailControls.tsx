@@ -20,7 +20,7 @@ export default function DetailControls({
       <div className="detail-controls">
         <button
           onClick={onEdit}
-          className="detail-controls__button detail-controls__button--edit"
+          className="detail-controls__button button button--md  button--with-text"
         >
           Edit
         </button>

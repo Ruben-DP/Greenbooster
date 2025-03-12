@@ -3,7 +3,7 @@
     flex-direction: row;
     gap: 4px;
     margin-bottom: 32px;
-    justify-content: center;
+    justify-content: flex-end;
   
     &__buttons {
       display: flex;
@@ -29,7 +29,8 @@
       }
   
       &--edit {
-        background-color: hsl(0 0% 100%);
+        background-color: var(--accent-color);
+        color:white;
         &:hover {
           background-color: hsl(240 4.9% 97%);
         }

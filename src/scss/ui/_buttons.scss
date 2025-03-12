@@ -23,6 +23,10 @@
       height: 2.25rem;
     }
   }
+  &--remove {
+    background:transparent;
+    border:none;
+  }
 
   &--md {
     &.button--with-text {

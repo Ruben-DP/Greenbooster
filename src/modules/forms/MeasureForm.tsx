@@ -1,6 +1,7 @@
 import React from "react";
 import { TextField } from "../fields/TextField";
 import { SelectField } from "../fields/SelectField";
+import { Trash2 } from "lucide-react"; // Import the Trash2 icon from lucide-react
 
 type FormSection = {
   [key: string]: { value: number; period: string }[];
@@ -150,7 +151,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
       return [createDefaultMaintenanceItem()];
     }
 
-          return items.map((item) => ({
+    return items.map((item) => ({
       name: item.name || "",
       calculation: Array.isArray(item.calculation)
         ? item.calculation.map((calc: any) => ({ ...calc }))
@@ -179,6 +180,23 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
       : createDefaultMaintenanceItem();
     const currentItems = data[priceType];
     const updatedItems = [...currentItems, newItem];
+    handleChange(priceType, currentItems, updatedItems);
+  };
+
+  // Function to handle removing a price item
+  const handleRemovePriceItem = (priceType: "measure_prices" | "mjob_prices", itemIndex: number) => {
+    // Get current items
+    const currentItems = data[priceType];
+    
+    // Don't remove the last item
+    if (currentItems.length <= 1) {
+      return;
+    }
+    
+    // Create updated array without the item to remove
+    const updatedItems = currentItems.filter((_, idx) => idx !== itemIndex);
+    
+    // Update the state
     handleChange(priceType, currentItems, updatedItems);
   };
 
@@ -243,9 +261,19 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                     )
                   }
                 />
+                {isEditing && (
+                  <button
+                    type="button"
+                    className="button button--icon button--remove"
+                    onClick={() => handleRemovePriceItem(priceType, idx)}
+                    title="Verwijderen"
+                  >
+                    <Trash2 size={18} color="rgb(167, 17, 17)" />
+                  </button>
+                )}
               </div>
 
-              <div className="grouped-between">
+              <div className="grouped">
                 <div className="form__calculation">
                   {Array.isArray(item.calculation) ? (
                     item.calculation.map((formula, valIdx) => (
@@ -383,7 +411,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                     </>
                   )}
                   <TextField
-                    label="Eenheid prijs € "
+                    label="Prijs € "
                     value={String(
                       getValue(
                         `${priceType}[${idx}].price`,
