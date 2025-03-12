@@ -177,9 +177,7 @@ export default function Residence({
     <div className="residence tile">
       <div className="residence__header">
         <h4 className="residence__title">Woning:</h4>
-        <div className="residence__street">
-          {selectedWoning?.projectInformation.adres}
-        </div>
+  
         <div className="residence__button">
           <select value={selectedId} onChange={handleResidenceChange}>
             {woningen.map((woning) => (
@@ -192,14 +190,7 @@ export default function Residence({
       </div>
 
       <div className="residence__type">
-        <span>WoningType: </span>
-        {selectedWoning?.isPortiekflat
-          ? "Portiekflat"
-          : selectedWoning?.isGalerieflat
-          ? "Galerieflat"
-          : selectedWoning?.isGrondgebonden
-          ? "Grondgebonden"
-          : ""}
+
       </div>
     </div>
   );

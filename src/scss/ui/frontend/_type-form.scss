@@ -62,6 +62,9 @@
 }
 .type-title {
   margin-bottom: 32px;
+  .title-fields-container {
+    justify-content: space-between;
+  }
   * {
     font-size: 20px;
     font-weight: 500;

@@ -1,3 +1,394 @@
 .cost-form {
-    
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 24px;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+
+    gap: 24px;
+
+    .inner-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  // Budget Section
+  .budget {
+    &__title {
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    &__sum {
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    &__notice {
+      color: #666;
+      font-size: 14px;
+    }
+  }
+
+  // Selected Measures Section
+  .selected-measures {
+    h2 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      button {
+        background: none;
+        border: none;
+        color: #666;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        &:hover {
+          background-color: #f5f5f5;
+        }
+      }
+    }
+  }
+
+  // Measure List Section
+  .measure-list {
+    .measure-group {
+      margin-bottom: 24px;
+
+      &-title {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 12px;
+        color: #333;
+      }
+    }
+
+    .measure {
+      display: flex;
+      flex-direction: column;
+
+      &__name {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 8px;
+        min-height: fit-content; 
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-bottom: 0;
+
+        &:hover {
+          background-color: #f5f5f5;
+        }
+
+        .price {
+          color: #333;
+          font-weight: 400;
+        }
+      }
+    }
+  }
+
+  // Button Styles
+  .button-container {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  button.button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.selected-measures {
+  &__title {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+
+  &__empty {
+    color: #666;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: white;
+    border-radius: 8px;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__content {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  &__name {
+    font-weight: 500;
+  }
+
+  &__price {
+    color: #666;
+  }
+
+  &__remove {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin-left: 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+
+    &:hover {
+      color: #dc2626;
+      background-color: #f5f5f5;
+    }
+  }
+}
+
+.residence {
+  &__button select {
+
+    padding: 4px 6px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 1rem;
+    background: #f9f9f9;
+  }
+}
+
+// Add this to your existing SCSS or create a new file
+
+.measure-list {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  .measure-group {
+    margin-bottom: 24px;
+
+    &-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: #333;
+    }
+  }
+
+  .measure {
+    display: flex;
+    flex-direction: column;
+
+    &__item {
+      margin-bottom: 4px;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    &__header {
+      width: 100%;
+    }
+
+    &__name {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      transition: background-color 0.2s;
+      margin-bottom: 0;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+
+      &.expanded {
+        background-color: #f5f5f5;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+
+    &__title-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 13px;
+      flex-grow:1;
+    }
+
+    &__toggle {
+      background: none;
+      border: none;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &-icon {
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #666;
+        transition: transform 0.2s;
+      }
+
+      &[aria-expanded="true"] .measure__toggle-icon {
+        transform: rotate(-180deg);
+      }
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: flex-end;
+flex-grow: 0;
+width:fit-content
+    }
+
+    &__add {
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: darken(#4a90e2, 10%);
+      }
+    }
+
+    &__details {
+      background-color: #f9f9f9;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      overflow: hidden;
+    }
+
+    &__breakdown {
+      padding: 16px;
+
+      &-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
+      &-name {
+        font-size: 14px;
+      }
+
+      &-formula {
+        color: #666;
+        margin-left: 8px;
+        font-size: 13px;
+      }
+
+      &-price {
+        font-size: 14px;
+      }
+
+      &-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #ddd;
+        font-weight: 500;
+      }
+
+      &-error {
+        padding: 16px;
+        color: #d97706;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .price {
+    color: #333;
+    font-weight: 400;
+
+    &--warning {
+      color: #d97706;
+    }
+
+    &--loading {
+      color: #666;
+      font-style: italic;
+    }
+  }
 }

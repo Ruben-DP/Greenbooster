@@ -23,7 +23,7 @@ function PageContent() {
     setPendingChanges,
   } = useMeasureData();
   const [showConfirmation, setShowConfirmation] = useState(false);
-
+  // console.log(items);
   return (
     <>
       <div className="search-area">

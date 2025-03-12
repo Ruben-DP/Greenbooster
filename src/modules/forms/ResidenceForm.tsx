@@ -154,7 +154,7 @@ const ResidenceForm = ({
               "projectInformation.bouwPeriode",
               item.projectInformation?.bouwPeriode
             )}
-            options={["Voor 1945", "1945-1975", "1975-1995", "Na 1995"]}
+            options={["tot 1965","1965-1974","1975-1982","1983-1987","1988-1991"]}
             isEditing={isEditing}
             onChange={(next) =>
               handleChange(
@@ -291,47 +291,6 @@ const ResidenceForm = ({
         </div>
       </div>
       <div className="form__section">
-        <h4 className="form__heading">Type & Afmetingen</h4>
-        <div className="form__fields">
-          <ReferenceField
-            label="Type"
-            value={getValue("typeId", item.typeId)}
-            onChange={handleChange}
-            path="typeId"
-            collection="types"
-            displayField="naam"
-            required
-            isEditing={isEditing}
-          />
-          <CheckboxField
-            label="Grondgebonden"
-            value={getValue("type.isGrondgebonden", item.type?.isGrondgebonden)}
-            isEditing={isEditing}
-            onChange={(next) =>
-              handleChange(
-                "type.isGrondgebonden",
-                item.type?.isGrondgebonden,
-                next
-              )
-            }
-          />
-          <CheckboxField
-            label="Portiekflat"
-            value={getValue("type.isPortiekflat", item.type?.isPortiekflat)}
-            isEditing={isEditing}
-            onChange={(next) =>
-              handleChange("type.isPortiekflat", item.type?.isPortiekflat, next)
-            }
-          />
-          <CheckboxField
-            label="Galerieflat"
-            value={getValue("type.isGalerieflat", item.type?.isGalerieflat)}
-            isEditing={isEditing}
-            onChange={(next) =>
-              handleChange("type.isGalerieflat", item.type?.isGalerieflat, next)
-            }
-          />
-        </div>
         <h4 className="form__heading">Afmetingen</h4>
         <div className="form__fields">
           <TextField

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { searchDocuments } from "@/app/actions/crudActions";
+import React from "react";
 
 interface Option {
   label: string;
   value: string;
+  id?: string;
 }
 
 interface SelectFieldProps {
@@ -21,8 +21,54 @@ interface SelectFieldProps {
     currentValue?: string;
   };
 }
-const STATIC_VARIABLES = [
-  "AantalWoningen", 
+
+// Comprehensive list of calculation variables matching the calculation output
+const CALCULATION_VARIABLES = [
+  // Basic measurements
+  "breedte",
+  "diepte",
+  "gootHoogte",
+  "nokHoogte",
+  "aantalWoningen",
+  "heeftPlatDak",
+  "bouwlagen",
+  "breedteComplex",
+  "kopgevels",
+  "portieken",
+  
+  // Gevel calculations
+  "gevelOppervlakVoor",
+  "gevelOppervlakAchter",
+  "gevelOppervlakTotaal",
+  "gevelOppervlakNetto",
+  
+  // Dak calculations
+  "dakOppervlak",
+  "dakOppervlakTotaal",
+  "dakLengte",
+  "dakLengteTotaal",
+  "dakOverstekOppervlak",
+  "dakTotaalMetOverhang",
+  
+  // Vloer calculations
+  "vloerOppervlak",
+  "vloerOppervlakTotaal",
+  
+  // Kozijn measurements
+  "kozijnOppervlakVoorTotaal",
+  "kozijnOppervlakAchterTotaal",
+  "kozijnOppervlakTotaal",
+  "kozijnRendementTotaal",
+  "kozijnOmtrekTotaal",
+  
+  // Project totals
+  "projectGevelOppervlak",
+  "projectKozijnenOppervlak",
+  "projectDakOppervlak",
+  "projectOmtrek",
+  
+  // Backward compatibility with old variable names
+  "AantalWoningen",
   "Dakoppervlak",
   "LengteDakvlak",
   "BreedteWoning",
@@ -31,10 +77,12 @@ const STATIC_VARIABLES = [
   "VensterbankLengte",
   "VloerOppervlakteBeganeGrond",
   "OmtrekKozijnen",
-  "0,3",
+  
+  // Common constants
+  "0.3",
   "2",
   "3",
-  "5%",
+  "0.05",
 ];
 
 export function SelectField({
@@ -48,46 +96,22 @@ export function SelectField({
   optionText,
   dynamicOptions,
 }: SelectFieldProps) {
-  const [dynamicOptionsList, setDynamicOptionsList] = useState<Option[]>([]);
-
-  useEffect(() => {
-    const fetchOptions = async () => {
-      if (dynamicOptions) {
-        try {
-          const results = await searchDocuments(dynamicOptions.collection);
-          const mappedOptions = results
-            .filter(
-              (item: any) =>
-                item[dynamicOptions.displayField] !==
-                dynamicOptions.currentValue
-            )
-            .map((item: any) => ({
-              label: item[dynamicOptions.displayField],
-              value: item[dynamicOptions.displayField],
-              id: item._id,
-            }));
-
-          const staticOptions = STATIC_VARIABLES.map((v) => ({
-            label: v,
-            value: v,
-          }));
-
-          setDynamicOptionsList([...staticOptions, ...mappedOptions]);
-        } catch (error) {
-          console.error("Failed to fetch options:", error);
-        }
-      }
-    };
-    fetchOptions();
-  }, [dynamicOptions]);
-
-  const finalOptions = dynamicOptions
-    ? dynamicOptionsList
-    : Array.isArray(providedOptions)
-    ? providedOptions.map((opt) =>
-        typeof opt === "string" ? { label: opt, value: opt } : opt
-      )
-    : [];
+  
+  // Convert the static variables into option objects
+  const staticOptions = CALCULATION_VARIABLES.map(variable => ({
+    label: variable,
+    value: variable,
+    id: variable, // Using the variable name as the ID for simplicity
+  }));
+  
+  // Use provided options if available, otherwise use static variables
+  const finalOptions = providedOptions
+    ? Array.isArray(providedOptions)
+      ? providedOptions.map((opt) =>
+          typeof opt === "string" ? { label: opt, value: opt } : opt
+        )
+      : []
+    : staticOptions;
 
   return (
     <div className="form-field">

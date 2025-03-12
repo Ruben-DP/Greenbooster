@@ -102,7 +102,7 @@ export default function ProjectForm() {
               <label htmlFor="bouwPeriode">Bouwperiode</label>
               <select id="bouwPeriode" name="bouwPeriode">
                 <option value="">Selecteer een periode</option>
-                <option value="1965">tot 1965</option>
+                <option value="tot 1965">tot 1965</option>
                 <option value="1965-1974">1965-1974</option>
                 <option value="1975-1982">1975-1982</option>
                 <option value="1983-1987">1983-1987</option>
@@ -138,7 +138,7 @@ export default function ProjectForm() {
               </label>
               <div className="flex-field">
                 <input
-                  type="number"
+                  type="text"
                   id="huidigEnergieVerbruik"
                   name="huidigEnergieVerbruik"
                 />
@@ -217,26 +217,7 @@ export default function ProjectForm() {
               </select>
             </div>
 
-            <div className="project-form__field project-form__field--checkbox">
-              <label>
-                <input type="checkbox" name="grondgebonden" />
-                Grondgebonden
-              </label>
-            </div>
-            <div className="project-form__field project-form__field--checkbox">
-              <label>
-                <input type="checkbox" name="portiekflat" value="true" />
-                Portiekflat
-              </label>
-            </div>
-            <div className="project-form__field project-form__field--checkbox">
-              <label>
-                <input type="checkbox" name="galerieflat" value="true" />
-                Galerieflat
-              </label>
-            </div>
             <h2>Afmetingen</h2>
-
             <div className="grouped">
               <div className="project-form__field">
                 <label htmlFor="breed">Breed</label>

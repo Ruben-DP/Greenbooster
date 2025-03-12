@@ -1,5 +1,6 @@
 import React from "react";
 import { TextField } from "../fields/TextField";
+import { SelectField } from "../fields/SelectField";
 
 type WindowDimensions = {
   breedte: number;
@@ -8,6 +9,7 @@ type WindowDimensions = {
 
 type BuildingType = {
   naam: string;
+  type: string; // Added the type property for the building type
   voorgevelKozijnen: {
     voordeur: WindowDimensions;
     toilet: WindowDimensions;
@@ -104,17 +106,33 @@ const TypeForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
   const handleChange = (path: string, old: any, next: any) =>
     onChange?.(path, old, next);
 
+  const buildingTypes = [
+    { label: "Grondgebonden", value: "grondgebonden" },
+    { label: "Portiekflat", value: "portiekflat" },
+    { label: "Galerijflat", value: "galerijflat" },
+  ];
+
   return (
     <>
       <div className="type-title">
-        <TextField
-          label="Naam"
-          value={getValue("naam", item.naam)}
-          type="text"
-          required={true}
-          isEditing={isEditing}
-          onChange={(next) => handleChange("naam", item.naam, next)}
-        />
+        <div className="title-fields-container" style={{ display: "flex", gap: "20px" }}>
+          <TextField
+            label="Naam"
+            value={getValue("naam", item.naam)}
+            type="text"
+            required={true}
+            isEditing={isEditing}
+            onChange={(next) => handleChange("naam", item.naam, next)}
+          />
+          <SelectField
+            label="Type"
+            value={getValue("type", item.type)}
+            options={buildingTypes}
+            required={true}
+            isEditing={isEditing}
+            onChange={(next) => handleChange("type", item.type, next)}
+          />
+        </div>
       </div>
       <div className="type-form">
         <div className="form__section">
