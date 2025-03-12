@@ -1,14 +1,23 @@
+interface MeasurePrice {
+  name?: string;
+  unit?: string;
+  calculation: any[];
+  price?: number;
+}
+
 interface Measure {
   name: string;
   group?: string;
   measure_prices?: MeasurePrice[];
+  maintenanceCostPerYear?: number;
+  price?: number;
+  heatDemandValue?: number;
   [key: string]: any;
 }
 
 interface SelectedMeasuresProps {
   measures: Measure[];
   onRemove: (measure: Measure) => void;
-  heatDemand: string;
 }
 
 export default function SelectedMeasures({
@@ -20,7 +29,19 @@ export default function SelectedMeasures({
     0
   );
 
-  console.log("selected measures", measures);
+  // Calculate total yearly maintenance cost
+  const totalMaintenanceCost = measures.reduce(
+    (sum, measure) => sum + (measure.maintenanceCostPerYear || 0),
+    0
+  );
+
+  const formatPrice = (price: number) => {
+    return price.toLocaleString("nl-NL", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
   return (
     <section className="tile selected-measures">
       <h2 className="selected-measures__title">Geselecteerde maatregelen</h2>
@@ -42,7 +63,7 @@ export default function SelectedMeasures({
                   </span>
 
                   <span className="selected-measures__price">
-                    € {measure.price?.toLocaleString("nl-NL")},-
+                    € {measure.price ? formatPrice(measure.price) : '0,00'}
                   </span>
 
                   <button
@@ -54,9 +75,19 @@ export default function SelectedMeasures({
                   </button>
                 </div>
                 <div className="selected-measures__bottom-bar">
-                  <span>
-                    {measure.heatDemandValue && measure.heatDemandValue}
-                  </span>
+                  <div className="selected-measures__details">
+                    {measure.heatDemandValue && (
+                      <span className="selected-measures__heat">
+                        {measure.heatDemandValue} kWh/m²
+                      </span>
+                    )}
+                    
+                    {measure.maintenanceCostPerYear > 0 && (
+                      <span className="selected-measures__maintenance">
+                        Onderhoud: € {formatPrice(measure.maintenanceCostPerYear)}/jaar
+                      </span>
+                    )}
+                  </div>
                 </div>
               </li>
             ))}

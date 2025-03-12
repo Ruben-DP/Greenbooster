@@ -116,15 +116,23 @@ function PageContent() {
   };
 
   const handleSelection = (residence: Woning, type: WoningType) => {
+    // Always clear selected measures when selecting a residence
+    // This ensures components will refresh properly
+    setSelectedMeasures([]);
+    setTotalBudget(0);
+    setCalculations(null); // Also reset calculations to force MeasureList to update
+    
+    // Set the new residence and type
     setSelectedResidence(residence);
     setSelectedType(type);
-    // console.log("Selected Residence:", residence);
-    // console.log("Selected Type:", type);
+    
+    // Log for debugging
+    console.log("Selected new residence:", residence.name);
+    console.log("Cleared measures and calculations");
   };
 
   const handleCalculations = (newCalculations: CalculationResults) => {
     setCalculations(newCalculations);
-    // console.log("Calculations:", newCalculations);
 
     if (newCalculations.missingInputs?.length > 0) {
       console.warn("Missing inputs:", newCalculations.missingInputs);
@@ -137,7 +145,6 @@ function PageContent() {
       );
     }
   };
-  // console.log("selected measures (from CostForm):", selectedMeasures);
 
   return (
     <div className="cost-form">

@@ -6,20 +6,28 @@ type FormSection = {
   [key: string]: { value: number; period: string }[];
 };
 
+type MeasurePriceItem = {
+  name: string;
+  calculation: Array<{
+    type: "variable" | "operator";
+    value: string;
+    id?: string;
+  }>;
+  price: number;
+  unit?: string;
+};
+
+type MaintenancePriceItem = MeasurePriceItem & {
+  cycleStart: number;
+  cycle: number;
+};
+
 type FormData = {
   name: string;
   heat_demand: FormSection;
   nuisance: number;
-  measure_prices: {
-    name: string;
-    calculation: Array<{
-      type: "variable" | "operator";
-      value: string;
-      id?: string;
-    }>;
-    price: number;
-    unit?: string;
-  }[];
+  measure_prices: MeasurePriceItem[];
+  mjob_prices: MaintenancePriceItem[];
   group: string;
 };
 
@@ -55,22 +63,31 @@ const createDefaultHeatDemand = () => {
   return periodsData;
 };
 
+// Default empty price item
+const createDefaultPriceItem = (): MeasurePriceItem => ({
+  name: "",
+  calculation: [
+    { type: "variable" as const, value: "", id: "" },
+    { type: "operator" as const, value: "+" },
+    { type: "variable" as const, value: "", id: "" },
+  ],
+  price: 0,
+  unit: "m2",
+});
+
+  // Default empty maintenance job price item
+const createDefaultMaintenanceItem = (): MaintenancePriceItem => ({
+  ...createDefaultPriceItem(),
+  cycleStart: 0,
+  cycle: 1, // Default to yearly cycle (1 year)
+});
+
 const DEFAULT_DATA = {
   heat_demand: createDefaultHeatDemand(),
   group: "",
   nuisance: 0,
-  measure_prices: [
-    {
-      name: "",
-      calculation: [
-        { type: "variable" as const, value: "", id: "" },
-        { type: "operator" as const, value: "+" },
-        { type: "variable" as const, value: "", id: "" },
-      ],
-      price: 0,
-      unit: "m2",
-    },
-  ],
+  measure_prices: [createDefaultPriceItem()],
+  mjob_prices: [createDefaultMaintenanceItem()],
 } satisfies Partial<FormData>;
 
 const UNIT_OPTIONS = ["m2", "m1", "stuk", "per stuk", "woning"];
@@ -111,54 +128,76 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
     return processed;
   };
 
-  // Ensure we have a deep defensive approach to measure_prices
+  // Helper function to process measure price items
+  const processMeasurePriceItems = (items: any[] | undefined): MeasurePriceItem[] => {
+    if (!Array.isArray(items) || items.length === 0) {
+      return [createDefaultPriceItem()];
+    }
+
+    return items.map((item) => ({
+      name: item.name || "",
+      calculation: Array.isArray(item.calculation)
+        ? item.calculation.map((calc: any) => ({ ...calc }))
+        : [{ type: "variable" as const, value: "", id: "" }],
+      price: item.price || 0,
+      unit: item.unit || "m2",
+    }));
+  };
+
+  // Helper function to process maintenance job price items
+  const processMaintenanceItems = (items: any[] | undefined): MaintenancePriceItem[] => {
+    if (!Array.isArray(items) || items.length === 0) {
+      return [createDefaultMaintenanceItem()];
+    }
+
+          return items.map((item) => ({
+      name: item.name || "",
+      calculation: Array.isArray(item.calculation)
+        ? item.calculation.map((calc: any) => ({ ...calc }))
+        : [{ type: "variable" as const, value: "", id: "" }],
+      price: item.price || 0,
+      unit: item.unit || "m2",
+      cycleStart: item.cycleStart || 0,
+      cycle: item.cycle || 1,
+    }));
+  };
+
+  // Ensure we have a deep defensive approach to measure_prices and mjob_prices
   const data: FormData = {
     name: item.name || "",
     group: item.group || DEFAULT_DATA.group,
     nuisance: item.nuisance || DEFAULT_DATA.nuisance,
     heat_demand: processHeatDemand(item.heat_demand),
-    measure_prices:
-      Array.isArray(item.measure_prices) && item.measure_prices.length > 0
-        ? item.measure_prices.map((measure) => ({
-            name: measure.name || "",
-            calculation: Array.isArray(measure.calculation)
-              ? measure.calculation.map((calc) => ({ ...calc }))
-              : [{ type: "variable" as const, value: "", id: "" }],
-            price: measure.price || 0,
-            unit: measure.unit || "m2",
-          }))
-        : DEFAULT_DATA.measure_prices,
+    measure_prices: processMeasurePriceItems(item.measure_prices),
+    mjob_prices: processMaintenanceItems(item.mjob_prices),
   };
 
-  const handleAddMeasure = () => {
-    // Ensure we create a complete new measure with properly initialized calculation array
-    const newMeasure = {
-      name: "",
-      calculation: [{ type: "variable" as const, value: "", id: "" }],
-      price: 0,
-      unit: "m2",
-    };
-
-    // Create a safe copy of the current array before adding to it
-    const updatedMeasures = Array.isArray(data.measure_prices)
-      ? [...data.measure_prices, newMeasure]
-      : [newMeasure];
-
-    handleChange("measure_prices", data.measure_prices, updatedMeasures);
+  // Generic function to handle adding a new price item to either measure_prices or mjob_prices
+  const handleAddPriceItem = (priceType: "measure_prices" | "mjob_prices") => {
+    const newItem = priceType === "measure_prices" 
+      ? createDefaultPriceItem()
+      : createDefaultMaintenanceItem();
+    const currentItems = data[priceType];
+    const updatedItems = [...currentItems, newItem];
+    handleChange(priceType, currentItems, updatedItems);
   };
 
-  const handleAddFormula = (measureIndex: number) => {
+  // Generic function to handle adding a formula to a price item
+  const handleAddFormula = (
+    priceType: "measure_prices" | "mjob_prices",
+    itemIndex: number
+  ) => {
     // Ensure the measure and its calculation property exist
-    if (!data.measure_prices || !data.measure_prices[measureIndex]) {
-      console.error("Cannot add formula to non-existent measure");
+    if (!data[priceType] || !data[priceType][itemIndex]) {
+      console.error(`Cannot add formula to non-existent ${priceType} item`);
       return;
     }
 
-    const measure = data.measure_prices[measureIndex];
+    const item = data[priceType][itemIndex];
 
     // Create a safe calculation array
-    const currentCalculation = Array.isArray(measure.calculation)
-      ? measure.calculation
+    const currentCalculation = Array.isArray(item.calculation)
+      ? item.calculation
       : [];
 
     const updatedCalculation = [
@@ -167,15 +206,219 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
       { type: "variable" as const, value: "", id: "" },
     ];
 
-    // Create a safe copy of all measures before updating one of them
-    const updatedMeasures = data.measure_prices.map((m, idx) =>
-      idx === measureIndex ? { ...m, calculation: updatedCalculation } : m
+    // Create a safe copy of all items before updating one of them
+    const updatedItems = data[priceType].map((m, idx) =>
+      idx === itemIndex ? { ...m, calculation: updatedCalculation } : m
     );
 
-    handleChange("measure_prices", data.measure_prices, updatedMeasures);
+    handleChange(priceType, data[priceType], updatedItems);
   };
 
-  console.log(data.measure_prices);
+  // Render a price section (used for both Begroting and Onderhoudskosten)
+  const renderPriceSection = (
+    title: string,
+    priceType: "measure_prices" | "mjob_prices"
+  ) => (
+    <>
+      <h4 className="form__heading">{title}</h4>
+      <div className="form__measures">
+        {Array.isArray(data[priceType]) &&
+          data[priceType].map((item, idx) => (
+            <div key={`${priceType}-${idx}`} className="form__card">
+              <div className="card-title">
+                <TextField
+                  label=""
+                  value={getValue(
+                    `${priceType}[${idx}].name`,
+                    item.name || ""
+                  )}
+                  type="text"
+                  required={false}
+                  isEditing={isEditing}
+                  onChange={(next) =>
+                    handleChange(
+                      `${priceType}[${idx}].name`,
+                      item.name || "",
+                      next
+                    )
+                  }
+                />
+              </div>
+
+              <div className="grouped-between">
+                <div className="form__calculation">
+                  {Array.isArray(item.calculation) ? (
+                    item.calculation.map((formula, valIdx) => (
+                      <div
+                        key={`calc-${priceType}-${idx}-${valIdx}`}
+                        className="form__field"
+                      >
+                        {formula.type === "operator" ? (
+                          <SelectField
+                            label=""
+                            value={String(
+                              getValue(
+                                `${priceType}[${idx}].calculation[${valIdx}].value`,
+                                formula.value || ""
+                              )
+                            )}
+                            options={["-", "+", "*", "/"]}
+                            optionText="Kies rekenteken"
+                            required={false}
+                            isEditing={isEditing}
+                            onChange={(next) =>
+                              handleChange(
+                                `${priceType}[${idx}].calculation[${valIdx}].value`,
+                                formula.value || "",
+                                next
+                              )
+                            }
+                          />
+                        ) : (
+                          <SelectField
+                            label="Variabele"
+                            value={String(
+                              getValue(
+                                `${priceType}[${idx}].calculation[${valIdx}].value`,
+                                formula.value || ""
+                              )
+                            )}
+                            dynamicOptions={{
+                              collection: "variables",
+                              displayField: "variableName",
+                            }}
+                            optionText="Kies variabele"
+                            required={false}
+                            isEditing={isEditing}
+                            onChange={(value, id) =>
+                              handleChange(
+                                `${priceType}[${idx}].calculation[${valIdx}]`,
+                                formula,
+                                {
+                                  ...formula,
+                                  value: value || "",
+                                  id: id || "",
+                                }
+                              )
+                            }
+                          />
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div>No calculation data available</div>
+                  )}
+                  {isEditing && (
+                    <button
+                      type="button"
+                      className="button button--icon"
+                      onClick={() => handleAddFormula(priceType, idx)}
+                    >
+                      +
+                    </button>
+                  )}
+                </div>
+
+                <div className="form__price">
+                  <SelectField
+                    label="Eenheid"
+                    value={String(
+                      getValue(
+                        `${priceType}[${idx}].unit`,
+                        item.unit || "m2"
+                      )
+                    )}
+                    options={UNIT_OPTIONS}
+                    optionText="Kies eenheid"
+                    required={false}
+                    isEditing={isEditing}
+                    onChange={(next) =>
+                      handleChange(
+                        `${priceType}[${idx}].unit`,
+                        item.unit || "m2",
+                        next
+                      )
+                    }
+                  />
+                  {priceType === "mjob_prices" && (
+                    <>
+                      <TextField
+                        label="Start cyclus (jaar)"
+                        value={String(
+                          getValue(
+                            `${priceType}[${idx}].cycleStart`,
+                            (item as MaintenancePriceItem).cycleStart || 0
+                          )
+                        )}
+                        type="number"
+                        required={false}
+                        isEditing={isEditing}
+                        onChange={(next) =>
+                          handleChange(
+                            `${priceType}[${idx}].cycleStart`,
+                            (item as MaintenancePriceItem).cycleStart || 0,
+                            Number(next)
+                          )
+                        }
+                      />
+                      <TextField
+                        label="Cyclus (elk .. jaar)"
+                        value={String(
+                          getValue(
+                            `${priceType}[${idx}].cycle`,
+                            (item as MaintenancePriceItem).cycle || 1
+                          )
+                        )}
+                        type="number"
+                        required={false}
+                        isEditing={isEditing}
+                        onChange={(next) =>
+                          handleChange(
+                            `${priceType}[${idx}].cycle`,
+                            (item as MaintenancePriceItem).cycle || 1,
+                            Number(next)
+                          )
+                        }
+                      />
+                    </>
+                  )}
+                  <TextField
+                    label="Eenheid prijs € "
+                    value={String(
+                      getValue(
+                        `${priceType}[${idx}].price`,
+                        item.price || 0
+                      )
+                    )}
+                    type="number"
+                    required={false}
+                    isEditing={isEditing}
+                    onChange={(next) =>
+                      handleChange(
+                        `${priceType}[${idx}].price`,
+                        item.price || 0,
+                        Number(next)
+                      )
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        {isEditing && (
+          <div className="button-container">
+            <button
+              type="button"
+              className="button"
+              onClick={() => handleAddPriceItem(priceType)}
+            >
+              {priceType === "measure_prices" ? "Maatregel +" : "Onderhoud +"}
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
 
   return (
     <div className="form">
@@ -263,161 +506,12 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
             }
           />
         </div>
-        <h4 className="form__heading">Begroting</h4>
-        <div className="form__measures">
-          {Array.isArray(data.measure_prices) &&
-            data.measure_prices.map((measure, idx) => (
-              <div key={`price-${idx}`} className="form__card">
-                <div className="card-title">
-                  <TextField
-                    label=""
-                    value={getValue(
-                      `measure_prices[${idx}].name`,
-                      measure.name || ""
-                    )}
-                    type="text"
-                    required={false}
-                    isEditing={isEditing}
-                    onChange={(next) =>
-                      handleChange(
-                        `measure_prices[${idx}].name`,
-                        measure.name || "",
-                        next
-                      )
-                    }
-                  />
-                </div>
-
-                <div className="grouped-between">
-                  <div className="form__calculation">
-                    {Array.isArray(measure.calculation) ? (
-                      measure.calculation.map((formula, valIdx) => (
-                        <div
-                          key={`calc-${idx}-${valIdx}`}
-                          className="form__field"
-                        >
-                          {formula.type === "operator" ? (
-                            <SelectField
-                              label=""
-                              value={String(
-                                getValue(
-                                  `measure_prices[${idx}].calculation[${valIdx}].value`,
-                                  formula.value || ""
-                                )
-                              )}
-                              options={["-", "+", "*", "/"]}
-                              optionText="Kies rekenteken"
-                              required={false}
-                              isEditing={isEditing}
-                              onChange={(next) =>
-                                handleChange(
-                                  `measure_prices[${idx}].calculation[${valIdx}].value`,
-                                  formula.value || "",
-                                  next
-                                )
-                              }
-                            />
-                          ) : (
-                            <SelectField
-                              label="Variabele"
-                              value={String(
-                                getValue(
-                                  `measure_prices[${idx}].calculation[${valIdx}].value`,
-                                  formula.value || ""
-                                )
-                              )}
-                              dynamicOptions={{
-                                collection: "variables",
-                                displayField: "variableName",
-                              }}
-                              optionText="Kies variabele"
-                              required={false}
-                              isEditing={isEditing}
-                              onChange={(value, id) =>
-                                handleChange(
-                                  `measure_prices[${idx}].calculation[${valIdx}]`,
-                                  formula,
-                                  {
-                                    ...formula,
-                                    value: value || "",
-                                    id: id || "",
-                                  }
-                                )
-                              }
-                            />
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <div>No calculation data available</div>
-                    )}
-                    {isEditing && (
-                      <button
-                        type="button"
-                        className="button button--icon"
-                        onClick={() => handleAddFormula(idx)}
-                      >
-                        +
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="form__price">
-                    <SelectField
-                      label="Eenheid"
-                      value={String(
-                        getValue(
-                          `measure_prices[${idx}].unit`,
-                          measure.unit || "m2"
-                        )
-                      )}
-                      options={UNIT_OPTIONS}
-                      optionText="Kies eenheid"
-                      required={false}
-                      isEditing={isEditing}
-                      onChange={(next) =>
-                        handleChange(
-                          `measure_prices[${idx}].unit`,
-                          measure.unit || "m2",
-                          next
-                        )
-                      }
-                    />
-                    <TextField
-                      label="Eenheid prijs € "
-                      value={String(
-                        getValue(
-                          `measure_prices[${idx}].price`,
-                          measure.price || 0
-                        )
-                      )}
-                      type="number"
-                      required={false}
-                      isEditing={isEditing}
-                      onChange={(next) =>
-                        handleChange(
-                          `measure_prices[${idx}].price`,
-                          measure.price || 0,
-                          Number(next)
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          {isEditing && (
-            <div className="button-container">
-              <button
-                type="button"
-                className="button"
-                onClick={handleAddMeasure}
-              >
-                Maatregel +
-              </button>
-            </div>
-          )}
-        </div>
+        
+        {/* Render the Begroting section */}
+        {renderPriceSection("Begroting", "measure_prices")}
+        
+        {/* Render the Onderhoudskosten section */}
+        {renderPriceSection("Onderhoudskosten", "mjob_prices")}
       </div>
     </div>
   );
