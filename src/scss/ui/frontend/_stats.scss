@@ -1,0 +1,22 @@
+.stats {
+    display: flex;
+    flex-direction: column;
+    &__row {
+        display: flex;
+        justify-content: space-between;
+    }
+    &__label {
+
+    }
+    &__value {
+
+    }
+    .icon-grouper {
+        svg {
+            height:20px;
+        }
+        display: flex;
+        align-items: center;
+        gap:4px;
+    }
+}

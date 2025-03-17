@@ -217,6 +217,8 @@ export default function ProjectForm() {
               </select>
             </div>
 
+            
+
             <h2>Afmetingen</h2>
             <div className="grouped">
               <div className="project-form__field">

@@ -128,6 +128,7 @@ function PageContent() {
     
     // Log for debugging
     console.log("Selected new residence:", residence.name);
+    console.log(type);
     console.log("Cleared measures and calculations");
   };
 
@@ -151,7 +152,7 @@ function PageContent() {
       <div className="container">
         <div className="inner-content">
           <Budget totalAmount={totalBudget} />
-          <Residence selectedResidence={handleSelection} />
+          <Residence selectedResidence={handleSelection} residenceType={selectedType?.type}/>
           <Stats selectedMeasures={selectedMeasures} />
           {selectedResidence &&
             selectedType &&

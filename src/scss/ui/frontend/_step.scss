@@ -1,4 +1,5 @@
 .step {
+  background-color: white;
   display: flex;
   justify-content: center;
   padding: 32px;
@@ -17,13 +18,12 @@
     &::before {
       content: "";
       position: absolute;
-      top: calc(50% - 40px);
+      top: calc(50% - 28px);
       left: 50%;
       transform: translate(-50%, 50%);
       right: 0;
       height: 4px;
       background-color: var(--accent-color);
-      z-index: -1;
       width:600px;
     }
   }
@@ -39,6 +39,7 @@
     color: white;
     font-weight: bold;
     border: 4px solid var(--accent-color);
+    z-index: 1;
     &.active {
       background-color: white;
       color: black;

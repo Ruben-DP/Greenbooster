@@ -24,7 +24,7 @@ interface SelectFieldProps {
 
 // Comprehensive list of calculation variables matching the calculation output
 const CALCULATION_VARIABLES = [
-  // Basic measurements
+  // Basic measurements (from woningSpecifiek)
   "breedte",
   "diepte",
   "gootHoogte",

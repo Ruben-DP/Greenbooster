@@ -1,10 +1,12 @@
 .details-panel {
   background-color: white;
-  height: 100vh;
+  height: calc(100vh);
   padding: 3em;
   padding-top: 0;
   overflow-y: scroll;
   width:auto;
+  margin:0 16px;
+  border-radius:10px;
 }
 
 .detail-group {

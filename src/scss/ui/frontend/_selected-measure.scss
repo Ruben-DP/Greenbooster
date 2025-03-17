@@ -1,0 +1,43 @@
+.selected-measures {
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap:8px;
+    position: relative;
+    margin-left:24px;
+    &:before {
+      position: absolute;
+      content: "";
+      height:12px;
+      width:12px;
+      border-radius: 50%;
+      background-color:#4a90e2 ;
+      transform: translate(-200%, -50%);
+      top:50%;
+      left:0;
+    }
+  }
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  &__bottom-bar {
+    width: 100%;
+  }
+  .icon-values {
+    display: flex;
+    align-items: center;
+    gap:8px;
+  }
+  .selected-measures__details {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    .selected-measures__maintenance {
+      //cros icon width;
+      margin-right: 10px;
+    }
+  }
+}

@@ -86,7 +86,7 @@ const WindowInputs = ({
       }
     />
     <TextField
-      label="Hoogte"
+      label="Lengte"
       value={String(getValue(`${basePath}.hoogte`, dimensions?.hoogte))}
       type="number"
       isEditing={isEditing}

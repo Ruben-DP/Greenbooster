@@ -4,6 +4,7 @@ import { useMeasureData } from "@/contexts/DataContext";
 import { useEffect, useState } from "react";
 import { getHeatDemandValue } from "./heat-demand";
 import { calculateMeasurePrice } from "./price.calculator";
+import { Flame, Volume1 } from "lucide-react";
 
 interface Calculation {
   type: string;
@@ -71,6 +72,8 @@ export default function MeasureList({
   > | null>(null);
   const [expandedMeasure, setExpandedMeasure] = useState<string | null>(null);
 
+  // console.log(residenceType);
+
   // Load measures when component mounts
   useEffect(() => {
     searchItems("");
@@ -88,7 +91,11 @@ export default function MeasureList({
     maintenanceResult: { isValid: boolean; price: number; calculations: any[] },
     mjob_prices?: MaintenancePrice[]
   ) => {
-    if (!maintenanceResult.isValid || !mjob_prices || !Array.isArray(mjob_prices)) {
+    if (
+      !maintenanceResult.isValid ||
+      !mjob_prices ||
+      !Array.isArray(mjob_prices)
+    ) {
       return { total40Years: 0, perYear: 0 };
     }
 
@@ -104,12 +111,12 @@ export default function MeasureList({
 
       // Get single occurrence cost
       const jobCost = calculation.totalPrice;
-      
+
       // Calculate how many times this job occurs in 40 years
       // cycleStart and cycle are now in years, not months
       const cycleStart = job.cycleStart || 0;
       const cycle = job.cycle || 1; // Default to yearly if not specified
-      
+
       if (cycleStart >= MAINTENANCE_PERIOD_YEARS) {
         // Job doesn't start within our 40-year window
         return;
@@ -126,7 +133,8 @@ export default function MeasureList({
       } else {
         // Job starts after some years
         const remainingYears = MAINTENANCE_PERIOD_YEARS - cycleStart;
-        occurrences = remainingYears > 0 ? Math.floor(remainingYears / cycle) + 1 : 0;
+        occurrences =
+          remainingYears > 0 ? Math.floor(remainingYears / cycle) + 1 : 0;
       }
 
       // Add to total
@@ -162,7 +170,7 @@ export default function MeasureList({
 
     // Calculate 40-year and per-year maintenance costs
     const { total40Years, perYear } = calculateMaintenanceCosts(
-      maintenanceData, 
+      maintenanceData,
       measure.mjob_prices
     );
 
@@ -172,9 +180,13 @@ export default function MeasureList({
       price: priceData.isValid ? priceData.price : undefined,
       priceCalculations: priceData.calculations,
       calculationError: !priceData.isValid ? priceData.errorMessage : undefined,
-      maintenancePrice: maintenanceData.isValid ? maintenanceData.price : undefined,
+      maintenancePrice: maintenanceData.isValid
+        ? maintenanceData.price
+        : undefined,
       maintenanceCalculations: maintenanceData.calculations,
-      maintenanceError: !maintenanceData.isValid ? maintenanceData.errorMessage : undefined,
+      maintenanceError: !maintenanceData.isValid
+        ? maintenanceData.errorMessage
+        : undefined,
       maintenanceCost40Years: total40Years,
       maintenanceCostPerYear: perYear,
       heatDemandValue: heatDemandValue,
@@ -231,15 +243,12 @@ export default function MeasureList({
 
               // Calculate maintenance price
               const maintenanceResult = selectedResidence
-                ? calculateMeasurePrice(
-                    measure.mjob_prices,
-                    selectedResidence
-                  )
+                ? calculateMeasurePrice(measure.mjob_prices, selectedResidence)
                 : { isValid: false, price: 0, calculations: [] };
 
               // Calculate 40-year maintenance costs
               const { total40Years, perYear } = calculateMaintenanceCosts(
-                maintenanceResult, 
+                maintenanceResult,
                 measure.mjob_prices
               );
 
@@ -250,10 +259,11 @@ export default function MeasureList({
               );
 
               // Check if measure has any maintenance jobs
-              const hasMaintenance = measure.mjob_prices && 
-                Array.isArray(measure.mjob_prices) && 
+              const hasMaintenance =
+                measure.mjob_prices &&
+                Array.isArray(measure.mjob_prices) &&
                 measure.mjob_prices.length > 0 &&
-                measure.mjob_prices.some(job => job.name);
+                measure.mjob_prices.some((job) => job.name);
 
               return (
                 <div key={`${measure.name}-${index}`} className="measure__item">
@@ -312,7 +322,31 @@ export default function MeasureList({
                     <div className="measure__details">
                       {/* Price calculation breakdown */}
                       <div className="measure__section">
-                        <h3 className="measure__section-title">Begroting</h3>
+                        {(measure.nuisance || heatDemandValue > 0) && (
+                          <div className="additional-info">
+                            {measure.nuisance && (
+                              <div className="measure__nuisance sub-measure">
+                                <Volume1 className="icon" size={20}/>
+                                <span>
+                                  Hinder indicator:{" "}
+                                  <strong>{measure.nuisance}</strong>{" "}
+                                </span>
+                              </div>
+                            )}
+                            {heatDemandValue > 0 && (
+                              <div className="measure__heat-demand sub-measure">
+                                <Flame className="icon" size={20}/>
+                                <span>
+                                  Warmtebehoefte:{" "}
+                                  <strong>{heatDemandValue} kWh/m²</strong>
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        <h4 className="measure__section-title">
+                          Aanschafkosten
+                        </h4>
                         {priceResult.isValid &&
                         priceResult.calculations.length > 0 ? (
                           <div className="measure__breakdown">
@@ -334,9 +368,13 @@ export default function MeasureList({
                               </div>
                             ))}
                             <div className="measure__breakdown-total">
-                              <div>Totaal</div>
                               <div>
-                                € {formatPrice(priceResult.price)}
+                                <strong>Totaal aanschafkosten</strong>
+                              </div>
+                              <div>
+                                <strong>
+                                  € {formatPrice(priceResult.price)}
+                                </strong>
                               </div>
                             </div>
                           </div>
@@ -350,54 +388,59 @@ export default function MeasureList({
 
                       {/* Maintenance calculation breakdown */}
                       {hasMaintenance && (
-                        <div className="measure__section">
-                          <h3 className="measure__section-title">Onderhoudskosten</h3>
+                        <div className="measure__section maintenance">
+                          <h4 className="measure__section-title">
+                            Onderhoudskosten
+                          </h4>
                           {maintenanceResult.isValid &&
                           maintenanceResult.calculations.length > 0 ? (
                             <div className="measure__breakdown">
-                              {maintenanceResult.calculations.map((calc, calcIndex) => {
-                                // Get the original maintenance job to display cycle info
-                                const mjob = measure.mjob_prices?.find(
-                                  j => j.name === calc.name
-                                );
-                                
-                                // Calculate yearly cost for this specific job
-                                let yearlyJobCost = 0;
-                                if (mjob && mjob.cycle && mjob.cycle > 0) {
-                                  // Calculate yearly cost by dividing single occurrence cost by cycle length
-                                  yearlyJobCost = calc.totalPrice / mjob.cycle;
-                                }
-                                
-                                return (
-                                  <div
-                                    key={`maint-${calcIndex}`}
-                                    className="measure__breakdown-item"
-                                  >
-                                    <div className="measure__breakdown-name">
-                                      {calc.name || `Onderhoud ${calcIndex + 1}`}
-                                      <span className="measure__breakdown-formula">
-                                        ({calc.quantity.toFixed(2)} {calc.unit} × €
-                                        {calc.unitPrice.toFixed(2)})
+                              {maintenanceResult.calculations.map(
+                                (calc, calcIndex) => {
+                                  // Get the original maintenance job to display cycle info
+                                  const mjob = measure.mjob_prices?.find(
+                                    (j) => j.name === calc.name
+                                  );
+
+                                  // Calculate yearly cost for this specific job
+                                  let yearlyJobCost = 0;
+                                  if (mjob && mjob.cycle && mjob.cycle > 0) {
+                                    // Calculate yearly cost by dividing single occurrence cost by cycle length
+                                    yearlyJobCost =
+                                      calc.totalPrice / mjob.cycle;
+                                  }
+
+                                  return (
+                                    <div
+                                      key={`maint-${calcIndex}`}
+                                      className="measure__breakdown-item"
+                                    >
+                                      <div className="measure__breakdown-name">
+                                        {calc.name ||
+                                          `Onderhoud ${calcIndex + 1}`}
+                                        <span className="measure__breakdown-formula">
+                                          ({calc.quantity.toFixed(2)}{" "}
+                                          {calc.unit} × €
+                                          {calc.unitPrice.toFixed(2)})
+                                        </span>
+                                        {mjob && (
+                                          <div className="measure__breakdown-details">
+                                            <div className="measure__breakdown-price">
+                                              € {formatPrice(calc.totalPrice)}{" "}
+                                              elke {mjob.cycle} jaar
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      <span className="measure__breakdown-yearly-cost">
+                                        € {formatPrice(yearlyJobCost)} p.j.
                                       </span>
-                                      {mjob && (
-                                        <div className="measure__breakdown-details">
-                                          <span className="measure__breakdown-cycle">
-                                            Start na {mjob.cycleStart} jaar, 
-                                            elke {mjob.cycle} jaar
-                                          </span>
-                                          <span className="measure__breakdown-yearly-cost">
-                                            Kosten per jaar: € {formatPrice(yearlyJobCost)}
-                                          </span>
-                                        </div>
-                                      )}
                                     </div>
-                                    <div className="measure__breakdown-price">
-                                      € {formatPrice(calc.totalPrice)}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                              
+                                  );
+                                }
+                              )}
+
                               {/* Single occurrence total - REMOVED */}
                               {/* <div className="measure__breakdown-subtotal">
                                 <div>Kosten per keer</div>
@@ -405,22 +448,28 @@ export default function MeasureList({
                                   € {formatPrice(maintenanceResult.price)}
                                 </div>
                               </div> */}
-                              
+
                               {/* 40-year maintenance cost */}
-                              <div className="measure__breakdown-total">
-                                <div>Totaal over {MAINTENANCE_PERIOD_YEARS} jaar</div>
-                                <div>
-                                  € {formatPrice(total40Years)}
-                                </div>
-                              </div>
-                              
-                              {/* Average yearly maintenance cost */}
                               <div className="measure__breakdown-yearly">
-                                <div>Gemiddeld per jaar</div>
                                 <div>
-                                  € {formatPrice(perYear)}
+                                  {" "}
+                                  <strong>
+                                    Gemmidelde onderhoudskosten per jaar{" "}
+                                  </strong>
+                                </div>
+                                <div>
+                                  {" "}
+                                  <strong>€ {formatPrice(perYear)} p.j</strong>
                                 </div>
                               </div>
+                              <div className="measure__breakdown-total">
+                                <div>
+                                  Totaal over {MAINTENANCE_PERIOD_YEARS} jaar
+                                </div>
+                                <div>€ {formatPrice(total40Years)}</div>
+                              </div>
+
+                              {/* Average yearly maintenance cost */}
                             </div>
                           ) : (
                             <div className="measure__breakdown-error">
@@ -430,17 +479,6 @@ export default function MeasureList({
                           )}
                         </div>
                       )}
-
-                      <div className="measure__info">
-                        <span>Hinder indicator: {measure.nuisance} </span>
-                        {/* Heat demand value display */}
-                        {heatDemandValue > 0 && (
-                          <div className="measure__heat-demand">
-                            <strong>Warmtebehoefte:</strong> {heatDemandValue}{" "}
-                            kWh/m²
-                          </div>
-                        )}
-                      </div>
                     </div>
                   )}
                 </div>

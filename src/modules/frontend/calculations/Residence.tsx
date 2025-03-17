@@ -67,12 +67,17 @@ interface WoningType {
 }
 
 interface ResidenceProps {
-  selectedResidence: (residence: Woning, type: WoningType) => void;
+  selectedResidence: (
+    residence: Woning,
+    type: WoningType,
+    residenceType: string
+  ) => void;
 }
 
 export default function Residence({
   selectedResidence,
   onTypeSelect,
+  residenceType,
 }: ResidenceProps) {
   const [woningen, setWoningen] = useState<Woning[]>([]);
   const [selectedWoning, setSelectedWoning] = useState<Woning | null>(null);
@@ -177,7 +182,7 @@ export default function Residence({
     <div className="residence tile">
       <div className="residence__header">
         <h4 className="residence__title">Woning:</h4>
-  
+
         <div className="residence__button">
           <select value={selectedId} onChange={handleResidenceChange}>
             {woningen.map((woning) => (
@@ -189,9 +194,8 @@ export default function Residence({
         </div>
       </div>
 
-      <div className="residence__type">
-
-      </div>
+      {residenceType && <div className="residence__type">
+        Type woning: {residenceType}</div>}
     </div>
   );
 }

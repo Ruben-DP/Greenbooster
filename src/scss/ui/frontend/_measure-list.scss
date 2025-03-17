@@ -1,0 +1,48 @@
+.measure__section-title {
+  padding: 16px;
+  padding-bottom: 0;
+}
+.measure-list {
+  .measure__title-area {
+    // * {
+    //   font-size: 16px;
+    // }
+  }
+  .measure__header {
+    * {
+        font-size:16px;
+    }
+  }
+  * {
+    font-size: 14px;
+  }
+  .additional-info {
+    padding-top: 32px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    .sub-measure {
+      display: flex;
+      align-items: center;
+      opacity: 0.8;
+    }
+    .icon {
+      margin-right: 8px;
+      height: 20px;
+    }
+    span {
+      height: 100%;
+    }
+  }
+  .maintenance {
+    .measure__breakdown-details {
+      color: #666;
+    }
+    .measure__breakdown-yearly {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}

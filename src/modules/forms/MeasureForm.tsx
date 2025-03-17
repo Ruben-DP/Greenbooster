@@ -87,8 +87,8 @@ const DEFAULT_DATA = {
   heat_demand: createDefaultHeatDemand(),
   group: "",
   nuisance: 0,
-  measure_prices: [createDefaultPriceItem()],
-  mjob_prices: [createDefaultMaintenanceItem()],
+  measure_prices: [],
+  mjob_prices: [],
 } satisfies Partial<FormData>;
 
 const UNIT_OPTIONS = ["m2", "m1", "stuk", "per stuk", "woning"];
@@ -131,8 +131,8 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
 
   // Helper function to process measure price items
   const processMeasurePriceItems = (items: any[] | undefined): MeasurePriceItem[] => {
-    if (!Array.isArray(items) || items.length === 0) {
-      return [createDefaultPriceItem()];
+    if (!Array.isArray(items)) {
+      return [];
     }
 
     return items.map((item) => ({
@@ -147,8 +147,8 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
 
   // Helper function to process maintenance job price items
   const processMaintenanceItems = (items: any[] | undefined): MaintenancePriceItem[] => {
-    if (!Array.isArray(items) || items.length === 0) {
-      return [createDefaultMaintenanceItem()];
+    if (!Array.isArray(items)) {
+      return [];
     }
 
     return items.map((item) => ({
@@ -187,11 +187,6 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
   const handleRemovePriceItem = (priceType: "measure_prices" | "mjob_prices", itemIndex: number) => {
     // Get current items
     const currentItems = data[priceType];
-    
-    // Don't remove the last item
-    if (currentItems.length <= 1) {
-      return;
-    }
     
     // Create updated array without the item to remove
     const updatedItems = currentItems.filter((_, idx) => idx !== itemIndex);
@@ -268,7 +263,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                     onClick={() => handleRemovePriceItem(priceType, idx)}
                     title="Verwijderen"
                   >
-                    <Trash2 size={18} color="rgb(167, 17, 17)" />
+                    <Trash2 size={18} color="red"/>
                   </button>
                 )}
               </div>
@@ -522,7 +517,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
           ))}
         </div>
         <h4 className="form__heading">Hinderindicator</h4>
-        <div className="form__grid">
+        <div className="form__grid nuisance-indicator">
           <TextField
             label="Hinder indicator"
             value={String(getValue("nuisance", data.nuisance || 0))}

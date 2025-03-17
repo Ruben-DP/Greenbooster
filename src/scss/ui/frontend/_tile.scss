@@ -1,13 +1,18 @@
 .tile {
-    background-color: white;
-    border-radius: 16px;
-    border:1px solid rgb(230, 230, 230);
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    &__title {
-        font-weight: 400;
-        font-size: 24px;
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid rgb(230, 230, 230);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  &__title {
+    font-weight: 400;
+    font-size: 24px;
+  }
+  &.residence {
+    .residence__title {
+      margin-bottom: 8px;
     }
+  }
 }

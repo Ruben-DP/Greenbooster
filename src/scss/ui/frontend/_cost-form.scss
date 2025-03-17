@@ -11,7 +11,7 @@
 
     .inner-content {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 2fr 4fr;
     }
   }
 
@@ -54,7 +54,7 @@
       button {
         background: none;
         border: none;
-        color: #666;
+        // color: #666;
         font-size: 20px;
         cursor: pointer;
         padding: 4px 8px;
@@ -183,14 +183,13 @@
   &__remove {
     background: none;
     border: none;
-    color: #666;
+    color: #dc2626;
     font-size: 20px;
     cursor: pointer;
     padding: 4px 8px;
     margin-left: 8px;
     border-radius: 4px;
     transition: all 0.2s;
-
     &:hover {
       color: #dc2626;
       background-color: #f5f5f5;

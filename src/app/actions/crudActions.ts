@@ -97,3 +97,30 @@ export async function updateDocument<T extends { _id: string }>(
     };
   }
 }
+
+export async function deleteDocument(
+  collectionName: string,
+  id: string
+): Promise<DatabaseResult<{ id: string }>> {
+  try {
+    const client = await clientPromise;
+    const collection = client.db("Greenbooster").collection(collectionName);
+    
+    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+
+    if (result.deletedCount === 1) {
+      return { success: true, data: { id } };
+    }
+    
+    return { 
+      success: false, 
+      error: "Document not found or could not be deleted" 
+    };
+  } catch (error) {
+    console.error(`Delete error in ${collectionName}:`, error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Deletion failed"
+    };
+  }
+}

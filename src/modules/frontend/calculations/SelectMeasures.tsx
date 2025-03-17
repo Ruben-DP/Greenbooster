@@ -1,3 +1,5 @@
+import { Flame } from "lucide-react";
+
 interface MeasurePrice {
   name?: string;
   unit?: string;
@@ -61,34 +63,45 @@ export default function SelectedMeasures({
                   <span className="selected-measures__name">
                     {measure.name}
                   </span>
+                  <div>
+                    <span className="selected-measures__price">
+                      {/* {measure.maintenanceCostPerYear && (
+                        <span>
+                          {" "}
+                          €{formatPrice(measure.maintenanceCostPerYear)} p.j.
+                        </span>
+                      )} */}
+                      € {measure.price ? formatPrice(measure.price) : "0,00"}
+                    </span>
 
-                  <span className="selected-measures__price">
-                    € {measure.price ? formatPrice(measure.price) : '0,00'}
-                  </span>
-
-                  <button
-                    onClick={() => onRemove(measure)}
-                    className="selected-measures__remove"
-                    aria-label="Verwijder maatregel"
-                  >
-                    ×
-                  </button>
+                    <button
+                      onClick={() => onRemove(measure)}
+                      className="selected-measures__remove"
+                      aria-label="Verwijder maatregel"
+                    >
+                      ×
+                    </button>
+                  </div>
                 </div>
-                <div className="selected-measures__bottom-bar">
+                {/* <div className="selected-measures__bottom-bar">
                   <div className="selected-measures__details">
-                    {measure.heatDemandValue && (
-                      <span className="selected-measures__heat">
-                        {measure.heatDemandValue} kWh/m²
-                      </span>
-                    )}
-                    
+                    <div className="icon-values">
+                      {measure.heatDemandValue && (
+                        <>
+                          <Flame />
+                          <span className="selected-measures__heat">
+                            <strong>{measure.heatDemandValue}</strong>kWh/m²
+                          </span>
+                        </>
+                      )}
+                    </div>
                     {measure.maintenanceCostPerYear > 0 && (
                       <span className="selected-measures__maintenance">
-                        Onderhoud: € {formatPrice(measure.maintenanceCostPerYear)}/jaar
+                        € {formatPrice(measure.maintenanceCostPerYear)} p.j.
                       </span>
                     )}
                   </div>
-                </div>
+                </div> */}
               </li>
             ))}
           </ul>

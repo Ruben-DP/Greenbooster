@@ -6,9 +6,9 @@ interface BudgetProps {
 export default function Budget({ totalAmount }: BudgetProps) {
   return (
     <section className="budget tile">
-      <span className="budget__title">Budget</span>
+      <h4 className="">Budget</h4>
       <span className="budget__sum">
-        Totale kosten: €{totalAmount.toLocaleString('nl-NL', {
+        Aanschafkosten: €{totalAmount.toLocaleString('nl-NL', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         })}
