@@ -11,3 +11,37 @@ body {
     --radius: 0.5rem;
   }
 }
+
+@layer components {
+  .selected-measures__group {
+    @apply mb-4 last:mb-0;
+  }
+
+  .selected-measures__group-title {
+    @apply text-base font-normal mb-2 text-gray-900;
+  }
+
+  .selected-measures__list {
+    @apply space-y-1;
+  }
+
+  .selected-measures__item {
+    @apply bg-white p-2;
+  }
+
+  .selected-measures__content {
+    @apply flex justify-between items-center;
+  }
+
+  .selected-measures__name {
+    @apply text-gray-800;
+  }
+
+  .selected-measures__price {
+    @apply text-gray-600 mr-2;
+  }
+
+  .selected-measures__remove {
+    @apply text-gray-400 hover:text-red-500 text-xl font-bold leading-none;
+  }
+}

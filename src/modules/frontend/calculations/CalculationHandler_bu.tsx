@@ -23,6 +23,7 @@ interface KozijnDetails {
   rendement: number;
   omtrek: number;
 }
+
 interface KozijnGrootte {
   tot1M2: number;
   tot1_5M2: number;

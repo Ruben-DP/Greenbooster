@@ -41,6 +41,8 @@ const CALCULATION_VARIABLES = [
   "gevelOppervlakAchter",
   "gevelOppervlakTotaal",
   "gevelOppervlakNetto",
+  "brutoKopgevelOppervlak",
+  "nettoGevelOppervlak",
   
   // Dak calculations
   "dakOppervlak",
@@ -53,6 +55,8 @@ const CALCULATION_VARIABLES = [
   // Vloer calculations
   "vloerOppervlak",
   "vloerOppervlakTotaal",
+  "vloerOppervlakteBeganeGrond",
+  "oppervlakteKelder",
   
   // Kozijn measurements
   "kozijnOppervlakVoorTotaal",
@@ -60,6 +64,47 @@ const CALCULATION_VARIABLES = [
   "kozijnOppervlakTotaal",
   "kozijnRendementTotaal",
   "kozijnOmtrekTotaal",
+  "kozijnOppervlakteWoning",
+  "glasOppervlakteWoning",
+  
+  // Kozijn by size categories
+  "kozijn05", 
+  "kozijn10", 
+  "kozijn15", 
+  "kozijn20", 
+  "kozijn25", 
+  "kozijn30", 
+  "kozijn35", 
+  "kozijn40",
+  
+  // Window perimeter measurements
+  "vensterbankLengte",
+  "vensterbankLengteTotaal",
+  "omtrekVoordeur",
+  "omtrekAchterdeur",
+  "omtrekKozijnen",
+  "omtrekDraaidelen",
+  
+  // Plinth and other perimeter measurements
+  "vloerplintLengte",
+  "vloerplintLengteTotaal",
+  "omtrekSandwichElementen",
+  
+  // Room measurements
+  "oppervlakteHal",
+  "aantalSlaapkamers",
+  
+  // Ventilation
+  "zrRooster",
+  "zrRoosterLengte",
+  
+  // PV Panel measurements
+  "aantalPVPanelenGGB",
+  "oppervlaktePVPanelenGGB",
+  "aantalPVPanelenKop",
+  "oppervlaktePVPanelenKop",
+  "aantalPVPanelenLangs",
+  "oppervlaktePVPanelenLangs",
   
   // Project totals
   "projectGevelOppervlak",

@@ -10,7 +10,6 @@
   &__group-title {
     font-size: 1rem;
     font-weight: normal;
-    text-transform: capitalize;
     margin-bottom: 0.5rem;
     color: #000;
   }
@@ -22,28 +21,12 @@
   }
 
   &__item {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    margin-left: 24px;
+    background: white;
     padding: 0.5rem;
     margin-bottom: 0.25rem;
-    background: white;
 
     &:last-child {
       margin-bottom: 0;
-    }
-
-    &:before {
-      position: absolute;
-      content: "";
-      height: 12px;
-      width: 12px;
-      border-radius: 50%;
-      background-color: #4a90e2;
-      transform: translate(-200%, -50%);
-      top: 50%;
-      left: 0;
     }
   }
 
@@ -51,7 +34,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
   }
 
   &__name {
@@ -77,24 +59,4 @@
       color: #ff4444;
     }
   }
-
-  &__bottom-bar {
-    width: 100%;
-  }
-
-  .icon-values {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .selected-measures__details {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-
-    .selected-measures__maintenance {
-      margin-right: 10px;
-    }
-  }
-}
+} 

@@ -8,6 +8,29 @@ import Stats from "./calculations/Stats";
 import { Woning, WoningType } from "@/types/woningen";
 import { CalculationHandler } from "./calculations/CalculationHandler";
 import SelectedMeasures from "./calculations/SelectMeasures";
+import PdfDownloadButton from "../PdfDownloadButton";
+
+interface Measure {
+  name: string;
+  group?: string;
+  measure_prices?: any[];
+  mjob_prices?: any[];
+  price?: number;
+  priceCalculations?: any[];
+  maintenancePrice?: number;
+  maintenanceCalculations?: any[];
+  maintenanceCost40Years?: number;
+  maintenanceCostPerYear?: number;
+  calculationError?: string;
+  maintenanceError?: string;
+  heat_demand?: {
+    portiek?: Array<{ period: string; value: number }>;
+    gallerij?: Array<{ period: string; value: number }>;
+    grondgebonden?: Array<{ period: string; value: number }>;
+  };
+  action?: string;
+  [key: string]: any;
+}
 
 interface KozijnDetails {
   type: string;
@@ -104,15 +127,23 @@ function PageContent() {
   const [totalBudget, setTotalBudget] = useState<number>(0);
 
   const handleAddMeasure = (measure: Measure) => {
+    if (measure.action === 'remove') {
+      // Remove the measure
+      setSelectedMeasures((prev) =>
+        prev.filter((m) => m.name !== measure.name)
+      );
+      setTotalBudget((prev) => prev - (measure.price || 0));
+      return;
+    }
+
+    // Check if measure already exists
+    const measureExists = selectedMeasures.some(m => m.name === measure.name);
+    if (measureExists) {
+      return; // Don't add if it already exists
+    }
+    
     setSelectedMeasures((prev) => [...prev, measure]);
     setTotalBudget((prev) => prev + (measure.price || 0));
-  };
-
-  const handleRemoveMeasure = (measureToRemove: Measure) => {
-    setSelectedMeasures((prev) =>
-      prev.filter((measure) => measure.name !== measureToRemove.name)
-    );
-    setTotalBudget((prev) => prev - (measureToRemove.price || 0));
   };
 
   const handleSelection = (residence: Woning, type: WoningType) => {
@@ -121,11 +152,11 @@ function PageContent() {
     setSelectedMeasures([]);
     setTotalBudget(0);
     setCalculations(null); // Also reset calculations to force MeasureList to update
-    
+
     // Set the new residence and type
     setSelectedResidence(residence);
     setSelectedType(type);
-    
+
     // Log for debugging
     console.log("Selected new residence:", residence.name);
     console.log(type);
@@ -152,8 +183,14 @@ function PageContent() {
       <div className="container">
         <div className="inner-content">
           <Budget totalAmount={totalBudget} />
-          <Residence selectedResidence={handleSelection} residenceType={selectedType?.type}/>
+          <Residence
+            selectedResidence={handleSelection}
+            residenceType={selectedType?.type}
+          />
           <Stats selectedMeasures={selectedMeasures} />
+          <div className="tile">
+            <PdfDownloadButton />
+          </div>
           {selectedResidence &&
             selectedType &&
             selectedResidence.dimensions && (
@@ -165,17 +202,16 @@ function PageContent() {
             )}
           <SelectedMeasures
             measures={selectedMeasures}
-            onRemove={handleRemoveMeasure}
+            onRemove={handleAddMeasure}
           />
         </div>
         {calculations && (
           <MeasureList
-            residenceType={selectedType?.type}
-            buildPeriod={
-              selectedResidence?.projectInformation?.bouwPeriode || ""
-            }
             residenceData={calculations}
             onSelectMeasure={handleAddMeasure}
+            buildPeriod={selectedResidence?.projectInformation?.bouwPeriode || ""}
+            residenceType={selectedType?.type || ""}
+            selectedMeasures={selectedMeasures}
           />
         )}
       </div>

@@ -4,7 +4,7 @@ import { useMeasureData } from "@/contexts/DataContext";
 import { useEffect, useState } from "react";
 import { getHeatDemandValue } from "./heat-demand";
 import { calculateMeasurePrice } from "./price.calculator";
-import { Flame, Volume1 } from "lucide-react";
+import { Flame, Volume1, Plus, Trash2 } from "lucide-react";
 
 interface Calculation {
   type: string;
@@ -54,16 +54,19 @@ interface MeasureListProps {
   onSelectMeasure: (measure: Measure) => void;
   buildPeriod: string;
   residenceType: string;
+  selectedMeasures?: Measure[];
 }
 
 // Constants
 const MAINTENANCE_PERIOD_YEARS = 40; // Period for calculation in years
+const ANNUAL_INFLATION_RATE = 0.01; // 1% annual inflation
 
 export default function MeasureList({
   residenceData,
   onSelectMeasure,
   buildPeriod,
   residenceType,
+  selectedMeasures = [],
 }: MeasureListProps) {
   const { searchItems, items, isLoading, error } = useMeasureData();
   const [selectedResidence, setSelectedResidence] = useState<Record<
@@ -110,10 +113,9 @@ export default function MeasureList({
       if (calculation.name !== job.name) return;
 
       // Get single occurrence cost
-      const jobCost = calculation.totalPrice;
+      const baseJobCost = calculation.totalPrice;
 
       // Calculate how many times this job occurs in 40 years
-      // cycleStart and cycle are now in years, not months
       const cycleStart = job.cycleStart || 0;
       const cycle = job.cycle || 1; // Default to yearly if not specified
 
@@ -122,23 +124,23 @@ export default function MeasureList({
         return;
       }
 
-      // Calculate occurrences
-      let occurrences = 0;
+      // Calculate occurrences with inflation
       if (cycle <= 0) {
         // Avoid division by zero
-        occurrences = 0;
-      } else if (cycleStart <= 0) {
-        // Job starts immediately
-        occurrences = Math.floor(MAINTENANCE_PERIOD_YEARS / cycle);
-      } else {
-        // Job starts after some years
-        const remainingYears = MAINTENANCE_PERIOD_YEARS - cycleStart;
-        occurrences =
-          remainingYears > 0 ? Math.floor(remainingYears / cycle) + 1 : 0;
+        return;
       }
 
-      // Add to total
-      total40Years += jobCost * occurrences;
+      // Apply inflation for each occurrence of the maintenance job
+      for (
+        let year = cycleStart;
+        year < MAINTENANCE_PERIOD_YEARS;
+        year += cycle
+      ) {
+        // Calculate inflated cost for this occurrence
+        const inflatedCost =
+          baseJobCost * Math.pow(1 + ANNUAL_INFLATION_RATE, year);
+        total40Years += inflatedCost;
+      }
     });
 
     // Calculate yearly average
@@ -147,15 +149,21 @@ export default function MeasureList({
     return { total40Years, perYear };
   };
 
-  // Handle adding a measure to the selection
-  const handleAddMeasure = (measure: Measure) => {
-    // Get the heat demand value for this measure
-    const heatDemandValue = getHeatDemandValue(
-      measure,
-      residenceType,
-      buildPeriod
-    );
+  // Add helper function to check if measure is selected
+  const isMeasureSelected = (measure: Measure) => {
+    return selectedMeasures.some(m => m.name === measure.name);
+  };
 
+  // Modify handleAddMeasure to handle both add and remove
+  const handleAddMeasure = (measure: Measure) => {
+    if (isMeasureSelected(measure)) {
+      // If measure is already selected, remove it
+      onSelectMeasure({ ...measure, action: 'remove' });
+      return;
+    }
+
+    // Original add logic
+    const heatDemandValue = getHeatDemandValue(measure, residenceType, buildPeriod);
     // Calculate the price based on the measure_prices and calculation data
     const priceData = calculateMeasurePrice(
       measure.measure_prices,
@@ -192,8 +200,8 @@ export default function MeasureList({
       heatDemandValue: heatDemandValue,
     };
 
-    // Pass the enriched measure to the parent component
-    onSelectMeasure(measureWithPrice);
+    // Add action property to indicate this is an add operation
+    onSelectMeasure({ ...measureWithPrice, action: 'add' });
   };
 
   // Toggle the expanded state of a measure
@@ -304,14 +312,18 @@ export default function MeasureList({
                         )}
 
                         <button
-                          className="measure__add"
+                          className={`measure__add ${isMeasureSelected(measure) ? 'measure__add--selected' : ''}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleAddMeasure(measure);
                           }}
-                          title="Toevoegen aan geselecteerde maatregelen"
+                          title={isMeasureSelected(measure) ? "Verwijderen uit geselecteerde maatregelen" : "Toevoegen aan geselecteerde maatregelen"}
                         >
-                          +
+                          {isMeasureSelected(measure) ? (
+                            <Trash2 size={16} />
+                          ) : (
+                            <Plus size={16} />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -326,7 +338,7 @@ export default function MeasureList({
                           <div className="additional-info">
                             {measure.nuisance && (
                               <div className="measure__nuisance sub-measure">
-                                <Volume1 className="icon" size={20}/>
+                                <Volume1 className="icon" size={20} />
                                 <span>
                                   Hinder indicator:{" "}
                                   <strong>{measure.nuisance}</strong>{" "}
@@ -335,7 +347,7 @@ export default function MeasureList({
                             )}
                             {heatDemandValue > 0 && (
                               <div className="measure__heat-demand sub-measure">
-                                <Flame className="icon" size={20}/>
+                                <Flame className="icon" size={20} />
                                 <span>
                                   Warmtebehoefte:{" "}
                                   <strong>{heatDemandValue} kWh/m²</strong>
@@ -464,7 +476,7 @@ export default function MeasureList({
                               </div>
                               <div className="measure__breakdown-total">
                                 <div>
-                                  Totaal over {MAINTENANCE_PERIOD_YEARS} jaar
+                                  Totaal over {MAINTENANCE_PERIOD_YEARS} jaar ({ANNUAL_INFLATION_RATE} inflatie p.j)
                                 </div>
                                 <div>€ {formatPrice(total40Years)}</div>
                               </div>
