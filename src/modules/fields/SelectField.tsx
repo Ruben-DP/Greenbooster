@@ -37,13 +37,13 @@ const CALCULATION_VARIABLES = [
   "portieken",
   "breedteWoningPlusHoogte",
   
+  
   // Gevel calculations
   "gevelOppervlakVoor",
   "gevelOppervlakAchter",
   "gevelOppervlakTotaal",
   "gevelOppervlakNetto",
   "brutoKopgevelOppervlak",
-  "nettoGevelOppervlak",
   
   // Dak calculations
   "dakOppervlak",
@@ -52,6 +52,8 @@ const CALCULATION_VARIABLES = [
   "dakLengteTotaal",
   "dakOverstekOppervlak",
   "dakTotaalMetOverhang",
+  "lengteDakvlak",
+  "lengteDakvlakPlusBreedteWoning",
   
   // Vloer calculations
   "vloerOppervlak",
@@ -126,9 +128,12 @@ const CALCULATION_VARIABLES = [
   
   // Common constants
   "0.3",
+  "1.1",
   "2",
+  "2.39",
   "3",
   "4",
+  "0.1",
   "0.05",
 ];
 

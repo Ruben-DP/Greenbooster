@@ -60,6 +60,8 @@ interface MeasureListProps {
 // Constants
 const MAINTENANCE_PERIOD_YEARS = 40; // Period for calculation in years
 const ANNUAL_INFLATION_RATE = 0.01; // 1% annual inflation
+const PROFIT_MARGIN_RATE = 0.25; // 25% profit margin and overhead
+const VAT_RATE = 0.21; // 21% BTW (VAT)
 
 export default function MeasureList({
   residenceData,
@@ -277,6 +279,11 @@ export default function MeasureList({
                 measure.mjob_prices.length > 0 &&
                 measure.mjob_prices.some((job) => job.name);
 
+              // Calculate additional pricing steps (profit and VAT)
+              const baseCost = priceResult.isValid ? priceResult.price : 0;
+              const withProfit = baseCost * (1 + PROFIT_MARGIN_RATE);
+              const withVAT = withProfit * (1 + VAT_RATE);
+
               return (
                 <div key={`${measure.name}-${index}`} className="measure__item">
                   <div className="measure__header">
@@ -302,7 +309,7 @@ export default function MeasureList({
                         {selectedResidence ? (
                           priceResult.isValid ? (
                             <div className="price">
-                              € {formatPrice(priceResult.price)}
+                              € {formatPrice(withVAT)}
                             </div>
                           ) : (
                             <div className="price price--warning">
@@ -393,14 +400,54 @@ export default function MeasureList({
                                 </div>
                               </div>
                             ))}
+                            <div className="measure__breakdown-item">
+                              {/* Subtotal before profit and VAT */}
+                              <div className="measure__breakdown-subtotal">
+                                <div>Totaal</div>
+                                <div>€ {formatPrice(baseCost)}</div>
+                              </div>
+                            </div>
+                            {/* Step 1: Add profit margin */}
+                            <div className="measure__breakdown-item">
+                              <div className="measure__breakdown-name">
+                                AK + Winst + CAR + Garantie
+                                <span className="measure__breakdown-formula">
+                                  (toeslag van {PROFIT_MARGIN_RATE * 100}%)
+                                </span>
+                              </div>
+                              <div className="measure__breakdown-price">
+                                € {formatPrice(baseCost * PROFIT_MARGIN_RATE)}
+                              </div>
+                            </div>
+
+                            {/* Subtotal after profit margin */}
+                            <div className="measure__breakdown-subtotal">
+                              <div>Subtotaal (excl. BTW)</div>
+                              <div>€ {formatPrice(withProfit)}</div>
+                            </div>
+
+                            {/* Step 2: Add VAT */}
+                            <div className="measure__breakdown-item">
+                              <div className="measure__breakdown-name">
+                                BTW
+                                <span className="measure__breakdown-formula">
+                                  ({VAT_RATE * 100}%)
+                                </span>
+                              </div>
+                              <div className="measure__breakdown-price">
+                                € {formatPrice(withProfit * VAT_RATE)}
+                              </div>
+                            </div>
+
+                            {/* Final total including VAT */}
                             <div className="measure__breakdown-total">
                               <div>
-                                <strong>Totaal aanschafkosten</strong>
+                                <strong>
+                                  Totaal aanschafkosten (incl. BTW)
+                                </strong>
                               </div>
                               <div>
-                                <strong>
-                                  € {formatPrice(priceResult.price)}
-                                </strong>
+                                <strong>€ {formatPrice(withVAT)}</strong>
                               </div>
                             </div>
                           </div>
@@ -491,7 +538,7 @@ export default function MeasureList({
                               <div className="measure__breakdown-total">
                                 <div>
                                   Totaal over {MAINTENANCE_PERIOD_YEARS} jaar (
-                                  {ANNUAL_INFLATION_RATE} inflatie p.j)
+                                  {ANNUAL_INFLATION_RATE * 100}% inflatie p.j)
                                 </div>
                                 <div>€ {formatPrice(total40Years)}</div>
                               </div>
