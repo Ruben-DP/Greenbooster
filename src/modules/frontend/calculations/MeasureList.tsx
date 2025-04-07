@@ -77,6 +77,8 @@ export default function MeasureList({
   > | null>(null);
   const [expandedMeasure, setExpandedMeasure] = useState<string | null>(null);
 
+  console.log('residencedata:', items);
+
   // console.log(residenceType);
 
   // Load measures when component mounts

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { TextField } from "../fields/TextField";
 import { SelectField } from "../fields/SelectField";
 import { Trash2 } from "lucide-react"; // Import the Trash2 icon from lucide-react
@@ -16,6 +16,8 @@ type MeasurePriceItem = {
   }>;
   price: number;
   unit?: string;
+  includeLabor?: boolean;
+  laborNorm?: number;
 };
 
 type MaintenancePriceItem = MeasurePriceItem & {
@@ -74,6 +76,8 @@ const createDefaultPriceItem = (): MeasurePriceItem => ({
   ],
   price: 0,
   unit: "m2",
+  includeLabor: false,
+  laborNorm: 0,
 });
 
   // Default empty maintenance job price item
@@ -142,6 +146,8 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
         : [{ type: "variable" as const, value: "", id: "" }],
       price: item.price || 0,
       unit: item.unit || "m2",
+      includeLabor: item.includeLabor || false,
+      laborNorm: item.laborNorm || 0,
     }));
   };
 
@@ -160,6 +166,9 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
       unit: item.unit || "m2",
       cycleStart: item.cycleStart || 0,
       cycle: item.cycle || 1,
+      includeLabor: item.includeLabor || false,
+      laborHours: item.laborHours || 0,
+      laborNorm: item.laborNorm || 0,
     }));
   };
 
@@ -225,6 +234,26 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
     );
 
     handleChange(priceType, data[priceType], updatedItems);
+  };
+
+  // Function to toggle the labor checkbox
+  const handleLaborToggle = (
+    priceType: "measure_prices" | "mjob_prices",
+    itemIndex: number,
+    currentValue: boolean
+  ) => {
+    // Get current items
+    const currentItems = data[priceType];
+    
+    // Create updated array with the toggled item
+    const updatedItems = currentItems.map((item, idx) => 
+      idx === itemIndex 
+        ? { ...item, includeLabor: !currentValue } 
+        : item
+    );
+    
+    // Update the state
+    handleChange(`${priceType}[${itemIndex}].includeLabor`, currentValue, !currentValue);
   };
 
   // Render a price section (used for both Begroting and Onderhoudskosten)
@@ -426,6 +455,64 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                   />
                 </div>
               </div>
+
+              {/* Add the labor costs checkbox and fields */}
+              {priceType === "measure_prices" && (
+                <div className="form__labor">
+                  {/* Only show checkbox in edit mode */}
+                  {isEditing && (
+                    <div className="form__checkbox">
+                      <input
+                        type="checkbox"
+                        id={`labor-checkbox-${idx}`}
+                        checked={Boolean(getValue(
+                          `${priceType}[${idx}].includeLabor`,
+                          item.includeLabor || false
+                        ))}
+                        onChange={() => 
+                          handleLaborToggle(
+                            priceType, 
+                            idx, 
+                            getValue(
+                              `${priceType}[${idx}].includeLabor`,
+                              item.includeLabor || false
+                            )
+                          )
+                        }
+                      />
+                      <label htmlFor={`labor-checkbox-${idx}`}>Arbeidskosten</label>
+                    </div>
+                  )}
+                  
+                  {/* Show labor fields if includeLabor is true, regardless of edit mode */}
+                  {Boolean(getValue(
+                    `${priceType}[${idx}].includeLabor`,
+                    item.includeLabor || false
+                  )) && (
+                    <div className="form__labor-fields">
+                      <TextField
+                        label="Arbeidsnorm"
+                        value={String(
+                          getValue(
+                            `${priceType}[${idx}].laborNorm`,
+                            item.laborNorm || 0
+                          )
+                        )}
+                        type="number"
+                        required={false}
+                        isEditing={isEditing}
+                        onChange={(next) =>
+                          handleChange(
+                            `${priceType}[${idx}].laborNorm`,
+                            item.laborNorm || 0,
+                            Number(next)
+                          )
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         {isEditing && (

@@ -112,8 +112,6 @@ interface Props {
 }
 
 export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, onCalculate }) => {
-
-
   const [calculations, setCalculations] = useState<CalculationResults | null>(null);
 
   // Main calculation function that orchestrates all calculations
