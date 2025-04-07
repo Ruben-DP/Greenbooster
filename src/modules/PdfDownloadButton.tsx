@@ -34,14 +34,44 @@ const PdfDownloadButton = () => {
       alert("Kan page-wrapper element niet vinden.");
       return;
     }
+
+    // Store original display values and hide sections
+    const heroSection = document.querySelector("section.hero") as HTMLElement;
+    const stepSection = document.querySelector("section.step") as HTMLElement;
+    const measureList = document.querySelector(".measure-list") as HTMLElement;
+    const downloadButton = document.querySelector(".download-button") as HTMLElement;
+    const originalHeroDisplay = heroSection?.style.display;
+    const originalStepDisplay = stepSection?.style.display;
+    const originalMeasureListDisplay = measureList?.style.display;
+    const originalDownloadButtonDisplay = downloadButton?.style.display;
+    
+    if (heroSection) heroSection.style.display = "none";
+    if (stepSection) stepSection.style.display = "none";
+    if (measureList) measureList.style.display = "none";
+    if (downloadButton) downloadButton.style.display = "none";
     
     // Options for html2pdf
     const options = {
       margin: 10,
       filename: "kostencalculator.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      image: { type: "png", quality: 1 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        windowWidth: 3840,
+        windowHeight: 2160,
+        logging: true,
+        letterRendering: true,
+        imageTimeout: 0,
+        backgroundColor: '#FFFFFF'
+      },
+      jsPDF: { 
+        unit: "mm", 
+        format: "a4",
+        orientation: "landscape",
+        compress: false,
+        hotfixes: ["px_scaling"]
+      }
     };
 
     // Generate the PDF directly from the page content
@@ -49,9 +79,21 @@ const PdfDownloadButton = () => {
       .from(pageContent)
       .set(options)
       .save()
-      .catch(error => {
+      .then(() => {
+        // Restore original display values
+        if (heroSection) heroSection.style.display = originalHeroDisplay || "";
+        if (stepSection) stepSection.style.display = originalStepDisplay || "";
+        if (measureList) measureList.style.display = originalMeasureListDisplay || "";
+        if (downloadButton) downloadButton.style.display = originalDownloadButtonDisplay || "";
+      })
+      .catch((error: Error) => {
         console.error("Fout bij het genereren van PDF:", error);
         alert("Er is een fout opgetreden bij het genereren van de PDF.");
+        // Restore original display values even if there's an error
+        if (heroSection) heroSection.style.display = originalHeroDisplay || "";
+        if (stepSection) stepSection.style.display = originalStepDisplay || "";
+        if (measureList) measureList.style.display = originalMeasureListDisplay || "";
+        if (downloadButton) downloadButton.style.display = originalDownloadButtonDisplay || "";
       });
   };
 

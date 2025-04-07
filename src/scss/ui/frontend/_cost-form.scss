@@ -316,9 +316,9 @@ width:fit-content
       cursor: pointer;
       transition: all 0.2s;
 
-      &:hover {
-        background-color: darken(#4a90e2, 10%);
-      }
+      // &:hover {
+      //   background-color: darken(#4a90e2, 10%);
+      // }
 
       svg {
         color: white;
@@ -328,9 +328,9 @@ width:fit-content
       &--selected {
         background-color: #dc2626;
         
-        &:hover {
-          background-color: darken(#dc2626, 10%);
-        }
+        // &:hover {
+        //   background-color: darken(#dc2626, 10%);
+        // }
       }
     }
 
@@ -349,7 +349,6 @@ width:fit-content
         justify-content: space-between;
         align-items: center;
         padding: 8px 0;
-        border-bottom: 1px solid #eee;
 
         &:last-child {
           border-bottom: none;

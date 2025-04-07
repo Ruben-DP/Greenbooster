@@ -35,6 +35,7 @@ const CALCULATION_VARIABLES = [
   "breedteComplex",
   "kopgevels",
   "portieken",
+  "breedteWoningPlusHoogte",
   
   // Gevel calculations
   "gevelOppervlakVoor",
@@ -127,6 +128,7 @@ const CALCULATION_VARIABLES = [
   "0.3",
   "2",
   "3",
+  "4",
   "0.05",
 ];
 

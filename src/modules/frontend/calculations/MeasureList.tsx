@@ -151,19 +151,23 @@ export default function MeasureList({
 
   // Add helper function to check if measure is selected
   const isMeasureSelected = (measure: Measure) => {
-    return selectedMeasures.some(m => m.name === measure.name);
+    return selectedMeasures.some((m) => m.name === measure.name);
   };
 
   // Modify handleAddMeasure to handle both add and remove
   const handleAddMeasure = (measure: Measure) => {
     if (isMeasureSelected(measure)) {
       // If measure is already selected, remove it
-      onSelectMeasure({ ...measure, action: 'remove' });
+      onSelectMeasure({ ...measure, action: "remove" });
       return;
     }
 
     // Original add logic
-    const heatDemandValue = getHeatDemandValue(measure, residenceType, buildPeriod);
+    const heatDemandValue = getHeatDemandValue(
+      measure,
+      residenceType,
+      buildPeriod
+    );
     // Calculate the price based on the measure_prices and calculation data
     const priceData = calculateMeasurePrice(
       measure.measure_prices,
@@ -201,7 +205,7 @@ export default function MeasureList({
     };
 
     // Add action property to indicate this is an add operation
-    onSelectMeasure({ ...measureWithPrice, action: 'add' });
+    onSelectMeasure({ ...measureWithPrice, action: "add" });
   };
 
   // Toggle the expanded state of a measure
@@ -312,12 +316,20 @@ export default function MeasureList({
                         )}
 
                         <button
-                          className={`measure__add ${isMeasureSelected(measure) ? 'measure__add--selected' : ''}`}
+                          className={`measure__add ${
+                            isMeasureSelected(measure)
+                              ? "measure__add--selected"
+                              : ""
+                          }`}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleAddMeasure(measure);
                           }}
-                          title={isMeasureSelected(measure) ? "Verwijderen uit geselecteerde maatregelen" : "Toevoegen aan geselecteerde maatregelen"}
+                          title={
+                            isMeasureSelected(measure)
+                              ? "Verwijderen uit geselecteerde maatregelen"
+                              : "Toevoegen aan geselecteerde maatregelen"
+                          }
                         >
                           {isMeasureSelected(measure) ? (
                             <Trash2 size={16} />
@@ -340,8 +352,9 @@ export default function MeasureList({
                               <div className="measure__nuisance sub-measure">
                                 <Volume1 className="icon" size={20} />
                                 <span>
-                                  Hinder indicator:{" "}
-                                  <strong>{measure.nuisance}</strong>{" "}
+                                  <strong>
+                                    Hinder indicator: {measure.nuisance}
+                                  </strong>{" "}
                                 </span>
                               </div>
                             )}
@@ -349,16 +362,17 @@ export default function MeasureList({
                               <div className="measure__heat-demand sub-measure">
                                 <Flame className="icon" size={20} />
                                 <span>
-                                  Warmtebehoefte:{" "}
-                                  <strong>{heatDemandValue} kWh/m²</strong>
+                                  <strong>
+                                    Warmtebehoefte: {heatDemandValue} kWh/m²
+                                  </strong>
                                 </span>
                               </div>
                             )}
                           </div>
                         )}
-                        <h4 className="measure__section-title">
+                        {/* <h4 className="measure__section-title">
                           Aanschafkosten
-                        </h4>
+                        </h4> */}
                         {priceResult.isValid &&
                         priceResult.calculations.length > 0 ? (
                           <div className="measure__breakdown">
@@ -401,9 +415,9 @@ export default function MeasureList({
                       {/* Maintenance calculation breakdown */}
                       {hasMaintenance && (
                         <div className="measure__section maintenance">
-                          <h4 className="measure__section-title">
+                          {/* <h4 className="measure__section-title">
                             Onderhoudskosten
-                          </h4>
+                          </h4> */}
                           {maintenanceResult.isValid &&
                           maintenanceResult.calculations.length > 0 ? (
                             <div className="measure__breakdown">
@@ -476,7 +490,8 @@ export default function MeasureList({
                               </div>
                               <div className="measure__breakdown-total">
                                 <div>
-                                  Totaal over {MAINTENANCE_PERIOD_YEARS} jaar ({ANNUAL_INFLATION_RATE} inflatie p.j)
+                                  Totaal over {MAINTENANCE_PERIOD_YEARS} jaar (
+                                  {ANNUAL_INFLATION_RATE} inflatie p.j)
                                 </div>
                                 <div>€ {formatPrice(total40Years)}</div>
                               </div>
