@@ -109,7 +109,7 @@ const PdfDownloadButton = () => {
         borderRadius: "4px",
         cursor: "pointer",
         fontSize: "16px",
-        margin: "20px 0"
+        width:"100%"
       }}
     >
       Download als PDF

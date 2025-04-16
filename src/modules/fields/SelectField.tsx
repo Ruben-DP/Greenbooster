@@ -129,6 +129,7 @@ const CALCULATION_VARIABLES = [
   // Common constants
   "0.3",
   "1.1",
+  "1.05",
   "2",
   "2.39",
   "3",

@@ -1,0 +1,160 @@
+[{
+  "_id": {
+    "$oid": "67adb3d09cd4c22a604d6f17"
+  },
+  "projectInformation": {
+    "projectNumber": "1372-10 V2",
+    "complexName": "Maessloot",
+    "aantalVHE": 1,
+    "adres": "Maessloot 6",
+    "postcode": "3437XJ",
+    "plaats": "Rijnsburg",
+    "renovatieJaar": 2012,
+    "bouwPeriode": "1965-1974"
+  },
+  "energyDetails": {
+    "huidigLabel": "C",
+    "huidigEnergie": 0,
+    "voorkostenScenario": "label_a",
+    "nieuwLabel": "-",
+    "labelStappen": "-",
+    "huidigVerbruik": 0,
+    "huidigEnergieprijs": 1
+  },
+  "typeId": "67ab7398763b8bca0d7227a7",
+  "isGrondgebonden": false,
+  "isPortiekflat": false,
+  "isGalerieflat": true,
+  "dimensions": {
+    "breed": "5,1",
+    "diepte": "10,4",
+    "goothoogte": "5,9",
+    "nokhoogte": "9,9",
+    "aantalwoningen": "5",
+    "kopgevels": "4",
+    "breedtecomplex": "37,2",
+    "portieken": "2",
+    "bouwlagen": "2"
+  }
+},
+{
+  "_id": {
+    "$oid": "67cea0eff7501dcc70b44b30"
+  },
+  "projectInformation": {
+    "projectNumber": "2",
+    "complexName": "1",
+    "aantalVHE": 5,
+    "adres": "Jan pieterszoon coenhof ",
+    "postcode": "2315AM",
+    "plaats": "59",
+    "renovatieJaar": 12,
+    "bouwPeriode": "tot 1965"
+  },
+  "energyDetails": {
+    "huidigLabel": "A+++",
+    "huidigEnergie": 0,
+    "voorkostenScenario": "label_a",
+    "nieuwLabel": "-",
+    "labelStappen": "-",
+    "huidigVerbruik": 0,
+    "huidigEnergieprijs": 300
+  },
+  "typeId": "67ab7398763b8bca0d7227a7",
+  "isGrondgebonden": false,
+  "isPortiekflat": true,
+  "isGalerieflat": false,
+  "dimensions": {
+    "breed": "3",
+    "diepte": "2",
+    "goothoogte": "2",
+    "nokhoogte": "2",
+    "aantalwoningen": "2",
+    "kopgevels": "2",
+    "breedtecomplex": "52",
+    "portieken": "52",
+    "bouwlagen": "52"
+  }
+},
+{
+  "_id": {
+    "$oid": "67d8183cf210c6fba1e4167a"
+  },
+  "projectInformation": {
+    "projectNumber": "P2023-145",
+    "complexName": "Westerhaven 12",
+    "aantalVHE": 24,
+    "adres": "Zeestraat 42",
+    "postcode": "2518AC ",
+    "plaats": "Den Haag",
+    "renovatieJaar": 2023,
+    "bouwPeriode": "1983-1987"
+  },
+  "energyDetails": {
+    "huidigLabel": "C",
+    "huidigEnergie": 0,
+    "voorkostenScenario": "label_a",
+    "nieuwLabel": "-",
+    "labelStappen": "-",
+    "huidigVerbruik": 0,
+    "huidigEnergieprijs": {
+      "$numberDouble": "NaN"
+    }
+  },
+  "typeId": "67ab7398763b8bca0d7227a7",
+  "isGrondgebonden": false,
+  "isPortiekflat": false,
+  "isGalerieflat": false,
+  "dimensions": {
+    "breed": "12,5",
+    "diepte": "9,8",
+    "goothoogte": "2,6",
+    "nokhoogte": "3,2",
+    "aantalwoningen": "24",
+    "kopgevels": "4",
+    "breedtecomplex": "42,5",
+    "portieken": "3",
+    "bouwlagen": "4"
+  }
+},
+{
+  "_id": {
+    "$oid": "67ee9a0a80569a3fb67abd23"
+  },
+  "projectInformation": {
+    "projectNumber": "13454-10 v3",
+    "complexName": "Sikkelweide",
+    "aantalVHE": 1,
+    "adres": "Sikkelweide 11",
+    "postcode": "3437XJ",
+    "plaats": "Nieuwegein",
+    "renovatieJaar": 2024,
+    "bouwPeriode": "1988-1991"
+  },
+  "energyDetails": {
+    "huidigLabel": "A",
+    "huidigEnergie": 0,
+    "voorkostenScenario": "label_a",
+    "nieuwLabel": "-",
+    "labelStappen": "-",
+    "huidigVerbruik": 0,
+    "huidigEnergieprijs": {
+      "$numberDouble": "NaN"
+    }
+  },
+  "typeId": "67ee999b80569a3fb67abd22",
+  "isGrondgebonden": false,
+  "isPortiekflat": false,
+  "isGalerieflat": false,
+  "dimensions": {
+    "breed": "5,4",
+    "diepte": "8,4",
+    "goothoogte": "5,4",
+    "nokhoogte": "9,9",
+    "aantalwoningen": "1",
+    "kopgevels": "4",
+    "breedtecomplex": "37,2",
+    "portieken": "2",
+    "bouwlagen": "2"
+  }
+}]

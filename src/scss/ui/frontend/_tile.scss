@@ -5,7 +5,7 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   &__title {
     font-weight: 400;
     font-size: 24px;
@@ -14,5 +14,23 @@
     .residence__title {
       margin-bottom: 8px;
     }
+  }
+  &:has(.downloadPDF) {
+    background-color: transparent;
+    border:1px solid transparent;
+  }
+  .downloadPDF {
+    display: flex;
+    .pdf-download-btn {
+      height: 54px;
+    }
+  }
+}
+.tile-grouper {
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  >* {
+    flex: 1;
   }
 }

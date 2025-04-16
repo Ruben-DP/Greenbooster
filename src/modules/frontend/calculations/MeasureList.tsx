@@ -42,6 +42,8 @@ interface Measure {
     gallerij?: Array<{ period: string; value: number }>;
     grondgebonden?: Array<{ period: string; value: number }>;
   };
+  includeLabor?: boolean;
+  laborNorm?: number;
   [key: string]: any;
 }
 
@@ -77,7 +79,7 @@ export default function MeasureList({
   > | null>(null);
   const [expandedMeasure, setExpandedMeasure] = useState<string | null>(null);
 
-  console.log('residencedata:', items);
+  // console.log("residencedata:", items);
 
   // console.log(residenceType);
 
@@ -217,12 +219,11 @@ export default function MeasureList({
     setExpandedMeasure(expandedMeasure === measureName ? null : measureName);
   };
 
-  // Render loading or error states
+
   if (isLoading) return <div>Maatregelen laden...</div>;
   if (error) return <div>Fout bij laden maatregelen: {error}</div>;
   if (!items || items.length === 0) return <div>Geen maatregelen gevonden</div>;
 
-  // Group measures by their group property
   const groupedItems = items.reduce<GroupedMeasures>((groups, item) => {
     if (!item) return groups;
     const groupName = item.group || "Overig";
@@ -231,7 +232,7 @@ export default function MeasureList({
     return groups;
   }, {});
 
-  // Format price for display
+
   const formatPrice = (price: number) => {
     return price.toLocaleString("nl-NL", {
       minimumFractionDigits: 2,
@@ -239,14 +240,33 @@ export default function MeasureList({
     });
   };
 
-  // Render the measure list
+
   return (
-    <div className="measure-list tile">
-      {Object.entries(groupedItems).map(([groupName, groupItems]) => (
-        <div key={groupName} className="measure-group">
-          <h2 className="measure-group-title">{groupName}</h2>
-          <div className="measure">
-            {groupItems.map((measure, index) => {
+      <div className="measure-list tile">
+        {Object.entries(groupedItems).map(([groupName, groupItems]) => (
+          <div key={groupName} className="measure-group">
+            <h2 className="measure-group-title">{groupName}</h2>
+            <div className="measure">
+              {[...groupItems]
+                .sort((a, b) => {
+                  // Extract numbers from the names
+                  const aMatches = a.name.match(/(\d+)/g);
+                  const bMatches = b.name.match(/(\d+)/g);
+                  
+                  // If both have numbers, compare the first number
+                  if (aMatches && bMatches) {
+                    const aNum = parseInt(aMatches[0], 10);
+                    const bNum = parseInt(bMatches[0], 10);
+                    // If the numbers are different, sort by number
+                    if (aNum !== bNum) {
+                      return aNum - bNum;
+                    }
+                  }
+                  
+                  // Fall back to regular string comparison if no numbers or same numbers
+                  return a.name.localeCompare(b.name);
+                })
+                .map((measure, index) => {
               const isExpanded = expandedMeasure === measure.name;
 
               // Calculate price and get heat demand for this measure
@@ -281,8 +301,71 @@ export default function MeasureList({
                 measure.mjob_prices.length > 0 &&
                 measure.mjob_prices.some((job) => job.name);
 
-              // Calculate additional pricing steps (profit and VAT)
-              const baseCost = priceResult.isValid ? priceResult.price : 0;
+              // Check if labor costs should be calculated
+              // Look for includeLabor and laborNorm in the measure_prices array
+              const shouldCalculateLabor =
+                measure.measure_prices &&
+                Array.isArray(measure.measure_prices) &&
+                measure.measure_prices.some(
+                  (item) =>
+                    item.includeLabor && item.laborNorm && item.laborNorm > 0
+                );
+
+              // Find items with labor costs
+              const itemsWithLabor =
+                measure.measure_prices?.filter(
+                  (item) =>
+                    item.includeLabor && item.laborNorm && item.laborNorm > 0
+                ) || [];
+
+              // Calculate base material cost
+              const materialCost = priceResult.isValid ? priceResult.price : 0;
+
+              // Calculate labor cost if applicable
+              let laborCost = 0;
+              let laborDetails: Array<{
+                name: string;
+                norm: number;
+                quantity: number;
+                cost: number;
+              }> = [];
+
+              if (shouldCalculateLabor && itemsWithLabor.length > 0) {
+                // Calculate labor costs for each item with labor
+                itemsWithLabor.forEach((laborItem) => {
+                  // If there are calculations, use the result quantity to determine labor hours
+                  const matchingCalc = priceResult.calculations.find(
+                    (calc) => calc.name === laborItem.name
+                  );
+
+                  if (matchingCalc && laborItem.laborNorm) {
+                    // Use fixed value of 51 for labor hour cost
+                    const laborHourCost = 51;
+
+                    // Calculate labor cost for this item
+                    const itemLaborCost =
+                      laborItem.laborNorm *
+                      matchingCalc.quantity *
+                      laborHourCost;
+
+                    // Add to total labor cost
+                    laborCost += itemLaborCost;
+
+                    // Store details for display
+                    laborDetails.push({
+                      name: laborItem.name || "Arbeidskosten",
+                      norm: laborItem.laborNorm,
+                      quantity: matchingCalc.quantity,
+                      cost: itemLaborCost,
+                    });
+                  }
+                });
+              }
+
+              // Calculate final base cost including labor
+              const baseCost = materialCost + laborCost;
+
+              // Calculate profit and VAT
               const withProfit = baseCost * (1 + PROFIT_MARGIN_RATE);
               const withVAT = withProfit * (1 + VAT_RATE);
 
@@ -372,7 +455,7 @@ export default function MeasureList({
                                 <Flame className="icon" size={20} />
                                 <span>
                                   <strong>
-                                    Warmtebehoefte: {heatDemandValue} kWh/m²
+                                    Warmtebehoefte: {heatDemandValue}
                                   </strong>
                                 </span>
                               </div>
@@ -385,6 +468,7 @@ export default function MeasureList({
                         {priceResult.isValid &&
                         priceResult.calculations.length > 0 ? (
                           <div className="measure__breakdown">
+                            {/* Material calculations */}
                             {priceResult.calculations.map((calc, calcIndex) => (
                               <div
                                 key={`calc-${calcIndex}`}
@@ -402,15 +486,47 @@ export default function MeasureList({
                                 </div>
                               </div>
                             ))}
-                            <div className="measure__breakdown-item">
-                              {/* Subtotal before profit and VAT */}
+
+                            {/* Labor costs - only shown if there are items with labor costs */}
+                            {shouldCalculateLabor &&
+                              laborDetails.length > 0 && (
+                                <>
+                                  {laborDetails.map((labor, idx) => (
+                                    <div
+                                      key={`labor-${idx}`}
+                                      className="measure__breakdown-item"
+                                    >
+                                      <div className="measure__breakdown-name">
+                                        Arbeidskosten: {labor.name}
+                                        <span className="measure__breakdown-formula">
+                                          ({labor.quantity.toFixed(2)} ×
+                                          {labor.norm} × €51)
+                                        </span>
+                                      </div>
+                                      <div className="measure__breakdown-price">
+                                        € {formatPrice(labor.cost)}
+                                      </div>
+                                    </div>
+                                  ))}
+                                  {laborDetails.length > 1 && (
+                                    <div className="measure__breakdown-subtotal">
+                                      <div>Totaal arbeidskosten</div>
+                                      <div>€ {formatPrice(laborCost)}</div>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+
+                            {/* Total base costs (materials + labor) */}
+                            {/* <div className="measure__breakdown-item">
                               <div className="measure__breakdown-subtotal">
                                 <div>Totaal</div>
                                 <div>€ {formatPrice(baseCost)}</div>
                               </div>
-                            </div>
+                            </div> */}
+
                             {/* Step 1: Add profit margin */}
-                            <div className="measure__breakdown-item">
+                            <div className="measure__breakdown-item subtotal">
                               <div className="measure__breakdown-name">
                                 AK + Winst + CAR + Garantie
                                 <span className="measure__breakdown-formula">
@@ -422,11 +538,11 @@ export default function MeasureList({
                               </div>
                             </div>
 
-                            {/* Subtotal after profit margin */}
+                            {/* Subtotal after profit margin
                             <div className="measure__breakdown-subtotal">
                               <div>Subtotaal (excl. BTW)</div>
                               <div>€ {formatPrice(withProfit)}</div>
-                            </div>
+                            </div> */}
 
                             {/* Step 2: Add VAT */}
                             <div className="measure__breakdown-item">
@@ -445,7 +561,7 @@ export default function MeasureList({
                             <div className="measure__breakdown-total">
                               <div>
                                 <strong>
-                                  Totaal aanschafkosten (incl. BTW)
+                                  Totaal eenmalige kosten (incl. BTW)
                                 </strong>
                               </div>
                               <div>

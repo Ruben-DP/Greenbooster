@@ -6,6 +6,10 @@
       margin-bottom: 0;
     }
   }
+  .measure-price {
+    width:180px;
+    text-align: right;
+  }
 
   &__group-title {
     font-size: 1rem;
@@ -61,7 +65,7 @@
   &__price {
     color: #666;
     margin-right: 0.5rem;
-  }
+}
 
   &__remove {
     color: #999;

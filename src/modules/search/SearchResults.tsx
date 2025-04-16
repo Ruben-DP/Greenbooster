@@ -26,7 +26,9 @@ export default function SearchResults<T extends object>({
   displayField,
   groupBy,
 }: SearchResultProps<T>) {
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    {}
+  );
 
   useEffect(() => {
     if (!items || !groupBy) return;
@@ -93,15 +95,21 @@ export default function SearchResults<T extends object>({
           </div>
           {expandedGroups[group] && (
             <div className="search-results__items">
-              {groupItems.map((item, index) => (
-                <div
-                  key={index}
-                  onClick={() => onSelect(item)}
-                  className="search-results__item"
-                >
-                  <span>{String(getNestedValue(item, displayField))}</span>
-                </div>
-              ))}
+              {[...groupItems]
+                .sort((a, b) => {
+                  const valueA = String(getNestedValue(a, displayField));
+                  const valueB = String(getNestedValue(b, displayField));
+                  return valueA.localeCompare(valueB);
+                })
+                .map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => onSelect(item)}
+                    className="search-results__item"
+                  >
+                    <span>{String(getNestedValue(item, displayField))}</span>
+                  </div>
+                ))}
             </div>
           )}
         </div>

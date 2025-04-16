@@ -6,6 +6,10 @@
     margin: 0 auto;
   }
 
+  .energy-label-container {
+    grid-column: 1 / span 2;
+    grid-row: 2 / span 4;
+  }
   .inner-content {
     padding-top: 40px;
     padding-bottom: 16px;
@@ -13,17 +17,20 @@
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
   }
-
+  .budget {
+    grid-column: 1 / span 2;
+  }
   // Layout positioning
   .budget,
   .residence,
-  .stats {
-    grid-column: 1;
+  .stats,
+  .download-button {
+    // grid-column: 2;
   }
 
   .selected-measures {
-    grid-column: 2;
-    grid-row: 1 / span 4;
+    grid-column: 3;
+    grid-row: 1 / span 3;
   }
 
   .measure-list {
@@ -60,7 +67,7 @@
       display: flex;
       justify-content: space-between;
       max-block-size: 16px;
-      height:32px;
+      height: 32px;
       margin-bottom: 10px;
     }
   }

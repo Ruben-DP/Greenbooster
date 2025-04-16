@@ -4,3 +4,74 @@
   gap: 24px;
   width: 100%;
 }
+
+.residence__button {
+  margin-top: 24px;
+  select {
+    width: 100%;
+    font-size: 20px;
+  }
+}
+.residence__type {
+  text-align: center;
+  span {
+    text-transform: capitalize;
+    font-weight: bold;
+  }
+}
+
+/* Add these styles to your CSS file */
+
+.residence__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.residence__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.edit-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.edit-button:hover {
+  color: #333;
+  background-color: #f0f0f0;
+}
+
+.residence__address {
+  font-weight: 500;
+  font-size: 22px;
+  margin-right: 0.5rem;
+}
+
+.residence__selector select {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  border: 1px solid #ccc;
+  font-size:16px;
+}
+
+.residence__type {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.residence__type span {
+  font-weight: 500;
+}

@@ -8,9 +8,18 @@
     //   font-size: 16px;
     // }
   }
+  .measure__breakdown-item {
+    &.subtotal {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #ddd;
+      font-weight: 500;
+      margin-top: 12px;
+    }
+  }
   .measure__header {
     * {
-        font-size:16px;
+      font-size: 16px;
     }
   }
   * {

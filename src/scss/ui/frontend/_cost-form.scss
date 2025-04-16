@@ -4,15 +4,23 @@
   padding: 24px;
 
   .container {
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto;
 
     gap: 24px;
 
     .inner-content {
       display: grid;
-      grid-template-columns: 2fr 4fr;
+      grid-template-columns: 2fr 2fr 7fr;
     }
+  }
+  .tile-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    padding-bottom: 14px;
+    width: 100%;
+    border-bottom: 1px solid #eee;
   }
 
   // Budget Section
@@ -22,10 +30,7 @@
       font-weight: 500;
     }
 
-    &__sum {
-      font-size: 24px;
-      font-weight: 500;
-    }
+
 
     &__notice {
       color: #666;
@@ -74,6 +79,7 @@
         font-size: 18px;
         font-weight: 500;
         margin-bottom: 12px;
+        font-weight: bold;
         color: #333;
       }
     }
@@ -87,7 +93,7 @@
         justify-content: space-between;
         align-items: center;
         border-radius: 8px;
-        min-height: fit-content; 
+        min-height: fit-content;
         cursor: pointer;
         transition: background-color 0.2s;
         margin-bottom: 0;
@@ -123,7 +129,6 @@
     gap: 8px;
     font-size: 14px;
     transition: background-color 0.2s;
-
 
     svg {
       width: 18px;
@@ -196,7 +201,6 @@
 
 .residence {
   &__button select {
-
     padding: 4px 6px;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
@@ -205,17 +209,13 @@
   }
 }
 
-// Add this to your existing SCSS or create a new file
-
 .measure-list {
   background-color: white;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
   .measure-group {
     margin-bottom: 24px;
-
     &-title {
       font-size: 18px;
       font-weight: 500;
@@ -264,7 +264,7 @@
       align-items: center;
       gap: 8px;
       padding: 10px 13px;
-      flex-grow:1;
+      flex-grow: 1;
     }
 
     &__toggle {
@@ -298,8 +298,8 @@
       align-items: center;
       gap: 12px;
       justify-content: flex-end;
-flex-grow: 0;
-width:fit-content
+      flex-grow: 0;
+      width: fit-content;
     }
 
     &__add {
@@ -327,7 +327,7 @@ width:fit-content
       // When measure is selected
       &--selected {
         background-color: #dc2626;
-        
+
         // &:hover {
         //   background-color: darken(#dc2626, 10%);
         // }

@@ -1,6 +1,5 @@
 import { Flame } from "lucide-react";
 
-
 interface MeasurePrice {
   name?: string;
   unit?: string;
@@ -40,6 +39,7 @@ export default function SelectedMeasures({
     return groups;
   }, {});
 
+  // Calculate total base price
   const total = measures.reduce(
     (sum, measure) => sum + (measure.price || 0),
     0
@@ -58,9 +58,20 @@ export default function SelectedMeasures({
     });
   };
 
+  // Calculate price with profit and BTW
+  const calculateFinalPrice = (basePrice: number) => {
+    // Step 1: Add profit margin (25%)
+    const priceWithProfit = basePrice * 1.25;
+    
+    // Step 2: Add BTW/VAT (21%)
+    const finalPrice = priceWithProfit * 1.21;
+    
+    return finalPrice;
+  };
+
   return (
     <section className="tile selected-measures">
-      <h2 className="selected-measures__title">Geselecteerde maatregelen</h2>
+      <h2 className="tile-title">Geselecteerde maatregelen</h2>
       {measures.length === 0 ? (
         <p className="selected-measures__empty">
           Geen maatregelen geselecteerd
@@ -71,56 +82,37 @@ export default function SelectedMeasures({
             <div key={groupName} className="selected-measures__group">
               <h3 className="selected-measures__group-title">{groupName}</h3>
               <ul className="selected-measures__list">
-                {groupMeasures.map((measure, index) => (
-                  <li
-                    key={`${measure.name}-${index}`}
-                    className="selected-measures__item"
-                  >
-                    <div className="selected-measures__content">
-                      <span className="selected-measures__name">
-                        {measure.name}
-                      </span>
-                      <div>
-                        <span className="selected-measures__price">
-                          {/* {measure.maintenanceCostPerYear && (
-                            <span>
-                              {" "}
-                              €{formatPrice(measure.maintenanceCostPerYear)} p.j.
-                            </span>
-                          )} */}
-                          € {measure.price ? formatPrice(measure.price) : "0,00"}
+                {groupMeasures.map((measure, index) => {
+                  // Calculate the final price with profit and BTW
+                  const basePrice = measure.price || 0;
+                  const finalPrice = calculateFinalPrice(basePrice);
+                  
+                  return (
+                    <li
+                      key={`${measure.name}-${index}`}
+                      className="selected-measures__item"
+                    >
+                      <div className="selected-measures__content">
+                        <span className="selected-measures__name">
+                          {measure.name}
                         </span>
-
-                        <button
-                          onClick={() => onRemove({ ...measure, action: 'remove' })}
-                          className="selected-measures__remove"
-                          aria-label="Verwijder maatregel"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
-                    {/* <div className="selected-measures__bottom-bar">
-                      <div className="selected-measures__details">
-                        <div className="icon-values">
-                          {measure.heatDemandValue && (
-                            <>
-                              <Flame />
-                              <span className="selected-measures__heat">
-                                <strong>{measure.heatDemandValue}</strong>kWh/m²
-                              </span>
-                            </>
-                          )}
-                        </div>
-                        {measure.maintenanceCostPerYear > 0 && (
-                          <span className="selected-measures__maintenance">
-                            € {formatPrice(measure.maintenanceCostPerYear)} p.j.
+                        <div className="measure-price">
+                          <span className="selected-measures__price">
+                            € {finalPrice ? formatPrice(finalPrice) : "0,00"}
                           </span>
-                        )}
+
+                          <button
+                            onClick={() => onRemove({ ...measure, action: 'remove' })}
+                            className="selected-measures__remove"
+                            aria-label="Verwijder maatregel"
+                          >
+                            ×
+                          </button>
+                        </div>
                       </div>
-                    </div> */}
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

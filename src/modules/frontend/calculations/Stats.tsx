@@ -18,9 +18,13 @@ interface Measure {
 
 interface StatsProps {
   selectedMeasures: Measure[];
+  totalHeatDemand: number;
 }
 
-export default function Stats({ selectedMeasures = [] }: StatsProps) {
+export default function Stats({
+  selectedMeasures = [],
+  totalHeatDemand = 0,
+}: StatsProps) {
   // Format price with Dutch formatting
   const formatPrice = (price: number) => {
     return price.toLocaleString("nl-NL", {
@@ -28,15 +32,6 @@ export default function Stats({ selectedMeasures = [] }: StatsProps) {
       maximumFractionDigits: 2,
     });
   };
-
-  // Calculate total heat demand
-  const initialHeatDemand = 0;
-  const totalHeatDemand = selectedMeasures.reduce((total, measure) => {
-    const demandValue = measure.heatDemandValue
-      ? parseFloat(String(measure.heatDemandValue))
-      : 0;
-    return total + (isNaN(demandValue) ? 0 : demandValue);
-  }, initialHeatDemand);
 
   // Calculate highest nuisance indicator
   const highestNuisance = selectedMeasures.reduce((highest, measure) => {
@@ -69,6 +64,9 @@ export default function Stats({ selectedMeasures = [] }: StatsProps) {
 
   return (
     <section className="stats tile">
+      <div className="tile-title">
+        Resultaten
+      </div>
       {/* <div className="stats__row">
         <span className="stats__label">CO₂ Reductie:</span>
         <span className="stats__value">
@@ -81,10 +79,10 @@ export default function Stats({ selectedMeasures = [] }: StatsProps) {
 
       {totalMaintenancePerYear > 0 && (
         <div className="stats__row">
-          <span className="stats__label">Onderhoudskosten per jaar:</span>
+          <span className="stats__label"><ReceiptText size={20} /> Onderhoudskosten per jaar:</span>
           <span className="stats__value">
             <div className="icon-grouper">
-              <ReceiptText size={20} />€ {formatPrice(totalMaintenancePerYear)}
+              € {formatPrice(totalMaintenancePerYear)}
             </div>
           </span>
         </div>
@@ -92,10 +90,10 @@ export default function Stats({ selectedMeasures = [] }: StatsProps) {
       {totalTCO > 0 && (
         <>
           <div className="stats__row">
-            <span className="stats__label">TCO (40 jaar):</span>
+            <span className="stats__label"><ReceiptEuro size={20} /> TCO (40 jaar):</span>
             <span className="stats__value">
               <div className="icon-grouper">
-                <ReceiptEuro size={20} />€ {formatPrice(totalTCO)}
+                € {formatPrice(totalTCO)}
               </div>
             </span>
           </div>
@@ -110,28 +108,31 @@ export default function Stats({ selectedMeasures = [] }: StatsProps) {
       )}
       {totalHeatDemand > 0 && (
         <div className="stats__row">
-          <span className="stats__label">Warmtebehoefte: </span>
+          <span className="stats__label"><Flame size={20} /> Warmtebehoefte: </span>
           <span className="stats__value">
             <div className="icon-grouper">
-              <Flame size={20} />
               {totalHeatDemand.toFixed(1)}
+              
             </div>
           </span>
         </div>
       )}
       {highestNuisance > 0 && (
         <div className="stats__row">
-          <span className="stats__label">Hinder indicator:</span>
+          <span className="stats__label"><Volume1 size={20} /> Hinder indicator:</span>
           <span className="stats__value">
             <div className="icon-grouper">
-              <Volume1 size={20} />
               {highestNuisance.toFixed(1)}
+              
             </div>
           </span>
         </div>
       )}
 
-      {(totalMaintenancePerYear <= 0 && totalTCO <= 0 && totalHeatDemand <= 0 && highestNuisance <= 0 ) && <span>Geen maatregelen geselecteerd</span>}
+      {totalMaintenancePerYear <= 0 &&
+        totalTCO <= 0 &&
+        totalHeatDemand <= 0 &&
+        highestNuisance <= 0 && <span>Geen maatregelen geselecteerd</span>}
     </section>
   );
 }
