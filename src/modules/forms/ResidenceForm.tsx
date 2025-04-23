@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { TextField } from "../fields/TextField";
 import { SelectField } from "../fields/SelectField";
 import { CheckboxField } from "../fields/CheckboxField";
 import { ReferenceField } from "../fields/ReferenceField";
+import ImageSelect from "../ImageSelect";
+import { searchDocuments } from "@/app/actions/crudActions";
+
+type BuildingType = {
+  _id: string;
+  naam: string;
+};
 
 type Props = {
   item: any;
@@ -18,12 +25,98 @@ const ResidenceForm = ({
   onChange,
 }: Props) => {
   if (!item) return null;
+  
+  const [buildingTypes, setBuildingTypes] = useState<BuildingType[]>([]);
+  const [selectedTypeId, setSelectedTypeId] = useState<string>(item.typeId || "");
+
+  useEffect(() => {
+    const fetchBuildingTypes = async () => {
+      try {
+        const types = await searchDocuments("types");
+        setBuildingTypes(types);
+      } catch (error) {
+        console.error("Failed to fetch building types:", error);
+      }
+    };
+
+    fetchBuildingTypes();
+  }, []);
+
+  // Build image options for the selector
+  const buildingTypeOptions = buildingTypes.map((type) => {
+    // Determine the image source for each type
+    let imageSrc = null;
+    const typeName = type.naam.toLowerCase();
+
+    // Map type names to corresponding images
+    if (typeName.includes("bbm") || typeName === "bbm") {
+      imageSrc = "/images/Bbm.jpg";
+    } else if (typeName.includes("bitcoin")) {
+      imageSrc = "/images/Bitcoin.jpg";
+    } else if (typeName.includes("bouwvliet")) {
+      imageSrc = "/images/Bouwvliet.jpg";
+    } else if (typeName.includes("coignet")) {
+      imageSrc = "/images/Coignet.jpg";
+    } else if (typeName === "eba" || typeName.includes("eba ")) {
+      imageSrc = "/images/Eba.jpg";
+    } else if (typeName.includes("ebo ii") || typeName.includes("ebo-ii")) {
+      imageSrc = "/images/Ebo II.jpg";
+    } else if (typeName.includes("elementum")) {
+      imageSrc = "/images/Elementum.jpg";
+    } else if (typeName.includes("era")) {
+      imageSrc = "/images/Era.jpg";
+    } else if (typeName.includes("gba")) {
+      imageSrc = "/images/Gba.jpg";
+    } else if (typeName.includes("grondgebonden")) {
+      imageSrc = "/images/Grondgebonden.jpg";
+    } else if (typeName.includes("heykamp")) {
+      imageSrc = "/images/Heykamp.jpg";
+    } else if (typeName.includes("intervam")) {
+      imageSrc = "/images/Intervam.jpg";
+    } else if (typeName.includes("korrelbeton")) {
+      imageSrc = "/images/Korrelbeton.jpg";
+    } else if (typeName.includes("lisman")) {
+      imageSrc = "/images/Lisman.jpg";
+    } else if (typeName.includes("muwi")) {
+      imageSrc = "/images/Muwi.jpg";
+    } else if (typeName.includes("pronto")) {
+      imageSrc = "/images/Pronto.jpg";
+    } else if (typeName === "rbm" || typeName.includes("rbm ")) {
+      imageSrc = "/images/Rbm.jpg";
+    } else if (typeName.includes("rottinghuis")) {
+      imageSrc = "/images/Rottinghuis.jpg";
+    } else if (typeName.includes("sanders")) {
+      imageSrc = "/images/Sanders.jpg";
+    } else if (typeName.includes("schokbeton")) {
+      imageSrc = "/images/Schokbeton.jpg";
+    } else if (typeName.includes("vaneg")) {
+      imageSrc = "/images/Vaneg.jpg";
+    } else if (typeName.includes("wilma ii") || typeName.includes("wilma-ii")) {
+      imageSrc = "/images/Wilma II.jpg";
+    } else if (typeName.includes("woning model brabant")) {
+      imageSrc = "/images/Woning model brabant.jpg";
+    } else if (typeName.includes("portiek")) {
+      imageSrc = "/images/portiekwoning.webp";
+    }
+
+    return {
+      value: type._id,
+      label: type.naam,
+      imageSrc: imageSrc,
+    };
+  });
 
   const getValue = (path: string, original: any) =>
     pendingChanges[path]?.newValue ?? original;
 
   const handleChange = (path: string, old: any, next: any) =>
     onChange?.(path, old, next);
+
+  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newTypeId = e.target.value;
+    setSelectedTypeId(newTypeId);
+    handleChange("typeId", item.typeId || "", newTypeId);
+  };
 
   return (
     <div className="form residence-form">
@@ -166,6 +259,10 @@ const ResidenceForm = ({
           />
         </div>
       </div>
+      
+      {/* Type selection section */}
+
+      
       <div className="form__section">
         <h4 className="form__heading">Energie details</h4>
         <div className="form__fields">
@@ -429,6 +526,56 @@ const ResidenceForm = ({
                 item.dimensions?.bouwlagen,
                 next
               )
+            }
+          />
+        </div>
+      </div>
+      <div className="form__section">
+        <h4 className="form__heading">Type woning</h4>
+        <div className="form__fields">
+          {isEditing ? (
+            <div className="image-select-container">
+              <ImageSelect
+                id="typeId"
+                name="typeId"
+                value={getValue("typeId", item.typeId || "")}
+                onChange={handleTypeChange}
+                options={buildingTypeOptions}
+                label="Type flat/woning"
+              />
+            </div>
+          ) : (
+            <div className="form-field">
+              <label className="field-label">Type woning</label>
+              <div className="input-read-only">
+                {buildingTypes.find(type => type._id === item.typeId)?.naam || 
+                  <span className="empty-reference">Geen type geselecteerd</span>}
+              </div>
+            </div>
+          )}
+          
+          <CheckboxField
+            label="Grondgebonden"
+            value={getValue("isGrondgebonden", item.isGrondgebonden || false)}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange("isGrondgebonden", item.isGrondgebonden || false, next)
+            }
+          />
+          <CheckboxField
+            label="Portiekflat"
+            value={getValue("isPortiekflat", item.isPortiekflat || false)}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange("isPortiekflat", item.isPortiekflat || false, next)
+            }
+          />
+          <CheckboxField
+            label="Galerijflat"
+            value={getValue("isGalerieflat", item.isGalerieflat || false)}
+            isEditing={isEditing}
+            onChange={(next) =>
+              handleChange("isGalerieflat", item.isGalerieflat || false, next)
             }
           />
         </div>

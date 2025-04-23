@@ -24,15 +24,7 @@
     display: flex;
     justify-content: space-between;
     gap:12px;
-  }
-  h2 {
-    margin-bottom: 2rem;
-    margin-top: 2rem;
-    font-size: 16px;
-    font-weight: 600;
-    &:first-child {
-      margin-top: 0;
-    }
+    
   }
 
   &__fields {
@@ -44,7 +36,9 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-
+    &.type-creation-toggle {
+      flex-direction: row;
+    }
     label {
       font-size: 1rem;
       color: #333;
@@ -57,7 +51,6 @@
       border-radius: 4px;
       background: white;
       width: 100%;
-      background-color: #f5f5f5;
       &[readonly]{
         background-color: transparent!important;
         border: 1px solid transparent;
@@ -149,4 +142,102 @@
       }
     }
   }
+}
+
+.mt-64 {
+  margin-top:64px;
+}
+
+
+.type-creation-toggle {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  
+  input[type="checkbox"] {
+    margin-right: 0.5rem;
+    width: 18px;
+    height: 18px;
+  }
+  
+  label {
+    font-weight: 500;
+    cursor: pointer;
+  }
+}
+
+.type-dimension {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  
+  &:hover {
+    background-color: #f9f9f9;
+  }
+}
+
+.type-dimension-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.dimension-inputs {
+  display: flex;
+  gap: 1rem;
+}
+
+.dimension-input {
+  position: relative;
+  flex: 1;
+  
+  input {
+    width: 100%;
+    padding: 0.5rem;
+    padding-right: 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    
+    &:focus {
+      outline: none;
+      border-color: var(--accent-color, #7c3aed);
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+    }
+  }
+  
+  .unit {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 0.8rem;
+  }
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .project-form__col4 {
+    padding: 1rem;
+  }
+  
+  .dimension-inputs {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Section headers styling */
+.project-form__col4 h3 {
+  margin-top: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+  color: var(--accent-color, #7c3aed);
+}
+
+.project-form__col4 h4 {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #555;
 }

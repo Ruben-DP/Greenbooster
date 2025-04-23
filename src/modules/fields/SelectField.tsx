@@ -59,7 +59,7 @@ const CALCULATION_VARIABLES = [
   "vloerOppervlak",
   "vloerOppervlakTotaal",
   "vloerOppervlakteBeganeGrond",
-  "oppervlakteKelder",
+  "oppervlakteKelder", // Hier is de nieuwe variabele toegevoegd
   
   // Kozijn measurements
   "kozijnOppervlakVoorTotaal",
@@ -128,14 +128,17 @@ const CALCULATION_VARIABLES = [
   
   // Common constants
   "0.3",
+  "0.75",
   "1.1",
   "1.05",
   "2",
   "2.39",
   "3",
   "4",
+  "5",
   "0.1",
   "0.05",
+
 ];
 
 export function SelectField({

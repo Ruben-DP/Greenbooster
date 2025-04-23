@@ -67,6 +67,7 @@ interface CalculationResults {
   // Floor calculations
   vloerOppervlak: number;
   vloerOppervlakTotaal: number;
+  oppervlakteKelder: number; // Nieuw toegevoegde variabele
   
   // Kozijn details
   kozijnenVoorgevel: KozijnDetails[];
@@ -175,6 +176,7 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
     // Vloer
     console.groupCollapsed("Vloer Berekeningen");
     logExplanationsByPrefix(explanations, "vloerOppervlak");
+    logExplanationsByPrefix(explanations, "oppervlakteKelder");
     console.groupEnd();
     
     // Project totals
@@ -312,7 +314,7 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
   };
 
   const calculateBasisMaten = (woningSpecifiek: WoningSpecifiek, explanations: Record<string, string>, woningType: WoningType) => {
-    const { breedte, diepte, gootHoogte, nokHoogte, heeftPlatDak } = woningSpecifiek;
+    const { breedte, diepte, gootHoogte, nokHoogte, heeftPlatDak, breedteComplex } = woningSpecifiek;
     
     // Calculate gevel areas
     const gevelOppervlakVoor = breedte * gootHoogte;
@@ -363,7 +365,16 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
     const vloerOppervlak = breedte * diepte;
     explanations["vloerOppervlak"] = `${breedte} (breedte) × ${diepte} (diepte) = ${vloerOppervlak}`;
 
-    const breedteWoningPlusHoogte = breedte + woningType.ruimten.hoogte
+    // Calculate kelder area (new)
+    let oppervlakteKelder = 0;
+    if (breedteComplex) {
+      oppervlakteKelder = breedteComplex * diepte;
+      explanations["oppervlakteKelder"] = `${breedteComplex} (breedteComplex) × ${diepte} (diepte) = ${oppervlakteKelder}`;
+    } else {
+      explanations["oppervlakteKelder"] = `Geen breedteComplex opgegeven, oppervlakteKelder = 0`;
+    }
+
+    const breedteWoningPlusHoogte = breedte + woningType.ruimten.hoogte;
 
     return {
       gevelOppervlakVoor,
@@ -372,9 +383,10 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
       dakOppervlak,
       dakLengte,
       vloerOppervlak,
+      oppervlakteKelder, // New field added
       breedteWoningPlusHoogte,
       lengteDakvlak,
-      lengteDakvlakPlusBreedteWoning // Add the new calculation
+      lengteDakvlakPlusBreedteWoning
     };
   };
 
@@ -413,7 +425,7 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
     explanations: Record<string, string>
   ) => {
     const { breedte, diepte, aantalWoningen } = woningSpecifiek;
-    const { gevelOppervlakTotaal, dakOppervlak, dakLengte, vloerOppervlak } = basisMaten;
+    const { gevelOppervlakTotaal, dakOppervlak, dakLengte, vloerOppervlak, oppervlakteKelder } = basisMaten;
     const { kozijnOppervlakTotaal } = kozijnInfo;
 
     // Calculate project totals

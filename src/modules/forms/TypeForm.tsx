@@ -55,8 +55,13 @@ type BuildingType = {
 type Props = {
   item: Partial<BuildingType>;
   isEditing: boolean;
-  pendingChanges: Record<string, { newValue: any }>;
+  pendingChanges?: Record<string, { newValue: any }>;
   onChange?: (path: string, oldValue: any, newValue: any) => void;
+  // New prop for simpler value changes (just path and new value)
+  onValueChange?: (path: string, value: any) => void;
+  // Optional styling props
+  containerClassName?: string;
+  compact?: boolean;
 };
 
 const WindowInputs = ({
@@ -97,14 +102,29 @@ const WindowInputs = ({
   </div>
 );
 
-const TypeForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
+const TypeForm = ({ 
+  item, 
+  isEditing, 
+  pendingChanges = {}, 
+  onChange,
+  onValueChange,
+  containerClassName = "",
+  compact = false
+}: Props) => {
   if (!item) return null;
 
   const getValue = (path: string, original: any) =>
     pendingChanges[path]?.newValue ?? original;
 
-  const handleChange = (path: string, old: any, next: any) =>
-    onChange?.(path, old, next);
+  const handleChange = (path: string, old: any, next: any) => {
+    if (onChange) {
+      // Admin panel mode - use onChange with old value tracking
+      onChange(path, old, next);
+    } else if (onValueChange) {
+      // Simple mode - just pass path and new value
+      onValueChange(path, next);
+    }
+  };
 
   const buildingTypes = [
     { label: "Grondgebonden", value: "grondgebonden" },
@@ -113,7 +133,7 @@ const TypeForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
   ];
 
   return (
-    <>
+    <div className={`${containerClassName} ${compact ? "type-form--compact" : ""}`}>
       <div className="type-title">
         <div className="title-fields-container" style={{ display: "flex", gap: "20px" }}>
           <TextField
@@ -154,35 +174,33 @@ const TypeForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
               getValue={getValue}
               handleChange={handleChange}
             />
-  <div className="form__group">
-
-            <h5>Woonkamer</h5>
-            {["raam1", "raam2", "raam3"].map((raam) => (
-              <WindowInputs
-                key={raam}
-                basePath={`voorgevelKozijnen.woonkamer.${raam}`}
-                label={`Raam ${raam.slice(-1)}`}
-                dimensions={item.voorgevelKozijnen?.woonkamer?.[raam]}
-                isEditing={isEditing}
-                getValue={getValue}
-                handleChange={handleChange}
-              />
-            ))}
+            <div className="form__group">
+              <h5>Woonkamer</h5>
+              {["raam1", "raam2", "raam3"].map((raam) => (
+                <WindowInputs
+                  key={raam}
+                  basePath={`voorgevelKozijnen.woonkamer.${raam}`}
+                  label={`Raam ${raam.slice(-1)}`}
+                  dimensions={item.voorgevelKozijnen?.woonkamer?.[raam]}
+                  isEditing={isEditing}
+                  getValue={getValue}
+                  handleChange={handleChange}
+                />
+              ))}
             </div>
             <div className="form__group">
-
-            <h5>Slaapkamer</h5>
-            {["raam1", "raam2"].map((raam) => (
-              <WindowInputs
-                key={raam}
-                basePath={`voorgevelKozijnen.slaapkamer.${raam}`}
-                label={`Raam ${raam.slice(-1)}`}
-                dimensions={item.voorgevelKozijnen?.slaapkamer?.[raam]}
-                isEditing={isEditing}
-                getValue={getValue}
-                handleChange={handleChange}
-              />
-            ))}
+              <h5>Slaapkamer</h5>
+              {["raam1", "raam2"].map((raam) => (
+                <WindowInputs
+                  key={raam}
+                  basePath={`voorgevelKozijnen.slaapkamer.${raam}`}
+                  label={`Raam ${raam.slice(-1)}`}
+                  dimensions={item.voorgevelKozijnen?.slaapkamer?.[raam]}
+                  isEditing={isEditing}
+                  getValue={getValue}
+                  handleChange={handleChange}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -206,19 +224,18 @@ const TypeForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
               handleChange={handleChange}
             />
             <div className="form__group">
-
-            <h5>Woonkamer</h5>
-            {["raam1", "raam2", "raam3"].map((raam) => (
-              <WindowInputs
-                key={raam}
-                basePath={`achtergevelKozijnen.woonkamer.${raam}`}
-                label={`Raam ${raam.slice(-1)}`}
-                dimensions={item.achtergevelKozijnen?.woonkamer?.[raam]}
-                isEditing={isEditing}
-                getValue={getValue}
-                handleChange={handleChange}
-              />
-            ))}
+              <h5>Woonkamer</h5>
+              {["raam1", "raam2", "raam3"].map((raam) => (
+                <WindowInputs
+                  key={raam}
+                  basePath={`achtergevelKozijnen.woonkamer.${raam}`}
+                  label={`Raam ${raam.slice(-1)}`}
+                  dimensions={item.achtergevelKozijnen?.woonkamer?.[raam]}
+                  isEditing={isEditing}
+                  getValue={getValue}
+                  handleChange={handleChange}
+                />
+              ))}
             </div>
             <div className="form__group">
               <h5>Slaapkamer 1</h5>
@@ -288,7 +305,7 @@ const TypeForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
