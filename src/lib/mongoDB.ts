@@ -9,6 +9,7 @@ const uri = process.env.MONGODB_URI;
 // const options = {
 //   maxPoolSize: 10,
 //   minPoolSize: 5,
+
 // };
 
 //temporary mobile hotspot connection
