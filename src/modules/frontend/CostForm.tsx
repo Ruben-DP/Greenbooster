@@ -10,6 +10,7 @@ import { CalculationHandler } from "./calculations/CalculationHandler";
 import SelectedMeasures from "./calculations/SelectMeasures";
 import PdfDownloadButton from "../PdfDownloadButton";
 import { EnergyLabel } from "./calculations/EnergyLabel";
+import SaveProfileButton from "../residenceProfile/SaveProfileButton";
 
 interface Measure {
   name: string;
@@ -612,7 +613,20 @@ function PageContent() {
                   onCalculate={handleCalculations}
                 />
               )}
-            <div className="tile">
+            <div className="tile actions-tile">
+              <h4 className="tile-title">Acties</h4>
+              {selectedResidence && (
+                <SaveProfileButton
+                  woningId={selectedResidence._id}
+                  typeId={selectedType?._id || ""}
+                  measures={selectedMeasures}
+                  totalBudget={totalBudget}
+                  totalHeatDemand={totalHeatDemand}
+                  isDisabled={
+                    !selectedResidence || selectedMeasures.length === 0
+                  }
+                />
+              )}
               <div className="downloadPDF">
                 <PdfDownloadButton />
               </div>

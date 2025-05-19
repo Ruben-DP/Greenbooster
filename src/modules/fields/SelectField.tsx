@@ -138,6 +138,7 @@ const CALCULATION_VARIABLES = [
   "5",
   "0.1",
   "0.05",
+  "477"
 
 ];
 

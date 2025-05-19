@@ -2,13 +2,11 @@
 
 import MenuLink from "./MenuLink";
 import {
-  Users,
-  Map,
-  Plane,
   HousePlug,
-  Calculator,
   House,
   Save,
+  Settings,
+  Link,
 } from "lucide-react";
 import { ThemeControls } from "./ThemeControls";
 
@@ -33,6 +31,11 @@ export default function Header() {
         title="Opgeslagen woningen"
         url="/admin/opgeslagen-woningen"
         icon={Save}
+      />
+      <MenuLink
+        title="Instellingen"
+        url="/admin/instellingen"
+        icon={Settings}
       />
       <div style={{ marginTop: "auto", width: "100%" }}>
         <a

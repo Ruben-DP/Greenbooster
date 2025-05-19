@@ -270,6 +270,16 @@ export default function ProjectForm() {
   return (
     <section className="project-form">
       <form action={handleSubmit}>
+        <div className="project-form__submit">
+          <button
+            type="submit"
+            className="project-form__button"
+            disabled={pending}
+          >
+            {pending ? "Bezig met opslaan..." : "Opslaan"}
+            <ArrowRight size={20} />
+          </button>
+        </div>
         <div className="project-form__col1">
           <h2 className="tile-title">Project informatie</h2>
           <div className="project-form__fields">
@@ -572,17 +582,6 @@ export default function ProjectForm() {
             />
           </div>
         )}
-
-        <div className="project-form__submit">
-          <button
-            type="submit"
-            className="project-form__button"
-            disabled={pending}
-          >
-            {pending ? "Bezig met opslaan..." : "Opslaan"}
-            <ArrowRight size={20} />
-          </button>
-        </div>
       </form>
     </section>
   );

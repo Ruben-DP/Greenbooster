@@ -227,7 +227,7 @@
     flex-direction: column;
 
     &__item { 
-      margin-bottom: 14px;
+      // margin-bottom: 14px;
       border-radius: 8px;
       overflow: hidden;
       transition: all 0.3s ease;
@@ -303,7 +303,7 @@
     }
 
     &__add {
-      background-color: #4a90e2;
+      background-color: var(--accent-color);
       color: white;
       border: none;
       width: 28px;
@@ -356,14 +356,12 @@
         }
       }
 
-      &-name {
-        font-size: 14px;
-      }
+    
 
       &-formula {
         color: #666;
         margin-left: 8px;
-        font-size: 13px;
+        font-size: 14px;
       }
 
       &-price {

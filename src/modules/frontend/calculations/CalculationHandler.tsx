@@ -98,6 +98,14 @@ interface CalculationResults {
   // Kozijn grouping by size
   kozijnenPerGrootte: KozijnGrootte;
   
+  // PV panel calculations (new)
+  aantalPVPanelenGGB: number;
+  oppervlaktePVPanelenGGB: number;
+  aantalPVPanelenKop: number;
+  aantalPVPanelenLangs: number;
+  oppervlaktePVPanelenKop: number;
+  oppervlaktePVPanelenLangs: number;
+  
   // Error tracking
   missingInputs: string[];
   calculationWarnings: string[];
@@ -130,6 +138,7 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
     const basisMaten = calculateBasisMaten(woningSpecifiek, explanations, woningType);
     const afgeLeideMaten = calculateAfgeLeideMaten(woningSpecifiek, kozijnInfo, basisMaten, explanations);
     const projectTotalen = calculateProjectTotalen(woningSpecifiek, basisMaten, kozijnInfo, explanations);
+    const pvPanelenInfo = calculatePVPanelen(woningSpecifiek, basisMaten, explanations);
 
     // Combine all results
     const results: CalculationResults = {
@@ -138,6 +147,7 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
       ...kozijnInfo,
       ...afgeLeideMaten,
       ...projectTotalen,
+      ...pvPanelenInfo,
       missingInputs: errors,
       calculationWarnings: warnings,
       calculationExplanations: explanations
@@ -177,6 +187,12 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
     console.groupCollapsed("Vloer Berekeningen");
     logExplanationsByPrefix(explanations, "vloerOppervlak");
     logExplanationsByPrefix(explanations, "oppervlakteKelder");
+    console.groupEnd();
+    
+    // PV Panelen (new)
+    console.groupCollapsed("PV Panelen Berekeningen");
+    logExplanationsByPrefix(explanations, "aantalPV");
+    logExplanationsByPrefix(explanations, "oppervlaktePV");
     console.groupEnd();
     
     // Project totals
@@ -233,86 +249,178 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
     };
   };
 
-
-  const calculateKozijnen = (woningType: WoningType, explanations: Record<string, string>) => {
-    // Helper function for kozijn calculations
-    const berekenKozijn = (breedte?: number, hoogte?: number, type: string = ''): KozijnDetails => {
-      if (!breedte || !hoogte) {
-        explanations[`kozijn_${type}`] = `Ongeldige afmetingen: breedte=${breedte}, hoogte=${hoogte}`;
-        return { type, breedte: 0, hoogte: 0, oppervlakte: 0, rendement: 0, omtrek: 0 };
-      }
-
-      const oppervlakte = breedte * hoogte;
-      const rendement = (breedte - 0.15) * (hoogte - 0.15);
-      const omtrek = (breedte + hoogte) * 2;
-
-      explanations[`kozijn_${type}_oppervlakte`] = `${breedte} × ${hoogte} = ${oppervlakte}`;
-      explanations[`kozijn_${type}_rendement`] = `(${breedte} - 0.15) × (${hoogte} - 0.15) = ${rendement}`;
-      explanations[`kozijn_${type}_omtrek`] = `(${breedte} + ${hoogte}) × 2 = ${omtrek}`;
-
-      return { type, breedte, hoogte, oppervlakte, rendement, omtrek };
-    };
-
-    // Calculate kozijnen details for voor- and achtergevel
-    const kozijnenVoorgevel = Object.entries(woningType.voorGevelKozijnen || {}).map(
-      ([type, dims]) => berekenKozijn(dims.breedte, dims.hoogte, type)
-    );
-
-    const kozijnenAchtergevel = Object.entries(woningType.achterGevelKozijnen || {}).map(
-      ([type, dims]) => berekenKozijn(dims.breedte, dims.hoogte, type)
-    );
-
-    // Calculate kozijn totals
-    const kozijnOppervlakVoorTotaal = kozijnenVoorgevel.reduce((sum, k) => sum + k.oppervlakte, 0);
-    const kozijnOppervlakAchterTotaal = kozijnenAchtergevel.reduce((sum, k) => sum + k.oppervlakte, 0);
-    const kozijnOppervlakTotaal = kozijnOppervlakVoorTotaal + kozijnOppervlakAchterTotaal;
-    const kozijnRendementTotaal = [...kozijnenVoorgevel, ...kozijnenAchtergevel]
-      .reduce((sum, k) => sum + k.rendement, 0);
-    const kozijnOmtrekTotaal = [...kozijnenVoorgevel, ...kozijnenAchtergevel]
-      .reduce((sum, k) => sum + k.omtrek, 0);
-
-    // Add explanations for totals
-    explanations["kozijnOppervlakVoorTotaal"] = `Som van alle voorgevel kozijn oppervlaktes = ${kozijnOppervlakVoorTotaal}`;
-    explanations["kozijnOppervlakAchterTotaal"] = `Som van alle achtergevel kozijn oppervlaktes = ${kozijnOppervlakAchterTotaal}`;
-    explanations["kozijnOppervlakTotaal"] = `${kozijnOppervlakVoorTotaal} + ${kozijnOppervlakAchterTotaal} = ${kozijnOppervlakTotaal}`;
-    explanations["kozijnRendementTotaal"] = `Som van alle kozijn rendement waarden = ${kozijnRendementTotaal}`;
-    explanations["kozijnOmtrekTotaal"] = `Som van alle kozijn omtrekken = ${kozijnOmtrekTotaal}`;
-
-    // Group kozijnen by size
-    const alleKozijnen = [...kozijnenVoorgevel, ...kozijnenAchtergevel];
-    const kozijnenPerGrootte: KozijnGrootte = {
-      tot1M2: calculateKozijnenInRange(alleKozijnen, 0, 1),
-      tot1_5M2: calculateKozijnenInRange(alleKozijnen, 1, 1.5),
-      tot2M2: calculateKozijnenInRange(alleKozijnen, 1.5, 2),
-      tot2_5M2: calculateKozijnenInRange(alleKozijnen, 2, 2.5),
-      tot3M2: calculateKozijnenInRange(alleKozijnen, 2.5, 3),
-      tot3_5M2: calculateKozijnenInRange(alleKozijnen, 3, 3.5),
-      tot4M2: calculateKozijnenInRange(alleKozijnen, 3.5, 4),
-      boven4M2: calculateKozijnenInRange(alleKozijnen, 4, Infinity),
-    };
-
+  // Calculate PV panel related values (new function)
+  const calculatePVPanelen = (
+    woningSpecifiek: WoningSpecifiek, 
+    basisMaten: any, 
+    explanations: Record<string, string>
+  ) => {
+    const { breedte, diepte, gootHoogte, nokHoogte, aantalWoningen, heeftPlatDak } = woningSpecifiek;
+    const { lengteDakvlak } = basisMaten;
+    
+    // Constants for PV panel dimensions
+    const pvPaneelBreedte = 1.096; // From cell C113
+    const pvPaneelHoogte = 1.754;  // From cell C114
+    
+    // Calculate AantalPVPanelenGGB
+    // First calculate PV in breedte (corresponds to C117)
+    const pvInBreedte = Math.floor(breedte / pvPaneelBreedte);
+    explanations["aantalPVInBreedte"] = `Math.floor(${breedte} (breedte) / ${pvPaneelBreedte} (pvPaneelBreedte)) = ${pvInBreedte}`;
+    
+    // Then calculate PV in diepte (corresponds to C118)
+    const pvInDiepte = Math.floor((lengteDakvlak / pvPaneelHoogte) - 1);
+    explanations["aantalPVInDiepte"] = `Math.floor((${lengteDakvlak} (lengteDakvlak) / ${pvPaneelHoogte} (pvPaneelHoogte)) - 1) = ${pvInDiepte}`;
+    
+    // Calculate AantalPVPanelenGGB (corresponds to C119)
+    const aantalPVPanelenGGB = pvInBreedte * pvInDiepte;
+    explanations["aantalPVPanelenGGB"] = `${pvInBreedte} (pvInBreedte) × ${pvInDiepte} (pvInDiepte) = ${aantalPVPanelenGGB}`;
+    
+    // Calculate OppervlaktePVPanelenGGB (corresponds to C120)
+    const oppervlaktePVPanelenGGB = aantalPVPanelenGGB * pvPaneelBreedte * pvPaneelHoogte;
+    explanations["oppervlaktePVPanelenGGB"] = `${aantalPVPanelenGGB} (aantalPVPanelenGGB) × ${pvPaneelBreedte} (pvPaneelBreedte) × ${pvPaneelHoogte} (pvPaneelHoogte) = ${oppervlaktePVPanelenGGB}`;
+    
+    // Calculate PV in hoogte for kopgevel (corresponds to C125)
+    const pvInHoogte = Math.floor((gootHoogte - 3) / pvPaneelHoogte);
+    explanations["aantalPVInHoogte"] = `Math.floor((${gootHoogte} (gootHoogte) - 3) / ${pvPaneelHoogte} (pvPaneelHoogte)) = ${pvInHoogte}`;
+    
+    // Calculate PV in diepte for kopgevel (corresponds to C126)
+    const pvInDiepteKop = Math.floor(diepte / pvPaneelBreedte);
+    explanations["aantalPVInDiepteKop"] = `Math.floor(${diepte} (diepte) / ${pvPaneelBreedte} (pvPaneelBreedte)) = ${pvInDiepteKop}`;
+    
+    // Calculate AantalPVPanelenKop (corresponds to C127)
+    const aantalPVPanelenKop = pvInHoogte * pvInDiepteKop;
+    explanations["aantalPVPanelenKop"] = `${pvInHoogte} (pvInHoogte) × ${pvInDiepteKop} (pvInDiepteKop) = ${aantalPVPanelenKop}`;
+    
+    // Calculate AantalPVPanelenLangs (corresponds to C128)
+    const aantalPVPanelenLangs = aantalWoningen * 2;
+    explanations["aantalPVPanelenLangs"] = `${aantalWoningen} (aantalWoningen) × 2 = ${aantalPVPanelenLangs}`;
+    
+    // Calculate OppervlaktePVPanelenKop (corresponds to C123)
+    const oppervlaktePVPanelenKop = aantalPVPanelenKop * pvPaneelBreedte * pvPaneelHoogte;
+    explanations["oppervlaktePVPanelenKop"] = `${aantalPVPanelenKop} (aantalPVPanelenKop) × ${pvPaneelBreedte} (pvPaneelBreedte) × ${pvPaneelHoogte} (pvPaneelHoogte) = ${oppervlaktePVPanelenKop}`;
+    
+    // Calculate OppervlaktePVPanelenLangs (corresponds to C124)
+    const oppervlaktePVPanelenLangs = aantalPVPanelenLangs * pvPaneelBreedte * pvPaneelHoogte;
+    explanations["oppervlaktePVPanelenLangs"] = `${aantalPVPanelenLangs} (aantalPVPanelenLangs) × ${pvPaneelBreedte} (pvPaneelBreedte) × ${pvPaneelHoogte} (pvPaneelHoogte) = ${oppervlaktePVPanelenLangs}`;
+    
     return {
-      kozijnenVoorgevel,
-      kozijnenAchtergevel,
-      kozijnOppervlakVoorTotaal,
-      kozijnOppervlakAchterTotaal,
-      kozijnOppervlakTotaal,
-      kozijnRendementTotaal,
-      kozijnOmtrekTotaal,
-      kozijnenPerGrootte
+      aantalPVPanelenGGB,
+      oppervlaktePVPanelenGGB,
+      aantalPVPanelenKop,
+      aantalPVPanelenLangs,
+      oppervlaktePVPanelenKop,
+      oppervlaktePVPanelenLangs
     };
   };
+console.log("woningType", woningType);
+  const calculateKozijnen = (woningType: WoningType, explanations: Record<string, string>) => {
+  // Helper function for kozijn calculations
+  const berekenKozijn = (breedte?: number, hoogte?: number, type: string = ''): KozijnDetails => {
+    if (!breedte || !hoogte) {
+      explanations[`kozijn_${type}`] = `Ongeldige afmetingen: breedte=${breedte}, hoogte=${hoogte}`;
+      return { type, breedte: 0, hoogte: 0, oppervlakte: 0, rendement: 0, omtrek: 0 };
+    }
 
-  // Helper function to calculate kozijnen in a specific size range
-  const calculateKozijnenInRange = (kozijnen: KozijnDetails[], min: number, max: number): number => {
-    return kozijnen.reduce((sum, k) => {
-      if (k.rendement > min && k.rendement <= max) {
-        return sum + k.rendement;
-      }
-      return sum;
-    }, 0);
+    const oppervlakte = breedte * hoogte;
+    const rendement = (breedte - 0.15) * (hoogte - 0.15);
+    const omtrek = (breedte + hoogte) * 2;
+
+    explanations[`kozijn_${type}_oppervlakte`] = `${breedte} × ${hoogte} = ${oppervlakte}`;
+    explanations[`kozijn_${type}_rendement`] = `(${breedte} - 0.15) × (${hoogte} - 0.15) = ${rendement}`;
+    explanations[`kozijn_${type}_omtrek`] = `(${breedte} + ${hoogte}) × 2 = ${omtrek}`;
+
+    return { type, breedte, hoogte, oppervlakte, rendement, omtrek };
   };
 
+  // Process nested kozijn structures recursively
+  const processKozijnen = (kozijnenData: any, prefix: string = ''): KozijnDetails[] => {
+    const result: KozijnDetails[] = [];
+    
+    // Handle null or undefined data
+    if (!kozijnenData) return result;
+    
+    Object.entries(kozijnenData).forEach(([key, value]) => {
+      const currentKey = prefix ? `${prefix}_${key}` : key;
+      
+      // If value has breedte property, it's a kozijn
+      if (value && typeof value === 'object' && 'breedte' in value) {
+        const { breedte, hoogte = 0 } = value as any;
+        result.push(berekenKozijn(breedte, hoogte, currentKey));
+      } 
+      // Otherwise it might be a nested object containing kozijnen
+      else if (value && typeof value === 'object') {
+        result.push(...processKozijnen(value, currentKey));
+      }
+    });
+    
+    return result;
+  };
+
+  // Calculate kozijnen details for voor- and achtergevel
+  const kozijnenVoorgevel = processKozijnen(woningType.voorgevelKozijnen);
+  const kozijnenAchtergevel = processKozijnen(woningType.achtergevelKozijnen);
+
+  // Calculate kozijn totals
+  const kozijnOppervlakVoorTotaal = kozijnenVoorgevel.reduce((sum, k) => sum + k.oppervlakte, 0);
+  const kozijnOppervlakAchterTotaal = kozijnenAchtergevel.reduce((sum, k) => sum + k.oppervlakte, 0);
+  const kozijnOppervlakTotaal = kozijnOppervlakVoorTotaal + kozijnOppervlakAchterTotaal;
+  const kozijnRendementTotaal = [...kozijnenVoorgevel, ...kozijnenAchtergevel].reduce((sum, k) => sum + k.rendement, 0);
+  const kozijnOmtrekTotaal = [...kozijnenVoorgevel, ...kozijnenAchtergevel].reduce((sum, k) => sum + k.omtrek, 0);
+
+  // Add explanations for totals
+  explanations["kozijnOppervlakVoorTotaal"] = `Som van alle voorgevel kozijn oppervlaktes = ${kozijnOppervlakVoorTotaal}`;
+  explanations["kozijnOppervlakAchterTotaal"] = `Som van alle achtergevel kozijn oppervlaktes = ${kozijnOppervlakAchterTotaal}`;
+  explanations["kozijnOppervlakTotaal"] = `${kozijnOppervlakVoorTotaal} + ${kozijnOppervlakAchterTotaal} = ${kozijnOppervlakTotaal}`;
+  explanations["kozijnRendementTotaal"] = `Som van alle kozijn rendement waarden = ${kozijnRendementTotaal}`;
+  explanations["kozijnOmtrekTotaal"] = `Som van alle kozijn omtrekken = ${kozijnOmtrekTotaal}`;
+
+  // Group kozijnen by size
+ const alleKozijnen = [...kozijnenVoorgevel, ...kozijnenAchtergevel];
+  const kozijnenPerGrootte: KozijnGrootte = {
+    tot1M2: calculateKozijnenInRange(alleKozijnen, 0, 1),
+    tot1_5M2: calculateKozijnenInRange(alleKozijnen, 1, 1.5),
+    tot2M2: calculateKozijnenInRange(alleKozijnen, 1.5, 2),
+    tot2_5M2: calculateKozijnenInRange(alleKozijnen, 2, 2.5),
+    tot3M2: calculateKozijnenInRange(alleKozijnen, 2.5, 3),
+    tot3_5M2: calculateKozijnenInRange(alleKozijnen, 3, 3.5),
+    tot4M2: calculateKozijnenInRange(alleKozijnen, 3.5, 4),
+    boven4M2: calculateKozijnenInRange(alleKozijnen, 4, Infinity),
+  };
+
+  // Calculate Glass surface totals (using rendement/netto values)
+  const glasOppervlakVoorTotaal = kozijnenVoorgevel.reduce((sum, k) => sum + k.rendement, 0);
+  const glasOppervlakAchterTotaal = kozijnenAchtergevel.reduce((sum, k) => sum + k.rendement, 0);
+  const glasOppervlakteWoning = glasOppervlakVoorTotaal + glasOppervlakAchterTotaal;
+  
+  // Add explanations for glass surface totals
+  explanations["glasOppervlakVoorTotaal"] = `Som van alle voorgevel kozijn netto oppervlaktes = ${glasOppervlakVoorTotaal}`;
+  explanations["glasOppervlakAchterTotaal"] = `Som van alle achtergevel kozijn netto oppervlaktes = ${glasOppervlakAchterTotaal}`;
+  explanations["glasOppervlakteWoning"] = `${glasOppervlakVoorTotaal} + ${glasOppervlakAchterTotaal} = ${glasOppervlakteWoning}`;
+
+  return {
+    kozijnenVoorgevel,
+    kozijnenAchtergevel,
+    kozijnOppervlakVoorTotaal,
+    kozijnOppervlakAchterTotaal,
+    kozijnOppervlakTotaal,
+    kozijnRendementTotaal,
+    kozijnOmtrekTotaal,
+    kozijnenPerGrootte,
+    glasOppervlakVoorTotaal,
+    glasOppervlakAchterTotaal,
+    glasOppervlakteWoning
+  };
+};
+
+// Helper function to calculate kozijnen in a specific size range
+const calculateKozijnenInRange = (kozijnen: KozijnDetails[], min: number, max: number): number => {
+  return kozijnen.reduce((sum, k) => {
+    if (k.rendement > min && k.rendement <= max) {
+      return sum + k.rendement;
+    }
+    return sum;
+  }, 0);
+};
   const calculateBasisMaten = (woningSpecifiek: WoningSpecifiek, explanations: Record<string, string>, woningType: WoningType) => {
     const { breedte, diepte, gootHoogte, nokHoogte, heeftPlatDak, breedteComplex } = woningSpecifiek;
     
@@ -375,6 +483,7 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
     }
 
     const breedteWoningPlusHoogte = breedte + woningType.ruimten.hoogte;
+    console.log("ruimten in woning", woningType.ruimten)
 
     return {
       gevelOppervlakVoor,
@@ -400,6 +509,7 @@ export const CalculationHandler: React.FC<Props> = ({ dimensions, woningType, on
     const { gevelOppervlakTotaal, dakOppervlak } = basisMaten;
     const { kozijnOppervlakTotaal } = kozijnInfo;
 
+    console.log("kozijn totaal", kozijnInfo)
     // Calculate net gevel area
     const gevelOppervlakNetto = gevelOppervlakTotaal - kozijnOppervlakTotaal;
     explanations["gevelOppervlakNetto"] = `${gevelOppervlakTotaal} (gevelOppervlakTotaal) - ${kozijnOppervlakTotaal} (kozijnOppervlakTotaal) = ${gevelOppervlakNetto}`;

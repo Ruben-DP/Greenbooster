@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { getHeatDemandValue } from "./heat-demand";
 import { calculateMeasurePrice } from "./price.calculator";
 import { Flame, Volume1, Plus, Trash2, AlertTriangle } from "lucide-react";
+import { getSettings } from "@/app/actions/settingsActions"; // Import de instellingen functie
+import { Settings } from "@/types/settings"; // Import het Settings type
 
 interface Calculation {
   type: string;
@@ -62,12 +64,21 @@ interface MeasureListProps {
 // Constants
 const MAINTENANCE_PERIOD_YEARS = 40; // Period for calculation in years
 const ANNUAL_INFLATION_RATE = 0.01; // 1% annual inflation
-const PROFIT_MARGIN_RATE = 0.25; // 25% profit margin and overhead
-const VAT_RATE = 0.21; // 21% BTW (VAT)
 
 // Define custom group order - modify this array to change the order
 // Any groups not in this array will be displayed after these groups
-const GROUP_ORDER = ["dak","gevel buiten","vloeren", "gevel binnen","kozijnen","bergingen","opwek","ventilatie","ruimteverwarming","diversen"];
+const GROUP_ORDER = [
+  "dak",
+  "gevel buiten",
+  "vloeren",
+  "gevel binnen",
+  "kozijnen",
+  "bergingen",
+  "opwek",
+  "ventilatie",
+  "ruimteverwarming",
+  "diversen",
+];
 
 export default function MeasureList({
   residenceData,
@@ -83,9 +94,33 @@ export default function MeasureList({
   > | null>(null);
   const [expandedMeasure, setExpandedMeasure] = useState<string | null>(null);
 
-  // Load measures when component mounts
+  const [settings, setSettings] = useState<Settings>({
+    hourlyLaborCost: 51, // Standaardwaarde tot geladen
+    profitPercentage: 25, // Standaardwaarde tot geladen
+    vatPercentage: 21, // Standaardwaarde tot geladen
+    inflationPercentage: 1, // Standaardwaarde tot geladen
+    cornerHouseCorrection: -10, // Standaardwaarde tot geladen
+  });
+
+  // Load measures and settings when component mounts
   useEffect(() => {
-    searchItems("");
+    // Haal zowel de maatregelen als de instellingen op
+    const initializeData = async () => {
+      // Haal maatregelen op
+      searchItems("");
+      // Haal instellingen op
+      try {
+        const settingsResult = await getSettings();
+        if (settingsResult.success && settingsResult.data) {
+          setSettings(settingsResult.data);
+          console.log("Instellingen geladen:", settingsResult.data);
+        }
+      } catch (error) {
+        console.error("Fout bij laden instellingen:", error);
+      }
+    };
+
+    initializeData();
   }, []);
 
   // Update selected residence when residenceData changes
@@ -94,6 +129,7 @@ export default function MeasureList({
       setSelectedResidence(residenceData);
     }
   }, [residenceData]);
+
 
   // Calculate maintenance costs over 40 years
   const calculateMaintenanceCosts = (
@@ -144,7 +180,8 @@ export default function MeasureList({
       ) {
         // Calculate inflated cost for this occurrence
         const inflatedCost =
-          baseJobCost * Math.pow(1 + ANNUAL_INFLATION_RATE, year);
+          baseJobCost * Math.pow(1 + settings.inflationPercentage / 100, year);
+
         total40Years += inflatedCost;
       }
     });
@@ -389,8 +426,8 @@ export default function MeasureList({
   // 1. First include all groups from GROUP_ORDER that exist in the data
   // 2. Then add any groups that aren't in GROUP_ORDER but exist in the data
   const orderedGroups = [
-    ...GROUP_ORDER.filter(group => allGroups.includes(group)),
-    ...allGroups.filter(group => !GROUP_ORDER.includes(group))
+    ...GROUP_ORDER.filter((group) => allGroups.includes(group)),
+    ...allGroups.filter((group) => !GROUP_ORDER.includes(group)),
   ];
 
   const formatPrice = (price: number) => {
@@ -495,8 +532,8 @@ export default function MeasureList({
                     );
 
                     if (matchingCalc && laborItem.laborNorm) {
-                      // Use fixed value of 51 for labor hour cost
-                      const laborHourCost = 51;
+                      // Gebruik het uurtarief uit de database instellingen
+                      const laborHourCost = settings.hourlyLaborCost;
 
                       // Calculate labor cost for this item
                       const itemLaborCost =
@@ -521,9 +558,12 @@ export default function MeasureList({
                 // Calculate final base cost including labor
                 const baseCost = materialCost + laborCost;
 
+                // Bereken het winstpercentage uit de database instellingen
+                const profitMarginRate = settings.profitPercentage / 100;
+
                 // Calculate profit and VAT
-                const withProfit = baseCost * (1 + PROFIT_MARGIN_RATE);
-                const withVAT = withProfit * (1 + VAT_RATE);
+                const withProfit = baseCost * (1 + profitMarginRate);
+                const withVAT = withProfit * (1 + settings.vatPercentage / 100);
 
                 // Check if measure has any calculation issues that should trigger a warning
                 const showWarning = hasCalculationWarning(
@@ -592,7 +632,7 @@ export default function MeasureList({
                                   withVAT === 0 ? "price--warning" : ""
                                 }`}
                               >
-                                € {formatPrice(withVAT)}
+                                € {formatPrice(baseCost)}
                               </div>
                             ) : (
                               <div className="price price--warning">
@@ -718,7 +758,8 @@ export default function MeasureList({
                                           Arbeidskosten: {labor.name}
                                           <span className="measure__breakdown-formula">
                                             ({labor.quantity.toFixed(2)} ×
-                                            {labor.norm} × €51)
+                                            {labor.norm} × €
+                                            {settings.hourlyLaborCost})
                                           </span>
                                         </div>
                                         <div className="measure__breakdown-price">
@@ -736,40 +777,40 @@ export default function MeasureList({
                                 )}
 
                               {/* Step 1: Add profit margin */}
-                              <div className="measure__breakdown-item subtotal">
+                              {/* <div className="measure__breakdown-item subtotal">
                                 <div className="measure__breakdown-name">
                                   AK + Winst + CAR + Garantie
                                   <span className="measure__breakdown-formula">
-                                    (toeslag van {PROFIT_MARGIN_RATE * 100}%)
+                                    (toeslag van {settings.profitPercentage}%)
                                   </span>
                                 </div>
                                 <div className="measure__breakdown-price">
-                                  € {formatPrice(baseCost * PROFIT_MARGIN_RATE)}
+                                  € {formatPrice(baseCost * profitMarginRate)}
                                 </div>
-                              </div>
+                              </div> */}
 
                               {/* Step 2: Add VAT */}
-                              <div className="measure__breakdown-item">
+                              {/* <div className="measure__breakdown-item">
                                 <div className="measure__breakdown-name">
                                   BTW
                                   <span className="measure__breakdown-formula">
-                                    ({VAT_RATE * 100}%)
+                                    ({settings.vatPercentage}%)
                                   </span>
                                 </div>
                                 <div className="measure__breakdown-price">
                                   € {formatPrice(withProfit * VAT_RATE)}
                                 </div>
-                              </div>
+                              </div> */}
 
                               {/* Final total including VAT */}
                               <div className="measure__breakdown-total">
                                 <div>
                                   <strong>
-                                    Totaal eenmalige kosten (incl. BTW)
+                                    Totaal eenmalige kosten (excl. BTW)
                                   </strong>
                                 </div>
                                 <div>
-                                  <strong>€ {formatPrice(withVAT)}</strong>
+                                  <strong>€ {formatPrice(baseCost)}</strong>
                                 </div>
                               </div>
                             </div>
@@ -836,14 +877,6 @@ export default function MeasureList({
                                   }
                                 )}
 
-                                {/* Single occurrence total - REMOVED */}
-                                {/* <div className="measure__breakdown-subtotal">
-                                <div>Kosten per keer</div>
-                                <div>
-                                  € {formatPrice(maintenanceResult.price)}
-                                </div>
-                              </div> */}
-
                                 {/* 40-year maintenance cost */}
                                 <div className="measure__breakdown-yearly">
                                   <div>
@@ -862,7 +895,7 @@ export default function MeasureList({
                                 <div className="measure__breakdown-total">
                                   <div>
                                     Totaal over {MAINTENANCE_PERIOD_YEARS} jaar
-                                    ({ANNUAL_INFLATION_RATE * 100}% inflatie
+                                    ({settings.inflationPercentage}% inflatie
                                     p.j)
                                   </div>
                                   <div>€ {formatPrice(total40Years)}</div>
@@ -920,7 +953,7 @@ export default function MeasureList({
           margin-bottom: 6px;
           padding-left: 26px;
           position: relative;
-          font-size: 14px;
+          font-size: 15px;
           line-height: 1.4;
         }
 

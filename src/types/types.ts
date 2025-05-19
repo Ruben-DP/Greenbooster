@@ -1,23 +1,28 @@
-export interface Item {
-  _id: string;
-  name?: string;
-  group?: string;
-  [key: string]: any;
+// types/settings.ts
+
+export interface Settings {
+  _id?: string;
+  hourlyLaborCost: number;      // Uurloon kostprijs
+  vatPercentage: number;        // BTW percentage
+  inflationPercentage: number;  // Jaarlijks inflatie percentage
+  cornerHouseCorrection: number; // Hoekhuis correctie
+  abkMaterieel: number;         // ABK / materieel volgens begroting
+  afkoop: number;               // Afkoop
+  kostenPlanuitwerking: number; // Kosten t.b.v. nadere planuitwerking
+  nazorgService: number;        // Nazorg / Service
+  carPiDicVerzekering: number;  // CAR / PI / DIC verzekering
+  bankgarantie: number;         // Bankgarantie
+  algemeneKosten: number;       // Algemene kosten (AK)
+  risico: number;               // Risico
+  winst: number;                // Winst
+  planvoorbereiding: number;    // Planvoorbereiding
+  huurdersbegeleiding: number;  // Huurdersbegeleiding
+  // Keeping profitPercentage optional for backward compatibility
+  profitPercentage?: number;    // Old field, no longer used
 }
 
-export interface ChangeRecord {
-  fieldId: string;
-  label: string;
-  oldValue: string;
-  newValue: string;
-}
-
-export interface FormField {
-  id: string;
-  label?: string;
-  value: string;
-  type: "text" | "email" | "number" | "tel" | "hidden" | "dropdown";
-  required?: boolean;
-  dropdownFields?: string[];
-  path?: string;
+export interface SettingsResult {
+  success: boolean;
+  data?: Settings;
+  error?: string;
 }

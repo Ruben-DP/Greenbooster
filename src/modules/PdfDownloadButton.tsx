@@ -7,10 +7,11 @@ const PdfDownloadButton = () => {
   useEffect(() => {
     // Load html2pdf script
     const script = document.createElement("script");
-    script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js";
+    script.src =
+      "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js";
     script.async = true;
     document.head.appendChild(script);
-    
+
     scriptRef.current = script;
 
     // Cleanup on unmount
@@ -24,7 +25,9 @@ const PdfDownloadButton = () => {
   const handleDownload = () => {
     // Check if html2pdf is loaded
     if (typeof window !== "undefined" && !window.html2pdf) {
-      alert("PDF bibliotheek wordt geladen, probeer het over enkele seconden opnieuw.");
+      alert(
+        "PDF bibliotheek wordt geladen, probeer het over enkele seconden opnieuw."
+      );
       return;
     }
 
@@ -39,23 +42,25 @@ const PdfDownloadButton = () => {
     const heroSection = document.querySelector("section.hero") as HTMLElement;
     const stepSection = document.querySelector("section.step") as HTMLElement;
     const measureList = document.querySelector(".measure-list") as HTMLElement;
-    const downloadButton = document.querySelector(".download-button") as HTMLElement;
+    const downloadButton = document.querySelector(
+      ".download-button"
+    ) as HTMLElement;
     const originalHeroDisplay = heroSection?.style.display;
     const originalStepDisplay = stepSection?.style.display;
     const originalMeasureListDisplay = measureList?.style.display;
     const originalDownloadButtonDisplay = downloadButton?.style.display;
-    
+
     if (heroSection) heroSection.style.display = "none";
     if (stepSection) stepSection.style.display = "none";
     if (measureList) measureList.style.display = "none";
     if (downloadButton) downloadButton.style.display = "none";
-    
+
     // Options for html2pdf
     const options = {
       margin: 10,
       filename: "kostencalculator.pdf",
       image: { type: "png", quality: 1 },
-      html2canvas: { 
+      html2canvas: {
         scale: 2,
         useCORS: true,
         windowWidth: 3840,
@@ -63,19 +68,20 @@ const PdfDownloadButton = () => {
         logging: true,
         letterRendering: true,
         imageTimeout: 0,
-        backgroundColor: '#FFFFFF'
+        backgroundColor: "#FFFFFF",
       },
-      jsPDF: { 
-        unit: "mm", 
+      jsPDF: {
+        unit: "mm",
         format: "a4",
         orientation: "landscape",
         compress: false,
-        hotfixes: ["px_scaling"]
-      }
+        hotfixes: ["px_scaling"],
+      },
     };
 
     // Generate the PDF directly from the page content
-    window.html2pdf()
+    window
+      .html2pdf()
       .from(pageContent)
       .set(options)
       .save()
@@ -83,8 +89,10 @@ const PdfDownloadButton = () => {
         // Restore original display values
         if (heroSection) heroSection.style.display = originalHeroDisplay || "";
         if (stepSection) stepSection.style.display = originalStepDisplay || "";
-        if (measureList) measureList.style.display = originalMeasureListDisplay || "";
-        if (downloadButton) downloadButton.style.display = originalDownloadButtonDisplay || "";
+        if (measureList)
+          measureList.style.display = originalMeasureListDisplay || "";
+        if (downloadButton)
+          downloadButton.style.display = originalDownloadButtonDisplay || "";
       })
       .catch((error: Error) => {
         console.error("Fout bij het genereren van PDF:", error);
@@ -92,26 +100,15 @@ const PdfDownloadButton = () => {
         // Restore original display values even if there's an error
         if (heroSection) heroSection.style.display = originalHeroDisplay || "";
         if (stepSection) stepSection.style.display = originalStepDisplay || "";
-        if (measureList) measureList.style.display = originalMeasureListDisplay || "";
-        if (downloadButton) downloadButton.style.display = originalDownloadButtonDisplay || "";
+        if (measureList)
+          measureList.style.display = originalMeasureListDisplay || "";
+        if (downloadButton)
+          downloadButton.style.display = originalDownloadButtonDisplay || "";
       });
   };
 
   return (
-    <button
-      onClick={handleDownload}
-      className="pdf-download-btn"
-      style={{
-        padding: "10px 20px",
-        backgroundColor: "#4CAF50",
-        color: "white",
-        border: "none",
-        borderRadius: "4px",
-        cursor: "pointer",
-        fontSize: "16px",
-        width:"100%"
-      }}
-    >
+    <button onClick={handleDownload} className="pdf-download-btn" style={{}}>
       Download als PDF
     </button>
   );

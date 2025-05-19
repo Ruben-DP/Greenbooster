@@ -1,8 +1,10 @@
 .budget {
   &__sum {
     text-align: center;
-    font-size: 30px;
+    font-size: 40px;
     font-weight: 500;
+    color: black;
+    font-family: var(--font2);
   }
   &__notice {
     text-align: center;
