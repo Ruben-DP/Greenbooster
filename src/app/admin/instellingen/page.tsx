@@ -21,7 +21,12 @@ export default function SettingsPage() {
     risico: 2,
     winst: 5,
     planvoorbereiding: 3,
-    huurdersbegeleiding: 2
+    huurdersbegeleiding: 2,
+    // Add default values for custom fields with string conversion for safety
+    customValue1Name: "Custom field 1",
+    customValue1: 0,
+    customValue2Name: "Custom field 2",
+    customValue2: 0
   };
   
   const [settings, setSettings] = useState<Settings>(defaultSettings);
@@ -34,11 +39,18 @@ export default function SettingsPage() {
         setIsLoading(true);
         const result = await getSettings();
         if (result.success && result.data) {
-          // Ensure all new fields have values if they don't exist in the fetched data
-          setSettings({
-            ...defaultSettings,
-            ...result.data
+          // Create a merged settings object with defaults for any missing values
+          const mergedSettings = {...defaultSettings};
+          
+          // Only copy values that are valid (not undefined, not null, not NaN)
+          Object.keys(result.data).forEach(key => {
+            if (result.data[key] !== undefined && result.data[key] !== null && 
+                (typeof result.data[key] !== 'number' || !isNaN(result.data[key]))) {
+              mergedSettings[key] = result.data[key];
+            }
           });
+          
+          setSettings(mergedSettings);
         }
       } catch (error) {
         console.error("Error fetching settings:", error);
@@ -54,12 +66,22 @@ export default function SettingsPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // Only update if value is not empty
-    if (value !== '') {
+    // Check if it's a numeric field or a text field
+    if (name === 'customValue1Name' || name === 'customValue2Name') {
+      // Handle text fields
       setSettings((prev) => ({
         ...prev,
-        [name]: parseFloat(value),
+        [name]: value,
       }));
+    } else {
+      // Handle numeric fields
+      // Only update if value is not empty
+      if (value !== '') {
+        setSettings((prev) => ({
+          ...prev,
+          [name]: parseFloat(value),
+        }));
+      }
     }
   };
 
@@ -79,6 +101,18 @@ export default function SettingsPage() {
         Object.keys(existingResult.data).forEach(key => {
           if (settings[key] !== undefined) {
             safeSettings[key] = settings[key];
+          }
+        });
+        
+        // Add custom fields - these might be new so they may not exist in backend yet
+        const customFields = [
+          'customValue1', 'customValue1Name', 
+          'customValue2', 'customValue2Name'
+        ];
+        
+        customFields.forEach(field => {
+          if (settings[field] !== undefined) {
+            safeSettings[field] = settings[field];
           }
         });
         
@@ -115,14 +149,18 @@ export default function SettingsPage() {
     return <div className="loading">Instellingen laden...</div>;
   }
 
+
   return (
     <div className="settings-page">
       <h1 className="settings-title">Algemene Instellingen</h1>
-      
+
       <div className="settings-actions-main">
         {isEditing ? (
           <>
-            <button className="button button-secondary" onClick={() => setIsEditing(false)}>
+            <button
+              className="button button-secondary"
+              onClick={() => setIsEditing(false)}
+            >
               Annuleren
             </button>
             <button className="button button-primary" onClick={handleSave}>
@@ -130,12 +168,15 @@ export default function SettingsPage() {
             </button>
           </>
         ) : (
-          <button className="button button-primary" onClick={() => setIsEditing(true)}>
+          <button
+            className="button button-primary"
+            onClick={() => setIsEditing(true)}
+          >
             Bewerken
           </button>
         )}
       </div>
-      
+
       <div className="settings-container">
         {/* First card - Basic settings */}
         <div className="settings-card">
@@ -160,13 +201,16 @@ export default function SettingsPage() {
                   />
                 </div>
               ) : (
-                <div className="settings-value">€ {settings.hourlyLaborCost.toFixed(2)}</div>
+                <div className="settings-value">
+                  € {settings.hourlyLaborCost.toFixed(2)}
+                </div>
               )}
               <div className="settings-description">
-                Het standaard uurloon dat gebruikt wordt voor het berekenen van arbeidskosten.
+                Het standaard uurloon dat gebruikt wordt voor het berekenen van
+                arbeidskosten.
               </div>
             </div>
-            
+
             <div className="settings-field">
               <label htmlFor="vatPercentage">BTW percentage (%)</label>
               {isEditing ? (
@@ -187,12 +231,15 @@ export default function SettingsPage() {
                 <div className="settings-value">{settings.vatPercentage}%</div>
               )}
               <div className="settings-description">
-                Het standaard BTW percentage dat wordt toegepast op alle berekeningen.
+                Het standaard BTW percentage dat wordt toegepast op alle
+                berekeningen.
               </div>
             </div>
-            
+
             <div className="settings-field">
-              <label htmlFor="inflationPercentage">Jaarlijks inflatie percentage (%)</label>
+              <label htmlFor="inflationPercentage">
+                Jaarlijks inflatie percentage (%)
+              </label>
               {isEditing ? (
                 <div className="input-with-symbol">
                   <input
@@ -208,13 +255,16 @@ export default function SettingsPage() {
                   <span className="input-symbol">%</span>
                 </div>
               ) : (
-                <div className="settings-value">{settings.inflationPercentage}%</div>
+                <div className="settings-value">
+                  {settings.inflationPercentage}%
+                </div>
               )}
               <div className="settings-description">
-                Het jaarlijkse inflatiepercentage voor de onderhoudskosten over lange termijn.
+                Het jaarlijkse inflatiepercentage voor de onderhoudskosten over
+                lange termijn.
               </div>
             </div>
-{/*             
+            {/*             
             <div className="settings-field">
               <label htmlFor="cornerHouseCorrection">Hoekhuis correctie (%)</label>
               {isEditing ? (
@@ -249,7 +299,9 @@ export default function SettingsPage() {
 
           <div className="settings-form">
             <div className="settings-field">
-              <label htmlFor="abkMaterieel">ABK / materieel volgens begroting (%)</label>
+              <label htmlFor="abkMaterieel">
+                ABK / materieel volgens begroting (%)
+              </label>
               {isEditing ? (
                 <div className="input-with-symbol">
                   <input
@@ -291,7 +343,9 @@ export default function SettingsPage() {
             </div>
 
             <div className="settings-field">
-              <label htmlFor="kostenPlanuitwerking">Kosten t.b.v. nadere planuitwerking (%)</label>
+              <label htmlFor="kostenPlanuitwerking">
+                Kosten t.b.v. nadere planuitwerking (%)
+              </label>
               {isEditing ? (
                 <div className="input-with-symbol">
                   <input
@@ -307,7 +361,9 @@ export default function SettingsPage() {
                   <span className="input-symbol">%</span>
                 </div>
               ) : (
-                <div className="settings-value">{settings.kostenPlanuitwerking}%</div>
+                <div className="settings-value">
+                  {settings.kostenPlanuitwerking}%
+                </div>
               )}
             </div>
 
@@ -333,7 +389,9 @@ export default function SettingsPage() {
             </div>
 
             <div className="settings-field">
-              <label htmlFor="carPiDicVerzekering">CAR / PI / DIC verzekering (%)</label>
+              <label htmlFor="carPiDicVerzekering">
+                CAR / PI / DIC verzekering (%)
+              </label>
               {isEditing ? (
                 <div className="input-with-symbol">
                   <input
@@ -349,7 +407,9 @@ export default function SettingsPage() {
                   <span className="input-symbol">%</span>
                 </div>
               ) : (
-                <div className="settings-value">{settings.carPiDicVerzekering}%</div>
+                <div className="settings-value">
+                  {settings.carPiDicVerzekering}%
+                </div>
               )}
             </div>
 
@@ -454,12 +514,16 @@ export default function SettingsPage() {
                   <span className="input-symbol">%</span>
                 </div>
               ) : (
-                <div className="settings-value">{settings.planvoorbereiding}%</div>
+                <div className="settings-value">
+                  {settings.planvoorbereiding}%
+                </div>
               )}
             </div>
 
             <div className="settings-field">
-              <label htmlFor="huurdersbegeleiding">Huurdersbegeleiding (%)</label>
+              <label htmlFor="huurdersbegeleiding">
+                Huurdersbegeleiding (%)
+              </label>
               {isEditing ? (
                 <div className="input-with-symbol">
                   <input
@@ -475,8 +539,102 @@ export default function SettingsPage() {
                   <span className="input-symbol">%</span>
                 </div>
               ) : (
-                <div className="settings-value">{settings.huurdersbegeleiding}%</div>
+                <div className="settings-value">
+                  {settings.huurdersbegeleiding}%
+                </div>
               )}
+            </div>
+          </div>
+        </div>
+        {/* Third card - Custom fields */}
+        <div className="settings-card">
+          <div className="settings-header">
+            <h2>Extra velden eindblad</h2>
+          </div>
+
+          <div className="settings-form">
+            {/* Custom Field 1 */}
+            <div className="custom-field-group">
+              <div className="settings-field">
+                <label htmlFor="customValue1Name">Veld 1 Naam</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    id="customValue1Name"
+                    name="customValue1Name"
+                    value={settings.customValue1Name}
+                    onChange={handleChange}
+                    placeholder="Naam van aangepast veld 1"
+                  />
+                ) : (
+                  <div className="settings-value">
+                    {settings.customValue1Name}
+                  </div>
+                )}
+              </div>
+
+              <div className="settings-field">
+                <label htmlFor="customValue1">Waarde (%)</label>
+                {isEditing ? (
+                  <div className="input-with-symbol">
+                    <input
+                      type="number"
+                      id="customValue1"
+                      name="customValue1"
+                      value={settings.customValue1}
+                      onChange={handleChange}
+                      step="0.1"
+                      min="0"
+                      max="100"
+                    />
+                    <span className="input-symbol">%</span>
+                  </div>
+                ) : (
+                  <div className="settings-value">{settings.customValue1}%</div>
+                )}
+              </div>
+            </div>
+
+            {/* Custom Field 2 */}
+            <div className="custom-field-group">
+              <div className="settings-field">
+                <label htmlFor="customValue2Name">Veld 2 Naam</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    id="customValue2Name"
+                    name="customValue2Name"
+                    value={settings.customValue2Name}
+                    onChange={handleChange}
+                    placeholder="Naam van aangepast veld 2"
+                  />
+                ) : (
+                  <div className="settings-value">
+                    {settings.customValue2Name}
+                  </div>
+                )}
+              </div>
+
+              <div className="settings-field">
+                <label htmlFor="customValue2">Waarde (%)</label>
+                {isEditing ? (
+                  <div className="input-with-symbol">
+                    <input
+                      type="number"
+                      id="customValue2"
+                      name="customValue2"
+                      value={settings.customValue2}
+                      onChange={handleChange}
+                      step="0.1"
+                      min="0"
+                      max="100"
+                    />
+                    <span className="input-symbol">%</span>
+                  </div>
+                ) : (
+                  <div className="settings-value">{settings.customValue2}%</div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -625,6 +783,23 @@ export default function SettingsPage() {
           padding-right: 12px;
         }
 
+        input[type="text"] {
+          width: 100%;
+          padding: 8px 12px;
+          font-size: 16px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
+
+        .custom-field-group {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          padding: 16px;
+          background-color: #f9f9f9;
+          border-radius: 4px;
+        }
+
         .loading {
           display: flex;
           justify-content: center;
@@ -638,7 +813,7 @@ export default function SettingsPage() {
           .settings-container {
             flex-direction: column;
           }
-          
+
           .settings-card {
             width: 100%;
           }

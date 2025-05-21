@@ -130,7 +130,6 @@ export default function MeasureList({
     }
   }, [residenceData]);
 
-
   // Calculate maintenance costs over 40 years
   const calculateMaintenanceCosts = (
     maintenanceResult: { isValid: boolean; price: number; calculations: any[] },
@@ -216,14 +215,14 @@ export default function MeasureList({
     }
 
     // Check if any calculation involves multiplication by zero
-    const hasZeroMultiplication =
-      priceResult.calculations.some(
-        (calc: any) => calc.quantity === 0 || calc.unitPrice === 0
-      ) ||
-      (maintenanceResult.isValid &&
-        maintenanceResult.calculations.some(
-          (calc: any) => calc.quantity === 0 || calc.unitPrice === 0
-        ));
+    // const hasZeroMultiplication =
+    //   priceResult.calculations.some(
+    //     (calc: any) => calc.quantity === 0 || calc.unitPrice === 0
+    //   ) ||
+    //   (maintenanceResult.isValid &&
+    //     maintenanceResult.calculations.some(
+    //       (calc: any) => calc.quantity === 0 || calc.unitPrice === 0
+    //     ));
 
     // Check if maintenance calculation has errors (if mjob_prices exists)
     const hasMaintenanceIssue =
@@ -263,7 +262,7 @@ export default function MeasureList({
       measure.hasOwnProperty("nuisance") && !measure.nuisance;
 
     return (
-      hasZeroMultiplication ||
+      // hasZeroMultiplication ||
       hasMaintenanceIssue ||
       missingHeatDemand ||
       missingNuisanceIndicator
@@ -293,13 +292,13 @@ export default function MeasureList({
     }
 
     // Check if any calculation involves multiplication by zero
-    const hasZeroMultiplication = priceResult.calculations.some(
-      (calc: any) => calc.quantity === 0 || calc.unitPrice === 0
-    );
+    // const hasZeroMultiplication = priceResult.calculations.some(
+    //   (calc: any) => calc.quantity === 0 || calc.unitPrice === 0
+    // );
 
-    if (hasZeroMultiplication) {
-      warnings.push("Berekening bevat vermenigvuldiging met nul");
-    }
+    // if (hasZeroMultiplication) {
+    //   warnings.push("Berekening bevat vermenigvuldiging met nul");
+    // }
 
     // Check if maintenance calculation has errors
     if (
