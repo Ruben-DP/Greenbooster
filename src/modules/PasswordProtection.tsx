@@ -227,7 +227,7 @@ const PasswordProtection = ({ children }) => {
         right: '10px', 
         zIndex: 1000 
       }}>
-        <button
+        {/* <button
           onClick={handleLogout}
           style={{
             background: 'rgba(0,0,0,0.1)',
@@ -240,7 +240,7 @@ const PasswordProtection = ({ children }) => {
           }}
         >
           Uitloggen
-        </button>
+        </button> */}
       </div>
       {children}
     </div>
