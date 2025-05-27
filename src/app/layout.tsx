@@ -1,6 +1,7 @@
 import "../scss/main.scss";
 import { Inter } from "next/font/google";
 import { Metadata } from "next";
+import PasswordProtection from "@/modules/PasswordProtection";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,12 +21,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Add Adobe Typekit stylesheet */}
         <link rel="stylesheet" href="https://use.typekit.net/pwq8zgw.css" />
       </head>
-      <body className={`${inter.variable} antialiased`}>
-        <main>{children}</main>
-      </body>
+      <PasswordProtection>
+        <body className={`${inter.variable} antialiased`}>
+          <main>{children}</main>
+        </body>
+      </PasswordProtection>
     </html>
   );
 }
