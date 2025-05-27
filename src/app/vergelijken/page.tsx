@@ -13,7 +13,7 @@ export default function ComparePage() {
         <CompareProfiles />
         <Toaster
           position="bottom-right"
-          expand={false}
+          expand={false} 
           richColors
           closeButton
         />

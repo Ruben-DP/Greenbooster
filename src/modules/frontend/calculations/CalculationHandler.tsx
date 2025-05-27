@@ -82,7 +82,7 @@ interface CalculationResults {
   kozijnOmtrekTotaal: number;
 
   // Gevel netto
-  gevelOppervlakNetto: number;
+  NettoGevelOppervlak: number;
 
   // Project totals
   projectGevelOppervlak: number;
@@ -320,6 +320,8 @@ export const CalculationHandler: React.FC<Props> = ({
     // Gevel
     console.groupCollapsed("Gevel Berekeningen");
     logExplanationsByPrefix(explanations, "gevelOppervlak");
+    logExplanationsByPrefix(explanations, "NettoGevelOppervlak");
+
     console.groupEnd();
 
     // Dak
@@ -512,7 +514,7 @@ export const CalculationHandler: React.FC<Props> = ({
       oppervlaktePVPanelenLangs,
     };
   };
-  console.log("woningType", woningType);
+
   const calculateKozijnen = (
     woningType: WoningType,
     explanations: Record<string, string>
@@ -796,7 +798,6 @@ export const CalculationHandler: React.FC<Props> = ({
     }
 
     const breedteWoningPlusHoogte = breedte + woningType.ruimten.hoogte;
-    console.log("ruimten in woning", woningType.ruimten);
 
     return {
       gevelOppervlakVoor,
@@ -821,12 +822,11 @@ export const CalculationHandler: React.FC<Props> = ({
     const { gevelOppervlakTotaal, dakOppervlak } = basisMaten;
     const { kozijnOppervlakTotaal } = kozijnInfo;
 
-    console.log("kozijn totaal", kozijnInfo);
     // Calculate net gevel area
-    const gevelOppervlakNetto = gevelOppervlakTotaal - kozijnOppervlakTotaal;
+    const NettoGevelOppervlak = gevelOppervlakTotaal - kozijnOppervlakTotaal;
     explanations[
-      "gevelOppervlakNetto"
-    ] = `${gevelOppervlakTotaal} (gevelOppervlakTotaal) - ${kozijnOppervlakTotaal} (kozijnOppervlakTotaal) = ${gevelOppervlakNetto}`;
+      "NettoGevelOppervlak"
+    ] = `${gevelOppervlakTotaal} (gevelOppervlakTotaal) - ${kozijnOppervlakTotaal} (kozijnOppervlakTotaal) = ${NettoGevelOppervlak}`;
 
     // Calculate additional roof measurements
     const dakOverstekOppervlak = dakOppervlak * 0.05;
@@ -840,7 +840,7 @@ export const CalculationHandler: React.FC<Props> = ({
     ] = `${dakOppervlak} (dakOppervlak) + ${dakOverstekOppervlak} (dakOverstekOppervlak) = ${dakTotaalMetOverhang}`;
 
     return {
-      gevelOppervlakNetto,
+      NettoGevelOppervlak,
       dakOverstekOppervlak,
       dakTotaalMetOverhang,
     };

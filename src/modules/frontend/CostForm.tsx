@@ -11,6 +11,7 @@ import SelectedMeasures from "./calculations/SelectMeasures";
 import PdfDownloadButton from "../PdfDownloadButton";
 import { EnergyLabel } from "./calculations/EnergyLabel";
 import SaveProfileButton from "../residenceProfile/SaveProfileButton";
+import { calculateMeasurePrice } from "./calculations/price.calculator";
 
 interface Measure {
   name: string;
@@ -132,6 +133,7 @@ function PageContent() {
   const [selectedMeasures, setSelectedMeasures] = useState<Measure[]>([]);
   const [totalBudget, setTotalBudget] = useState<number>(0);
   const [totalHeatDemand, setTotalHeatDemand] = useState<number>(0);
+  const [settings, setSettings] = useState(null);
 
   // Calculate total heat demand whenever selectedMeasures changes
   useEffect(() => {
@@ -145,6 +147,77 @@ function PageContent() {
 
     setTotalHeatDemand(newTotalHeatDemand);
   }, [selectedMeasures]);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { getSettings } = await import("@/app/actions/settingsActions");
+        const result = await getSettings();
+        if (result.success && result.data) {
+          setSettings(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  // New function to recalculate measure prices based on new residence data
+  const recalculateMeasures = (
+    measures: Measure[],
+    calculationData: CalculationResults
+  ) => {
+    if (!calculationData || measures.length === 0) return [];
+
+    return measures.map((measure) => {
+      // Calculate price
+      const priceResult = calculationData
+        ? calculateMeasurePrice(measure.measure_prices, calculationData)
+        : { isValid: false, price: 0, calculations: [] };
+
+      // Calculate maintenance
+      const maintenanceResult = calculationData
+        ? calculateMeasurePrice(measure.mjob_prices, calculationData)
+        : { isValid: false, price: 0, calculations: [] };
+
+      // Calculate maintenance costs
+      const { total40Years, perYear } = calculateMaintenanceCosts
+        ? calculateMaintenanceCosts(maintenanceResult, measure.mjob_prices)
+        : { total40Years: 0, perYear: 0 };
+
+      // Get heat demand value
+      const heatDemandValue =
+        selectedType && selectedResidence
+          ? getHeatDemandValue(
+              measure,
+              selectedType.type || "",
+              selectedResidence.projectInformation?.bouwPeriode || ""
+            )
+          : 0;
+
+      // Return updated measure
+      return {
+        ...measure,
+        price: priceResult.isValid ? priceResult.price : undefined,
+        priceCalculations: priceResult.calculations,
+        calculationError: !priceResult.isValid
+          ? priceResult.errorMessage
+          : undefined,
+        maintenancePrice: maintenanceResult.isValid
+          ? maintenanceResult.price
+          : undefined,
+        maintenanceCalculations: maintenanceResult.calculations,
+        maintenanceError: !maintenanceResult.isValid
+          ? maintenanceResult.errorMessage
+          : undefined,
+        maintenanceCost40Years: total40Years,
+        maintenanceCostPerYear: perYear,
+        heatDemandValue: heatDemandValue,
+      };
+    });
+  };
 
   const handleAddMeasure = (measure: Measure) => {
     console.groupCollapsed(
@@ -557,17 +630,40 @@ function PageContent() {
     return periodData?.value ?? defaultValue;
   };
 
-  const handleSelection = (residence: Woning, type: WoningType) => {
-    // Always clear selected measures when selecting a residence
-    // This ensures components will refresh properly
-    setSelectedMeasures([]);
-    setTotalBudget(0);
-    setCalculations(null); // Also reset calculations to force MeasureList to update
-
+  // Modified to keep selected measures
+  const handleSelection = (
+    residence: Woning,
+    type: WoningType,
+    typeStr: string
+  ) => {
     // Set the new residence and type
     setSelectedResidence(residence);
     setSelectedType(type);
+
+    // Don't reset the calculation yet
+    // We'll recalculate after getting the new calculation data
   };
+
+  // New useEffect to update measures when calculations change
+  useEffect(() => {
+    if (!calculations || !selectedResidence || !selectedType) return;
+
+    // If we have selected measures, recalculate them with the new residence data
+    if (selectedMeasures.length > 0) {
+      const updatedMeasures = recalculateMeasures(
+        selectedMeasures,
+        calculations
+      );
+      setSelectedMeasures(updatedMeasures);
+
+      // Calculate new total budget
+      const newBudget = updatedMeasures.reduce(
+        (sum, measure) => sum + (measure.price || 0),
+        0
+      );
+      setTotalBudget(newBudget);
+    }
+  }, [calculations, selectedResidence, selectedType]);
 
   const handleCalculations = (newCalculations: CalculationResults) => {
     setCalculations(newCalculations);
@@ -584,7 +680,72 @@ function PageContent() {
     }
   };
 
-  console.log("selected residence", selectedResidence);
+  // Function to help calculate maintenance costs
+  const calculateMaintenanceCosts = (
+    maintenanceResult: { isValid: boolean; price: number; calculations: any[] },
+    mjob_prices?: any[]
+  ) => {
+    if (
+      !maintenanceResult.isValid ||
+      !mjob_prices ||
+      !Array.isArray(mjob_prices)
+    ) {
+      return { total40Years: 0, perYear: 0 };
+    }
+
+    // Get settings (in a real implementation, you would fetch this from context or props)
+    const inflationPercentage = 1; // Default 1%
+    const maintenancePeriodYears = 40; // 40 year period
+
+    // Calculate how many times each maintenance job occurs in 40 years
+    let total40Years = 0;
+
+    mjob_prices.forEach((job, index) => {
+      const calculation = maintenanceResult.calculations[index];
+      if (!calculation || !job.cycle || job.cycle <= 0) return;
+
+      // Skip if this calculation has no matching job
+      if (calculation.name !== job.name) return;
+
+      // Get single occurrence cost
+      const baseJobCost = calculation.totalPrice;
+
+      // Calculate how many times this job occurs in 40 years
+      const cycleStart = job.cycleStart || 0;
+      const cycle = job.cycle || 1; // Default to yearly if not specified
+
+      if (cycleStart >= maintenancePeriodYears) {
+        // Job doesn't start within our 40-year window
+        return;
+      }
+
+      // Calculate occurrences with inflation
+      if (cycle <= 0) {
+        // Avoid division by zero
+        return;
+      }
+
+      // Apply inflation for each occurrence of the maintenance job
+      for (
+        let year = cycleStart;
+        year < maintenancePeriodYears;
+        year += cycle
+      ) {
+        // Calculate inflated cost for this occurrence
+        const inflatedCost =
+          baseJobCost * Math.pow(1 + inflationPercentage / 100, year);
+
+        total40Years += inflatedCost;
+      }
+    });
+
+    // Calculate yearly average
+    const perYear = total40Years / maintenancePeriodYears;
+
+    return { total40Years, perYear };
+  };
+
+  // console.log("selected residence", selectedResidence);
 
   return (
     <div className="cost-form">
@@ -628,7 +789,13 @@ function PageContent() {
                 />
               )}
               <div className="downloadPDF">
-                <PdfDownloadButton />
+                <PdfDownloadButton
+                  selectedResidence={selectedResidence}
+                  selectedMeasures={selectedMeasures}
+                  totalBudget={totalBudget}
+                  totalHeatDemand={totalHeatDemand}
+                  settings={settings} 
+                />
               </div>
             </div>
           </div>

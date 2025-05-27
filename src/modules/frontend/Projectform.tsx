@@ -540,7 +540,7 @@ export default function ProjectForm() {
                 <span>st</span>
               </div>
             </div>
-            <div className="grouped">
+            {/* <div className="grouped">
               <div className="project-form__field">
                 <label htmlFor="aantalHoekWoningen">Aantal hoekwoningen</label>
                 <div className="flex-field">
@@ -566,7 +566,7 @@ export default function ProjectForm() {
                   <span>%</span>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 

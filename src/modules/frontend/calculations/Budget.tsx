@@ -47,92 +47,110 @@ export default function Budget({ totalAmount }: BudgetProps) {
     // Start with base amount (direct costs)
     const directCosts = Math.max(0, totalAmount);
 
+    
+    const customValue1Amount = directCosts > 0 ? settings.customValue1 || 0 : 0;
+    const customValue2Amount =  directCosts > 0 ? settings.customValue2 || 0 : 0;
+
+    // Subtotal after direct costs and custom values
+    const subtotalDirectAndCustom =
+      directCosts + customValue1Amount + customValue2Amount;
+
     // ABK / Materieel
-    const abkMaterieelAmount = directCosts * (settings.abkMaterieel / 100);
+    const abkMaterieelAmount =
+      subtotalDirectAndCustom * (settings.abkMaterieel / 100);
+
+    // Subtotal after ABK
+    const subtotalAfterABK = subtotalDirectAndCustom + abkMaterieelAmount;
 
     // Afkoop
-    const afkoopAmount = directCosts * (settings.afkoop / 100);
+    const afkoopAmount = subtotalDirectAndCustom * (settings.afkoop / 100);
+
+    // Subtotal "Directe kosten + ABK + Afkoop"
+    const subtotalDirectABKAfkoop = subtotalAfterABK + afkoopAmount;
 
     // Kosten t.b.v. nadere planuitwerking
     const planuitwerkingAmount =
-      directCosts * (settings.kostenPlanuitwerking / 100);
+      subtotalDirectAndCustom * (settings.kostenPlanuitwerking / 100);
+
+    // Subtotal after planuitwerking
+    const subtotalAfterPlanuitwerking =
+      subtotalDirectABKAfkoop + planuitwerkingAmount;
 
     // Nazorg / Service
-    const nazorgServiceAmount = directCosts * (settings.nazorgService / 100);
+    const nazorgServiceAmount =
+      subtotalDirectAndCustom * (settings.nazorgService / 100);
 
     // CAR / PI / DIC verzekering
-    const carPiDicAmount = directCosts * (settings.carPiDicVerzekering / 100);
+    const carPiDicAmount =
+      subtotalDirectAndCustom * (settings.carPiDicVerzekering / 100);
 
     // Bankgarantie
-    const bankgarantieAmount = directCosts * (settings.bankgarantie / 100);
-
-    // Subtotal 1 - Direct costs plus initial factors
-    const subtotal1 =
-      directCosts +
-      abkMaterieelAmount +
-      afkoopAmount +
-      planuitwerkingAmount +
-      nazorgServiceAmount +
-      carPiDicAmount +
-      bankgarantieAmount;
+    const bankgarantieAmount =
+      subtotalDirectAndCustom * (settings.bankgarantie / 100);
 
     // Algemene kosten (AK)
-    const algemeneKostenAmount = subtotal1 * (settings.algemeneKosten / 100);
+    const algemeneKostenAmount =
+      subtotalDirectAndCustom * (settings.algemeneKosten / 100);
 
     // Risico
-    const risicoAmount = subtotal1 * (settings.risico / 100);
+    const risicoAmount = subtotalDirectAndCustom * (settings.risico / 100);
 
     // Winst
-    const winstAmount = subtotal1 * (settings.winst / 100);
+    const winstAmount = subtotalDirectAndCustom * (settings.winst / 100);
 
-    // Subtotal 2 - After AK, Risico, Winst
-    const subtotal2 =
-      subtotal1 + algemeneKostenAmount + risicoAmount + winstAmount;
+    // Subtotal "Bouwkosten"
+    const subtotalBouwkosten =
+      subtotalAfterPlanuitwerking +
+      nazorgServiceAmount +
+      carPiDicAmount +
+      bankgarantieAmount +
+      algemeneKostenAmount +
+      risicoAmount +
+      winstAmount;
 
-    // Planvoorbereiding
+    // Bijkomende kosten: Planvoorbereiding
     const planvoorbereidingAmount =
-      subtotal1 * (settings.planvoorbereiding / 100);
+      subtotalDirectAndCustom * (settings.planvoorbereiding / 100);
 
-    // Huurdersbegeleiding
+    // Bijkomende kosten: Huurdersbegeleiding
     const huurdersbegeleidingAmount =
-      subtotal1 * (settings.huurdersbegeleiding / 100);
+      subtotalDirectAndCustom * (settings.huurdersbegeleiding / 100);
 
-    // Custom fields if they exist
-    const customValue1Amount = subtotal1 * ((settings.customValue1 || 0) / 100);
-    const customValue2Amount = subtotal1 * ((settings.customValue2 || 0) / 100);
+    // Subtotal after Bijkomende kosten
+    const subtotalAfterBijkomendeKosten =
+      subtotalBouwkosten + planvoorbereidingAmount + huurdersbegeleidingAmount;
 
-    // Subtotal 3 - After all factors before VAT
-    const subtotal3 =
-      subtotal2 +
-      planvoorbereidingAmount +
-      huurdersbegeleidingAmount +
-      customValue1Amount +
-      customValue2Amount;
+    // Total offering excluding VAT
+    const totalExclVAT = subtotalAfterBijkomendeKosten;
 
     // BTW (VAT)
-    const vat = subtotal3 * (settings.vatPercentage / 100);
+    const vat = totalExclVAT * (settings.vatPercentage / 100);
 
     // Final amount including VAT
-    const finalAmount = subtotal3 + vat;
+    const finalAmount = totalExclVAT + vat;
 
     return {
       directCosts,
+      customValue1Amount,
+      customValue2Amount,
+      subtotalDirectAndCustom,
       abkMaterieelAmount,
+      subtotalAfterABK,
       afkoopAmount,
+      subtotalDirectABKAfkoop,
       planuitwerkingAmount,
+      subtotalAfterPlanuitwerking,
       nazorgServiceAmount,
       carPiDicAmount,
       bankgarantieAmount,
-      subtotal1,
       algemeneKostenAmount,
       risicoAmount,
       winstAmount,
-      subtotal2,
+      subtotalBouwkosten,
       planvoorbereidingAmount,
       huurdersbegeleidingAmount,
-      customValue1Amount,
-      customValue2Amount,
-      subtotal3,
+      subtotalAfterBijkomendeKosten,
+      totalExclVAT,
       vat,
       finalAmount,
     };
@@ -176,12 +194,40 @@ export default function Budget({ totalAmount }: BudgetProps) {
 
           {isExpanded && breakdown && (
             <div className="budget__breakdown">
+              {/* Section 1: Direct costs and custom values */}
               <div className="budget__section">
                 <div className="budget__line budget__line--main">
                   <span>Directe kosten</span>
                   <span>€ {formatCurrency(breakdown.directCosts)}</span>
                 </div>
+                {settings.customValue1 > 0 && (
+                  <div className="budget__line">
+                    <span>{settings.customValue1Name || "Extra veld 1"}</span>
+                    <span>
+                      € {formatCurrency(breakdown.customValue1Amount)}
+                    </span>
+                  </div>
+                )}
 
+                {settings.customValue2 > 0 && (
+                  <div className="budget__line">
+                    <span>{settings.customValue2Name || "Extra veld 2"}</span>
+                    <span>
+                      € {formatCurrency(breakdown.customValue2Amount)}
+                    </span>
+                  </div>
+                )}
+
+                <div className="budget__line budget__line--subtotal">
+                  <span>Subtotaal</span>
+                  <span>
+                    € {formatCurrency(breakdown.subtotalDirectAndCustom)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Section 2: ABK */}
+              <div className="budget__section">
                 <div className="budget__line">
                   <span>
                     ABK / materieel volgens begroting ({settings.abkMaterieel}%)
@@ -189,11 +235,29 @@ export default function Budget({ totalAmount }: BudgetProps) {
                   <span>€ {formatCurrency(breakdown.abkMaterieelAmount)}</span>
                 </div>
 
+                <div className="budget__line budget__line--subtotal">
+                  <span>Subtotaal na ABK</span>
+                  <span>€ {formatCurrency(breakdown.subtotalAfterABK)}</span>
+                </div>
+              </div>
+
+              {/* Section 3: Afkoop */}
+              <div className="budget__section">
                 <div className="budget__line">
                   <span>Afkoop ({settings.afkoop}%)</span>
                   <span>€ {formatCurrency(breakdown.afkoopAmount)}</span>
                 </div>
 
+                <div className="budget__line budget__line--subtotal">
+                  <span>Directe kosten + ABK + Afkoop</span>
+                  <span>
+                    € {formatCurrency(breakdown.subtotalDirectABKAfkoop)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Section 4: Planuitwerking */}
+              <div className="budget__section">
                 <div className="budget__line">
                   <span>
                     Kosten t.b.v. nadere planuitwerking (
@@ -204,6 +268,16 @@ export default function Budget({ totalAmount }: BudgetProps) {
                   </span>
                 </div>
 
+                <div className="budget__line budget__line--subtotal">
+                  <span>Subtotaal na planuitwerking</span>
+                  <span>
+                    € {formatCurrency(breakdown.subtotalAfterPlanuitwerking)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Section 5: Various percentages leading to Bouwkosten */}
+              <div className="budget__section">
                 <div className="budget__line">
                   <span>Nazorg / Service ({settings.nazorgService}%)</span>
                   <span>€ {formatCurrency(breakdown.nazorgServiceAmount)}</span>
@@ -221,13 +295,6 @@ export default function Budget({ totalAmount }: BudgetProps) {
                   <span>€ {formatCurrency(breakdown.bankgarantieAmount)}</span>
                 </div>
 
-                <div className="budget__line budget__line--subtotal">
-                  <span>Subtotaal</span>
-                  <span>€ {formatCurrency(breakdown.subtotal1)}</span>
-                </div>
-              </div>
-
-              <div className="budget__section">
                 <div className="budget__line">
                   <span>Algemene kosten (AK) ({settings.algemeneKosten}%)</span>
                   <span>
@@ -246,11 +313,12 @@ export default function Budget({ totalAmount }: BudgetProps) {
                 </div>
 
                 <div className="budget__line budget__line--subtotal">
-                  <span>Subtotaal</span>
-                  <span>€ {formatCurrency(breakdown.subtotal2)}</span>
+                  <span>Bouwkosten</span>
+                  <span>€ {formatCurrency(breakdown.subtotalBouwkosten)}</span>
                 </div>
               </div>
 
+              {/* Section 6: Bijkomende kosten */}
               <div className="budget__section">
                 <div className="budget__line">
                   <span>Planvoorbereiding ({settings.planvoorbereiding}%)</span>
@@ -267,38 +335,15 @@ export default function Budget({ totalAmount }: BudgetProps) {
                     € {formatCurrency(breakdown.huurdersbegeleidingAmount)}
                   </span>
                 </div>
-
-                {settings.customValue1 > 0 && (
-                  <div className="budget__line">
-                    <span>
-                      {settings.customValue1Name || "Extra veld 1"} (
-                      {settings.customValue1}%)
-                    </span>
-                    <span>
-                      € {formatCurrency(breakdown.customValue1Amount)}
-                    </span>
-                  </div>
-                )}
-
-                {settings.customValue2 > 0 && (
-                  <div className="budget__line">
-                    <span>
-                      {settings.customValue2Name || "Extra veld 2"} (
-                      {settings.customValue2}%)
-                    </span>
-                    <span>
-                      € {formatCurrency(breakdown.customValue2Amount)}
-                    </span>
-                  </div>
-                )}
-
-                <div className="budget__line budget__line--subtotal">
-                  <span>Subtotaal excl. BTW</span>
-                  <span>€ {formatCurrency(breakdown.subtotal3)}</span>
-                </div>
               </div>
 
+              {/* Section 7: Final totals */}
               <div className="budget__section">
+                <div className="budget__line budget__line--subtotal">
+                  <span>Totale aanbieding excl. BTW</span>
+                  <span>€ {formatCurrency(breakdown.totalExclVAT)}</span>
+                </div>
+
                 <div className="budget__line">
                   <span>BTW ({settings.vatPercentage}%)</span>
                   <span>€ {formatCurrency(breakdown.vat)}</span>
@@ -336,7 +381,7 @@ export default function Budget({ totalAmount }: BudgetProps) {
           padding: 4px 8px;
           border-radius: 4px;
           transition: background-color 0.2s;
-          min-width:92px;
+          min-width: 92px;
         }
 
         .budget__toggle-btn:hover {
@@ -347,7 +392,7 @@ export default function Budget({ totalAmount }: BudgetProps) {
           display: flex;
           align-items: baseline;
           margin-bottom: 10px;
-          justify-content:center;
+          justify-content: center;
         }
 
         .budget__currency {
@@ -381,6 +426,14 @@ export default function Budget({ totalAmount }: BudgetProps) {
           margin-bottom: 0;
         }
 
+        .budget__heading {
+          font-weight: 600;
+          font-size: 15px;
+          margin-bottom: 8px;
+          padding-bottom: 4px;
+          border-bottom: 1px solid #eaeaea;
+        }
+
         .budget__line {
           display: flex;
           justify-content: space-between;
@@ -388,24 +441,29 @@ export default function Budget({ totalAmount }: BudgetProps) {
           margin-bottom: 8px;
         }
 
+        .budget__line span {
+          font-size: 15px;
+        }
+        .budget__line--subtotal span {
+          font-size: 16px;
+        }
         .budget__line--main {
           font-weight: 600;
-        } 
+        }
 
         .budget__line--subtotal {
-          font-weight: 600;
           border-top: 1px dashed #eaeaea;
           padding-top: 8px;
           margin-top: 8px;
         }
-        .budget__line--subtotal span{
+
+        .budget__line--subtotal span {
           font-weight: 600;
         }
 
-        .budget__line--final {
+        .budget__line--final span {
           font-weight: 700;
-          font-size: 16px;
-          border-top: 2px solid #eaeaea;
+          font-size: 18px;
           padding-top: 12px;
           margin-top: 12px;
         }

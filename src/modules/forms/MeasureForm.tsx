@@ -80,7 +80,7 @@ const createDefaultPriceItem = (): MeasurePriceItem => ({
   laborNorm: 0,
 });
 
-  // Default empty maintenance job price item
+// Default empty maintenance job price item
 const createDefaultMaintenanceItem = (): MaintenancePriceItem => ({
   ...createDefaultPriceItem(),
   cycleStart: 0,
@@ -134,7 +134,9 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
   };
 
   // Helper function to process measure price items
-  const processMeasurePriceItems = (items: any[] | undefined): MeasurePriceItem[] => {
+  const processMeasurePriceItems = (
+    items: any[] | undefined
+  ): MeasurePriceItem[] => {
     if (!Array.isArray(items)) {
       return [];
     }
@@ -152,7 +154,9 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
   };
 
   // Helper function to process maintenance job price items
-  const processMaintenanceItems = (items: any[] | undefined): MaintenancePriceItem[] => {
+  const processMaintenanceItems = (
+    items: any[] | undefined
+  ): MaintenancePriceItem[] => {
     if (!Array.isArray(items)) {
       return [];
     }
@@ -184,22 +188,26 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
 
   // Generic function to handle adding a new price item to either measure_prices or mjob_prices
   const handleAddPriceItem = (priceType: "measure_prices" | "mjob_prices") => {
-    const newItem = priceType === "measure_prices" 
-      ? createDefaultPriceItem()
-      : createDefaultMaintenanceItem();
+    const newItem =
+      priceType === "measure_prices"
+        ? createDefaultPriceItem()
+        : createDefaultMaintenanceItem();
     const currentItems = data[priceType];
     const updatedItems = [...currentItems, newItem];
     handleChange(priceType, currentItems, updatedItems);
   };
 
   // Function to handle removing a price item
-  const handleRemovePriceItem = (priceType: "measure_prices" | "mjob_prices", itemIndex: number) => {
+  const handleRemovePriceItem = (
+    priceType: "measure_prices" | "mjob_prices",
+    itemIndex: number
+  ) => {
     // Get current items
     const currentItems = data[priceType];
-    
+
     // Create updated array without the item to remove
     const updatedItems = currentItems.filter((_, idx) => idx !== itemIndex);
-    
+
     // Update the state
     handleChange(priceType, currentItems, updatedItems);
   };
@@ -244,16 +252,18 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
   ) => {
     // Get current items
     const currentItems = data[priceType];
-    
+
     // Create updated array with the toggled item
-    const updatedItems = currentItems.map((item, idx) => 
-      idx === itemIndex 
-        ? { ...item, includeLabor: !currentValue } 
-        : item
+    const updatedItems = currentItems.map((item, idx) =>
+      idx === itemIndex ? { ...item, includeLabor: !currentValue } : item
     );
-    
+
     // Update the state
-    handleChange(`${priceType}[${itemIndex}].includeLabor`, currentValue, !currentValue);
+    handleChange(
+      `${priceType}[${itemIndex}].includeLabor`,
+      currentValue,
+      !currentValue
+    );
   };
 
   // Render a price section (used for both Begroting and Onderhoudskosten)
@@ -270,10 +280,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
               <div className="card-title">
                 <TextField
                   label=""
-                  value={getValue(
-                    `${priceType}[${idx}].name`,
-                    item.name || ""
-                  )}
+                  value={getValue(`${priceType}[${idx}].name`, item.name || "")}
                   type="text"
                   required={false}
                   isEditing={isEditing}
@@ -292,7 +299,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                     onClick={() => handleRemovePriceItem(priceType, idx)}
                     title="Verwijderen"
                   >
-                    <Trash2 size={18} color="red"/>
+                    <Trash2 size={18} color="red" />
                   </button>
                 )}
               </div>
@@ -375,10 +382,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                   <SelectField
                     label="Eenheid"
                     value={String(
-                      getValue(
-                        `${priceType}[${idx}].unit`,
-                        item.unit || "m2"
-                      )
+                      getValue(`${priceType}[${idx}].unit`, item.unit || "m2")
                     )}
                     options={UNIT_OPTIONS}
                     optionText="Kies eenheid"
@@ -437,10 +441,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                   <TextField
                     label="Prijs € "
                     value={String(
-                      getValue(
-                        `${priceType}[${idx}].price`,
-                        item.price || 0
-                      )
+                      getValue(`${priceType}[${idx}].price`, item.price || 0)
                     )}
                     type="number"
                     required={false}
@@ -465,14 +466,16 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                       <input
                         type="checkbox"
                         id={`labor-checkbox-${idx}`}
-                        checked={Boolean(getValue(
-                          `${priceType}[${idx}].includeLabor`,
-                          item.includeLabor || false
-                        ))}
-                        onChange={() => 
+                        checked={Boolean(
+                          getValue(
+                            `${priceType}[${idx}].includeLabor`,
+                            item.includeLabor || false
+                          )
+                        )}
+                        onChange={() =>
                           handleLaborToggle(
-                            priceType, 
-                            idx, 
+                            priceType,
+                            idx,
                             getValue(
                               `${priceType}[${idx}].includeLabor`,
                               item.includeLabor || false
@@ -480,15 +483,19 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                           )
                         }
                       />
-                      <label htmlFor={`labor-checkbox-${idx}`}>Arbeidskosten</label>
+                      <label htmlFor={`labor-checkbox-${idx}`}>
+                        Arbeidskosten
+                      </label>
                     </div>
                   )}
-                  
+
                   {/* Show labor fields if includeLabor is true, regardless of edit mode */}
-                  {Boolean(getValue(
-                    `${priceType}[${idx}].includeLabor`,
-                    item.includeLabor || false
-                  )) && (
+                  {Boolean(
+                    getValue(
+                      `${priceType}[${idx}].includeLabor`,
+                      item.includeLabor || false
+                    )
+                  ) && (
                     <div className="form__labor-fields">
                       <TextField
                         label="Arbeidsnorm"
@@ -544,16 +551,18 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
               handleChange("name", getValue("name", data.name), next)
             }
           />
-          <TextField
-            label="Groep"
-            value={getValue("group", data.group)}
-            type="text"
-            required={false}
-            isEditing={isEditing}
-            onChange={(next) =>
-              handleChange("group", getValue("group", data.group), next)
-            }
-          />
+          <div className="group">
+            <TextField
+              label="Groep"
+              value={getValue("group", data.group)}
+              type="text"
+              required={false}
+              isEditing={isEditing}
+              onChange={(next) =>
+                handleChange("group", getValue("group", data.group), next)
+              }
+            />
+          </div>
         </div>
 
         <h4 className="form__heading">Warmtebehoefte</h4>
@@ -612,14 +621,18 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
             required={false}
             isEditing={isEditing}
             onChange={(next) =>
-              handleChange("nuisance", getValue("nuisance", data.nuisance || 0), Number(next))
+              handleChange(
+                "nuisance",
+                getValue("nuisance", data.nuisance || 0),
+                Number(next)
+              )
             }
           />
         </div>
-        
+
         {/* Render the Begroting section */}
         {renderPriceSection("Begroting", "measure_prices")}
-        
+
         {/* Render the Onderhoudskosten section */}
         {renderPriceSection("Onderhoudskosten", "mjob_prices")}
       </div>

@@ -263,9 +263,7 @@ export default function MeasureList({
 
     return (
       // hasZeroMultiplication ||
-      hasMaintenanceIssue ||
-      missingHeatDemand ||
-      missingNuisanceIndicator
+      hasMaintenanceIssue || missingHeatDemand || missingNuisanceIndicator
     );
   };
 
@@ -347,6 +345,7 @@ export default function MeasureList({
   };
 
   // Modify handleAddMeasure to handle both add and remove
+  // Modify handleAddMeasure to handle both add and remove
   const handleAddMeasure = (measure: Measure) => {
     if (isMeasureSelected(measure)) {
       // If measure is already selected, remove it
@@ -360,6 +359,7 @@ export default function MeasureList({
       residenceType,
       buildPeriod
     );
+
     // Calculate the price based on the measure_prices and calculation data
     const priceData = calculateMeasurePrice(
       measure.measure_prices,
@@ -378,10 +378,76 @@ export default function MeasureList({
       measure.mjob_prices
     );
 
-    // Add price, maintenance price, and heat demand value to measure object before passing it up
+    // Calculate labor cost if applicable
+    let laborCost = 0;
+    let laborDetails: Array<{
+      name: string;
+      norm: number;
+      quantity: number;
+      cost: number;
+    }> = [];
+
+    // Check if labor costs should be calculated
+    const shouldCalculateLabor =
+      measure.measure_prices &&
+      Array.isArray(measure.measure_prices) &&
+      measure.measure_prices.some(
+        (item) => item.includeLabor && item.laborNorm && item.laborNorm > 0
+      );
+
+    // Find items with labor costs
+    const itemsWithLabor =
+      measure.measure_prices?.filter(
+        (item) => item.includeLabor && item.laborNorm && item.laborNorm > 0
+      ) || [];
+
+    if (
+      shouldCalculateLabor &&
+      itemsWithLabor.length > 0 &&
+      priceData.isValid
+    ) {
+      // Calculate labor costs for each item with labor
+      itemsWithLabor.forEach((laborItem) => {
+        // If there are calculations, use the result quantity to determine labor hours
+        const matchingCalc = priceData.calculations.find(
+          (calc) => calc.name === laborItem.name
+        );
+
+        if (matchingCalc && laborItem.laborNorm) {
+          // Get hourly rate from settings
+          const laborHourCost = settings.hourlyLaborCost;
+
+          // Calculate labor cost for this item
+          const itemLaborCost =
+            laborItem.laborNorm * matchingCalc.quantity * laborHourCost;
+
+          // Add to total labor cost
+          laborCost += itemLaborCost;
+
+          // Store details for display
+          laborDetails.push({
+            name: laborItem.name || "Arbeidskosten",
+            norm: laborItem.laborNorm,
+            quantity: matchingCalc.quantity,
+            cost: itemLaborCost,
+          });
+        }
+      });
+    }
+
+    // Calculate the base material cost
+    const materialCost = priceData.isValid ? priceData.price : 0;
+
+    // Calculate final base cost including labor
+    const baseCost = materialCost + laborCost;
+
+    // Add price (including labor), maintenance price, and heat demand value to measure object before passing it up
     const measureWithPrice = {
       ...measure,
-      price: priceData.isValid ? priceData.price : undefined,
+      price: baseCost, // Use baseCost instead of just priceData.price
+      laborCost: laborCost, // Also pass the labor cost separately for reference
+      laborDetails: laborDetails, // Pass labor details for breakdown
+      materialCost: materialCost, // Pass the material cost separately
       priceCalculations: priceData.calculations,
       calculationError: !priceData.isValid ? priceData.errorMessage : undefined,
       maintenancePrice: maintenanceData.isValid

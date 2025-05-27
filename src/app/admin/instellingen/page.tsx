@@ -574,7 +574,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="settings-field">
-                <label htmlFor="customValue1">Waarde (%)</label>
+                <label htmlFor="customValue1">Bedrag (€)</label>
                 {isEditing ? (
                   <div className="input-with-symbol">
                     <input
@@ -583,14 +583,10 @@ export default function SettingsPage() {
                       name="customValue1"
                       value={settings.customValue1}
                       onChange={handleChange}
-                      step="0.1"
-                      min="0"
-                      max="100"
                     />
-                    <span className="input-symbol">%</span>
                   </div>
                 ) : (
-                  <div className="settings-value">{settings.customValue1}%</div>
+                  <div className="settings-value">{settings.customValue1}</div>
                 )}
               </div>
             </div>
@@ -616,7 +612,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="settings-field">
-                <label htmlFor="customValue2">Waarde (%)</label>
+                <label htmlFor="customValue2">Bedrag (€)</label>
                 {isEditing ? (
                   <div className="input-with-symbol">
                     <input
@@ -625,14 +621,10 @@ export default function SettingsPage() {
                       name="customValue2"
                       value={settings.customValue2}
                       onChange={handleChange}
-                      step="0.1"
-                      min="0"
-                      max="100"
                     />
-                    <span className="input-symbol">%</span>
                   </div>
                 ) : (
-                  <div className="settings-value">{settings.customValue2}%</div>
+                  <div className="settings-value">{settings.customValue2}</div>
                 )}
               </div>
             </div>

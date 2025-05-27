@@ -1,115 +1,356 @@
 "use client";
-import { useEffect, useRef } from "react";
 
-const PdfDownloadButton = () => {
-  const scriptRef = useRef(null);
+import { useEffect, useRef, useState } from "react";
+
+const PdfDownloadButton = ({
+  selectedResidence,
+  selectedMeasures,
+  totalBudget,
+  totalHeatDemand,
+  settings // Add settings prop to get budget breakdown data
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const jsPDFRef = useRef(null);
 
   useEffect(() => {
-    // Load html2pdf script
     const script = document.createElement("script");
-    script.src =
-      "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js";
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
     script.async = true;
-    document.head.appendChild(script);
+    document.body.appendChild(script);
 
-    scriptRef.current = script;
+    script.onload = () => {
+      jsPDFRef.current = window.jspdf.jsPDF;
+    };
 
-    // Cleanup on unmount
     return () => {
-      if (scriptRef.current) {
-        document.head.removeChild(scriptRef.current);
-      }
+      document.body.removeChild(script);
     };
   }, []);
 
-  const handleDownload = () => {
-    // Check if html2pdf is loaded
-    if (typeof window !== "undefined" && !window.html2pdf) {
-      alert(
-        "PDF bibliotheek wordt geladen, probeer het over enkele seconden opnieuw."
-      );
-      return;
-    }
+  const formatPrice = (price) => {
+    return price.toLocaleString("nl-NL", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
 
-    // Target the entire page-wrapper element
-    const pageContent = document.querySelector(".page-wrapper");
-    if (!pageContent) {
-      alert("Kan page-wrapper element niet vinden.");
-      return;
-    }
+  // Calculate budget breakdown (same logic as Budget.tsx)
+  const calculateBudgetBreakdown = () => {
+    if (!settings) return null;
 
-    // Store original display values and hide sections
-    const heroSection = document.querySelector("section.hero") as HTMLElement;
-    const stepSection = document.querySelector("section.step") as HTMLElement;
-    const measureList = document.querySelector(".measure-list") as HTMLElement;
-    const downloadButton = document.querySelector(
-      ".download-button"
-    ) as HTMLElement;
-    const originalHeroDisplay = heroSection?.style.display;
-    const originalStepDisplay = stepSection?.style.display;
-    const originalMeasureListDisplay = measureList?.style.display;
-    const originalDownloadButtonDisplay = downloadButton?.style.display;
+    const directCosts = Math.max(0, totalBudget);
+    const customValue1Amount = directCosts > 0 ? settings.customValue1 || 0 : 0;
+    const customValue2Amount = directCosts > 0 ? settings.customValue2 || 0 : 0;
 
-    if (heroSection) heroSection.style.display = "none";
-    if (stepSection) stepSection.style.display = "none";
-    if (measureList) measureList.style.display = "none";
-    if (downloadButton) downloadButton.style.display = "none";
+    const subtotalDirectAndCustom = directCosts + customValue1Amount + customValue2Amount;
+    const abkMaterieelAmount = subtotalDirectAndCustom * (settings.abkMaterieel / 100);
+    const subtotalAfterABK = subtotalDirectAndCustom + abkMaterieelAmount;
+    const afkoopAmount = subtotalDirectAndCustom * (settings.afkoop / 100);
+    const subtotalDirectABKAfkoop = subtotalAfterABK + afkoopAmount;
+    const planuitwerkingAmount = subtotalDirectAndCustom * (settings.kostenPlanuitwerking / 100);
+    const subtotalAfterPlanuitwerking = subtotalDirectABKAfkoop + planuitwerkingAmount;
+    const nazorgServiceAmount = subtotalDirectAndCustom * (settings.nazorgService / 100);
+    const carPiDicAmount = subtotalDirectAndCustom * (settings.carPiDicVerzekering / 100);
+    const bankgarantieAmount = subtotalDirectAndCustom * (settings.bankgarantie / 100);
+    const algemeneKostenAmount = subtotalDirectAndCustom * (settings.algemeneKosten / 100);
+    const risicoAmount = subtotalDirectAndCustom * (settings.risico / 100);
+    const winstAmount = subtotalDirectAndCustom * (settings.winst / 100);
+    const subtotalBouwkosten = subtotalAfterPlanuitwerking + nazorgServiceAmount + carPiDicAmount + 
+                               bankgarantieAmount + algemeneKostenAmount + risicoAmount + winstAmount;
+    const planvoorbereidingAmount = subtotalDirectAndCustom * (settings.planvoorbereiding / 100);
+    const huurdersbegeleidingAmount = subtotalDirectAndCustom * (settings.huurdersbegeleiding / 100);
+    const subtotalAfterBijkomendeKosten = subtotalBouwkosten + planvoorbereidingAmount + huurdersbegeleidingAmount;
+    const totalExclVAT = subtotalAfterBijkomendeKosten;
+    const vat = totalExclVAT * (settings.vatPercentage / 100);
+    const finalAmount = totalExclVAT + vat;
 
-    // Options for html2pdf
-    const options = {
-      margin: 10,
-      filename: "kostencalculator.pdf",
-      image: { type: "png", quality: 1 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        windowWidth: 3840,
-        windowHeight: 2160,
-        logging: true,
-        letterRendering: true,
-        imageTimeout: 0,
-        backgroundColor: "#FFFFFF",
-      },
-      jsPDF: {
-        unit: "mm",
-        format: "a4",
-        orientation: "landscape",
-        compress: false,
-        hotfixes: ["px_scaling"],
-      },
+    return {
+      directCosts, customValue1Amount, customValue2Amount, subtotalDirectAndCustom,
+      abkMaterieelAmount, subtotalAfterABK, afkoopAmount, subtotalDirectABKAfkoop,
+      planuitwerkingAmount, subtotalAfterPlanuitwerking, nazorgServiceAmount,
+      carPiDicAmount, bankgarantieAmount, algemeneKostenAmount, risicoAmount,
+      winstAmount, subtotalBouwkosten, planvoorbereidingAmount, huurdersbegeleidingAmount,
+      subtotalAfterBijkomendeKosten, totalExclVAT, vat, finalAmount
+    };
+  };
+
+  const determineEnergyLabel = (originalEnergy, heatDemandReduction) => {
+    if (!originalEnergy) return "?";
+    
+    const newEnergy = originalEnergy - heatDemandReduction;
+    const labels = {
+      "A++++": 0, "A+++": 50, "A++": 75, "A+": 105, "A": 160,
+      "B": 190, "C": 250, "D": 290, "E": 335, "F": 380, "G": 1000,
     };
 
-    // Generate the PDF directly from the page content
-    window
-      .html2pdf()
-      .from(pageContent)
-      .set(options)
-      .save()
-      .then(() => {
-        // Restore original display values
-        if (heroSection) heroSection.style.display = originalHeroDisplay || "";
-        if (stepSection) stepSection.style.display = originalStepDisplay || "";
-        if (measureList)
-          measureList.style.display = originalMeasureListDisplay || "";
-        if (downloadButton)
-          downloadButton.style.display = originalDownloadButtonDisplay || "";
-      })
-      .catch((error: Error) => {
-        console.error("Fout bij het genereren van PDF:", error);
-        alert("Er is een fout opgetreden bij het genereren van de PDF.");
-        // Restore original display values even if there's an error
-        if (heroSection) heroSection.style.display = originalHeroDisplay || "";
-        if (stepSection) stepSection.style.display = originalStepDisplay || "";
-        if (measureList)
-          measureList.style.display = originalMeasureListDisplay || "";
-        if (downloadButton)
-          downloadButton.style.display = originalDownloadButtonDisplay || "";
+    const sortedLabels = Object.entries(labels).sort((a, b) => a[1] - b[1]);
+    for (let i = 0; i < sortedLabels.length - 1; i++) {
+      if (newEnergy < sortedLabels[i + 1][1]) {
+        return sortedLabels[i][0];
+      }
+    }
+    return "G";
+  };
+
+  // Convert image to base64 and get dimensions for proper scaling
+  const getImageAsBase64WithDimensions = (imagePath) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL('image/png');
+        resolve({
+          base64: dataURL,
+          width: img.width,
+          height: img.height
+        });
+      };
+      img.onerror = reject;
+      img.src = imagePath;
+    });
+  };
+
+  // Calculate dimensions to fit within bounds while maintaining aspect ratio (like object-fit: contain)
+  const calculateContainDimensions = (originalWidth, originalHeight, maxWidth, maxHeight) => {
+    const aspectRatio = originalWidth / originalHeight;
+    
+    let newWidth = maxWidth;
+    let newHeight = maxWidth / aspectRatio;
+    
+    // If height exceeds max, scale based on height instead
+    if (newHeight > maxHeight) {
+      newHeight = maxHeight;
+      newWidth = maxHeight * aspectRatio;
+    }
+    
+    return { width: newWidth, height: newHeight };
+  };
+
+  // Simplified function to just add the final total
+  const addFinalTotalToPDF = (doc, breakdown, startY) => {
+    let currentY = startY;
+    const leftMargin = 20;
+    const rightMargin = doc.internal.pageSize.getWidth() - 20;
+    
+    // Final total with prominent styling (removed "Totaal Project" title and one line)
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Totaal incl. BTW", leftMargin, currentY);
+    doc.text(`€ ${formatPrice(breakdown.finalAmount)}`, rightMargin, currentY, { align: "right" });
+    
+    return currentY + 10;
+  };
+
+  const handleDownload = async () => {
+    if (!jsPDFRef.current) {
+      alert("PDF library is still loading. Please try again in a moment.");
+      return;
+    }
+
+    if (!selectedResidence || selectedMeasures.length === 0) {
+      alert("Selecteer eerst een woning en maatregelen voordat je een PDF genereert.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const doc = new jsPDFRef.current({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      doc.setFont("helvetica");
+      
+      const projectInfo = selectedResidence.projectInformation || {};
+      const energyInfo = selectedResidence.energyDetails || {};
+      const currentEnergyUsage = energyInfo.huidigVerbruik || 0;
+      const currentLabel = energyInfo.huidigLabel || "?";
+      const newLabel = determineEnergyLabel(currentEnergyUsage, totalHeatDemand);
+      
+      // Header with logo
+      try {
+        const logoImagePath = `/images/giesbersLogo.png`;
+        const logoData = await getImageAsBase64WithDimensions(logoImagePath);
+        
+        // Set max dimensions for logo (50% bigger)
+        const maxLogoWidth = 90;  // Was 60, now 90 (50% increase)
+        const maxLogoHeight = 37.5;  // Was 25, now 37.5 (50% increase)
+        
+        // Calculate proper dimensions maintaining aspect ratio
+        const logoDimensions = calculateContainDimensions(
+          logoData.width, 
+          logoData.height, 
+          maxLogoWidth, 
+          maxLogoHeight
+        );
+        
+        doc.addImage(logoData.base64, 'PNG', 20, 10, logoDimensions.width, logoDimensions.height);
+      } catch (error) {
+        // Fallback to text if logo fails
+        console.warn('Could not load logo image, using text fallback');
+        doc.setFontSize(20);
+        doc.setTextColor(29, 112, 184);
+        doc.text("Giesbers", 20, 20);
+        
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text("Bouwen en Renoveren", 20, 30);
+      }
+      
+      // Try to add energy label image
+      try {
+        const labelImagePath = `/images/${newLabel}.png`;
+        const labelData = await getImageAsBase64WithDimensions(labelImagePath);
+        
+        // Set max dimensions for energy label
+        const maxLabelWidth = 40;
+        const maxLabelHeight = 20;
+        
+        // Calculate proper dimensions maintaining aspect ratio
+        const labelDimensions = calculateContainDimensions(
+          labelData.width, 
+          labelData.height, 
+          maxLabelWidth, 
+          maxLabelHeight
+        );
+        
+        // Position from top-right, accounting for actual image size (moved down to align better with text)
+        const labelX = pageWidth - 20 - labelDimensions.width;
+        doc.addImage(labelData.base64, 'PNG', labelX, 35, labelDimensions.width, labelDimensions.height);
+      } catch (error) {
+        // Fallback to text if image fails
+        console.warn('Could not load energy label image, using text fallback');
+        doc.setFontSize(28);
+        doc.setTextColor(29, 112, 184);
+        doc.text(newLabel, pageWidth - 20, 40, { align: "right" });
+      }
+      
+      // Residence information
+      const leftColX = 20;
+      const rightColX = pageWidth / 2 + 10;
+      let currentY = 50;
+      
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      
+      const addInfoLine = (label, value, x = leftColX) => {
+        doc.setFont("helvetica", "bold");
+        doc.text(label, x, currentY);
+        doc.setFont("helvetica", "normal");
+        doc.text(value || "", x + 40, currentY);
+      };
+      
+      // Left column
+      addInfoLine("Adres", projectInfo.adres);
+      currentY += 6;
+      addInfoLine("Postcode", projectInfo.postcode);
+      currentY += 6;
+      addInfoLine("Plaats", projectInfo.plaats);
+      currentY += 6;
+      addInfoLine("Bouwjaar", new Date().getFullYear().toString());
+      
+      // Right column
+      currentY = 50;
+      addInfoLine("Nieuw label", newLabel, rightColX);
+      currentY += 6;
+      
+      // Calculate and display budget breakdown
+      const breakdown = calculateBudgetBreakdown();
+      if (breakdown) {
+        const totalMaintenance40Years = selectedMeasures.reduce((sum, measure) => 
+          sum + (measure.maintenanceCost40Years || 0), 0);
+        const totalTCO = breakdown.finalAmount + totalMaintenance40Years;
+        
+        addInfoLine("TCO", `€ ${formatPrice(totalTCO)}`, rightColX);
+        currentY += 8;
+      }
+      
+      const highestNuisance = selectedMeasures.reduce((highest, measure) => {
+        const nuisanceValue = measure.nuisance ? parseFloat(String(measure.nuisance)) : 0;
+        return Math.max(highest, isNaN(nuisanceValue) ? 0 : nuisanceValue);
+      }, 0);
+      
+      addInfoLine("Hinderindicator", highestNuisance.toFixed(1), rightColX);
+      currentY += 8;
+      addInfoLine("Warmtebehoefte", totalHeatDemand.toFixed(2), rightColX);
+      
+      // Measures section
+      currentY = 100;
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Maatregelen", 20, currentY);
+      currentY += 8;
+      
+      doc.setDrawColor(200, 200, 200);
+      doc.line(20, currentY, pageWidth - 20, currentY);
+      currentY += 5;
+      
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      
+      selectedMeasures.forEach((measure, index) => {
+        if (currentY > 250) {
+          doc.addPage();
+          currentY = 20;
+        }
+        
+        // Draw blue dot
+        doc.setFillColor(29, 112, 184); // Same blue as used for headers
+        doc.circle(23, currentY - 2, 1.5, 'F'); // Small filled circle at x:23, y:currentY-2, radius:1.5
+        
+        const measureText = `${measure.name}`;
+        const priceText = `€ ${formatPrice(measure.price || 0)}`;
+        
+        // Indent text to account for the dot
+        doc.text(measureText, 30, currentY);
+        doc.text(priceText, pageWidth - 20, currentY, { align: "right" });
+        currentY += 8;
       });
+      
+      currentY += 15;
+      
+      // Add simplified final total if settings are available
+      if (breakdown && settings) {
+        currentY = addFinalTotalToPDF(doc, breakdown, currentY);
+      }
+      
+      // Footer
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text("Disclaimer - uitkomsten zijn een benadering - er kunnen geen rechten aan ontleent worden", 20, currentY + 10);
+      
+      doc.save("kostencalculator.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Er is een fout opgetreden bij het genereren van de PDF.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <button onClick={handleDownload} className="pdf-download-btn" style={{}}>
-      Download als PDF
+    <button 
+      onClick={handleDownload} 
+      className="pdf-download-btn"
+      disabled={isLoading}
+      style={{
+        padding: "8px 16px",
+        backgroundColor: "#1d70b8",
+        color: "white",
+        border: "none",
+        borderRadius: "4px",
+        cursor: isLoading ? "not-allowed" : "pointer",
+        fontSize: "14px",
+        fontWeight: "bold",
+        width: "100%"
+      }}
+    >
+      {isLoading ? "PDF wordt gegenereerd..." : "Download als PDF"}
     </button>
   );
 };

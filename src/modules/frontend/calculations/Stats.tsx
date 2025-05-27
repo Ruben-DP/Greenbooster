@@ -1,6 +1,9 @@
 import {
+  BadgeEuro,
+  CloudAlert,
   Factory,
   Flame,
+  Heater,
   ReceiptEuro,
   ReceiptText,
   Volume1,
@@ -64,9 +67,7 @@ export default function Stats({
 
   return (
     <section className="stats tile">
-      <div className="tile-title">
-        Resultaten
-      </div>
+      <div className="tile-title">Resultaten</div>
       {/* <div className="stats__row">
         <span className="stats__label">CO₂ Reductie:</span>
         <span className="stats__value">
@@ -79,7 +80,9 @@ export default function Stats({
 
       {totalMaintenancePerYear > 0 && (
         <div className="stats__row">
-          <span className="stats__label"><ReceiptText size={20} /> Onderhoudskosten per jaar:</span>
+          <span className="stats__label">
+            <ReceiptText size={20} /> Onderhoudskosten per jaar:
+          </span>
           <span className="stats__value">
             <div className="icon-grouper">
               € {formatPrice(totalMaintenancePerYear)}
@@ -90,11 +93,11 @@ export default function Stats({
       {totalTCO > 0 && (
         <>
           <div className="stats__row">
-            <span className="stats__label"><ReceiptEuro size={20} /> TCO (40 jaar):</span>
+            <span className="stats__label">
+              <BadgeEuro size={20} /> TCO (40 jaar):
+            </span>
             <span className="stats__value">
-              <div className="icon-grouper">
-                € {formatPrice(totalTCO)}
-              </div>
+              <div className="icon-grouper">€ {formatPrice(totalTCO)}</div>
             </span>
           </div>
 
@@ -108,25 +111,54 @@ export default function Stats({
       )}
       {totalHeatDemand > 0 && (
         <div className="stats__row">
-          <span className="stats__label"><Flame size={20} /> Warmtebehoefte: </span>
+          <span className="stats__label">
+            <Flame size={20} /> Warmtebehoefte:{" "}
+          </span>
           <span className="stats__value">
-            <div className="icon-grouper">
-              {totalHeatDemand.toFixed(1)}
-              
-            </div>
+            <div className="icon-grouper">{totalHeatDemand.toFixed(1)}</div>
           </span>
         </div>
       )}
       {highestNuisance > 0 && (
         <div className="stats__row">
-          <span className="stats__label"><Volume1 size={20} /> Hinder indicator:</span>
+          <span className="stats__label">
+            <Volume1 size={20} /> Hinder indicator:
+          </span>
           <span className="stats__value">
-            <div className="icon-grouper">
-              {highestNuisance.toFixed(1)}
-              
-            </div>
+            <div className="icon-grouper">{highestNuisance.toFixed(1)}</div>
           </span>
         </div>
+      )}
+      {totalHeatDemand > 0 && (
+        <>
+          <div className="stats__row">
+            <span className="stats__label">
+              <CloudAlert size={20} />
+              Besparing Co2 uitstoot
+            </span>
+            <span className="stats__value">
+              <div className="icon-grouper alert">Geen berekening</div>
+            </span>
+          </div>
+          <div className="stats__row">
+            <span className="stats__label">
+              <ReceiptEuro size={20} />
+              NCW (Netto contante waarde)
+            </span>
+            <span className="stats__value">
+              <div className="icon-grouper alert">Geen berekening</div>
+            </span>
+          </div>
+          <div className="stats__row">
+            <span className="stats__label">
+              <Heater size={20} />
+              Verbruik per maand
+            </span>
+            <span className="stats__value">
+              <div className="icon-grouper alert">Geen berekening</div>
+            </span>
+          </div>
+        </>
       )}
 
       {totalMaintenancePerYear <= 0 &&

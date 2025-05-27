@@ -31,13 +31,16 @@ export default function SelectedMeasures({
   onRemove,
 }: SelectedMeasuresProps) {
   // Group measures by their group property
-  const groupedMeasures = measures.reduce<GroupedMeasures>((groups, measure) => {
-    if (!measure) return groups;
-    const groupName = measure.group || "Overig";
-    if (!groups[groupName]) groups[groupName] = [];
-    groups[groupName].push(measure);
-    return groups;
-  }, {});
+  const groupedMeasures = measures.reduce<GroupedMeasures>(
+    (groups, measure) => {
+      if (!measure) return groups;
+      const groupName = measure.group || "Overig";
+      if (!groups[groupName]) groups[groupName] = [];
+      groups[groupName].push(measure);
+      return groups;
+    },
+    {}
+  );
 
   // Calculate total base price
   const total = measures.reduce(
@@ -58,17 +61,6 @@ export default function SelectedMeasures({
     });
   };
 
-  // Calculate price with profit and BTW
-  const calculateFinalPrice = (basePrice: number) => {
-    // Step 1: Add profit margin (25%)
-    const priceWithProfit = basePrice * 1.25;
-    
-    // Step 2: Add BTW/VAT (21%)
-    const finalPrice = priceWithProfit * 1.21;
-    
-    return finalPrice;
-  };
-
   return (
     <section className="tile selected-measures">
       <h2 className="tile-title">Geselecteerde maatregelen</h2>
@@ -85,8 +77,7 @@ export default function SelectedMeasures({
                 {groupMeasures.map((measure, index) => {
                   // Calculate the final price with profit and BTW
                   const basePrice = measure.price || 0;
-                  const finalPrice = calculateFinalPrice(basePrice);
-                  
+
                   return (
                     <li
                       key={`${measure.name}-${index}`}
@@ -98,11 +89,13 @@ export default function SelectedMeasures({
                         </span>
                         <div className="measure-price">
                           <span className="selected-measures__price">
-                            € {finalPrice ? formatPrice(finalPrice) : "0,00"}
+                            € {basePrice ? formatPrice(basePrice) : "0,00"}
                           </span>
 
                           <button
-                            onClick={() => onRemove({ ...measure, action: 'remove' })}
+                            onClick={() =>
+                              onRemove({ ...measure, action: "remove" })
+                            }
                             className="selected-measures__remove"
                             aria-label="Verwijder maatregel"
                           >

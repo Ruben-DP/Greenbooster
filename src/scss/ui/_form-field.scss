@@ -1,7 +1,24 @@
 .form-field {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 .input-base {
-    max-width: 100px;
+  max-width: 100px;
+}
+.form__calculation {
+  select.input-base {
+    max-width: 164px;
+  }
+}
+.title > .form-field .input-base {
+  width: 400px;
+}
+.form__grid {
+  flex-wrap: wrap;
+}
+.form__checkbox {
+  input {
+    width: auto !important;
+    margin-right: 6px;
+  }
 }

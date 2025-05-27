@@ -85,28 +85,28 @@ export default function Step({ step }: StepProps) {
       else if (step === 3) targetUrl = "/kosten-berekening";
     }
     
-    // Als we op de kostenbereking pagina zijn en vooruit willen, dan moeten we eerst het profiel opslaan
-    if (pathname === "/kosten-berekening" && direction === "forward") {
-      // Zoek naar de SaveProfileButton en trigger een klik
-      const saveButton = document.querySelector(".save-profile-btn") as HTMLButtonElement;
+    // // Als we op de kostenbereking pagina zijn en vooruit willen, dan moeten we eerst het profiel opslaan
+    // if (pathname === "/kosten-berekening" && direction === "forward") {
+    //   // Zoek naar de SaveProfileButton en trigger een klik
+    //   const saveButton = document.querySelector(".save-profile-btn") as HTMLButtonElement;
       
-      if (saveButton) {
-        // Sla de doelbestemming op voor later gebruik
-        setPendingNavigation(targetUrl);
+    //   if (saveButton) {
+    //     // Sla de doelbestemming op voor later gebruik
+    //     setPendingNavigation(targetUrl);
         
-        // Klik op de save button om het opslaan te starten
-        saveButton.click();
+    //     // Klik op de save button om het opslaan te starten
+    //     saveButton.click();
         
-        // Wacht op een mogelijke modal om in te vullen
-        toast.info("Vul de profielnaam in en sla op om door te gaan", {
-          duration: 5000,
-        });
+    //     // Wacht op een mogelijke modal om in te vullen
+    //     toast.info("Vul de profielnaam in en sla op om door te gaan", {
+    //       duration: 5000,
+    //     });
         
-        // Reset navigatie status maar we navigeren nog niet
-        setIsNavigating(false);
-        return;
-      }
-    }
+    //     // Reset navigatie status maar we navigeren nog niet
+    //     setIsNavigating(false);
+    //     return;
+    //   }
+    // }
     
     // Voor directe navigatie zonder opslaan
     router.push(targetUrl);
