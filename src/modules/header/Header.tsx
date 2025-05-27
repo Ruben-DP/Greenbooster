@@ -7,6 +7,7 @@ import {
   Save,
   Settings,
   Link,
+  ArrowLeft,
 } from "lucide-react";
 import { ThemeControls } from "./ThemeControls";
 
@@ -39,12 +40,38 @@ export default function Header() {
       />
       <div style={{ marginTop: "auto", width: "100%" }}>
         <a
-          style={{ marginBottom: "16px", display: "block", textDecoration: "none" }}
           href="/"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "12px 16px",
+            marginBottom: "16px",
+            backgroundColor: "#f8fafc",
+            color: "#475569",
+            textDecoration: "none",
+            borderRadius: "8px",
+            border: "1px solid #e2e8f0",
+            fontSize: "14px",
+            fontWeight: "500",
+            transition: "all 0.2s ease",
+            cursor: "pointer"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#f1f5f9";
+            e.currentTarget.style.borderColor = "#cbd5e1";
+            e.currentTarget.style.transform = "translateY(-1px)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#f8fafc";
+            e.currentTarget.style.borderColor = "#e2e8f0";
+            e.currentTarget.style.transform = "translateY(0)";
+          }}
         >
-          Naar voorkant
+          <ArrowLeft size={16} color="black" />
+          Naar applicatie
         </a>
-        <ThemeControls />
+        {/* <ThemeControls /> */}
       </div>
     </nav>
   );
