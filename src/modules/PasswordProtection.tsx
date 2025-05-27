@@ -11,7 +11,7 @@ const PasswordProtection = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Simple password - you can change this
-  const CORRECT_PASSWORD = 'DuurzameEddy25';
+  const CORRECT_PASSWORD = 'SnelleEddy25';
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -56,7 +56,7 @@ const PasswordProtection = ({ children }) => {
         <div className="auth-card">
           <div className="auth-header">
             <Lock size={48} className="auth-icon" />
-            <h1>Duurzaamheidsversneller</h1>
+            <h1>Verduurzamings versneller</h1>
             <p>Voer het wachtwoord in om toegang te krijgen</p>
           </div>
 
