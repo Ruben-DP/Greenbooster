@@ -480,7 +480,7 @@ export default function ProjectForm() {
             <div className="project-form__field">
               <label htmlFor="bouwlagen">Bouwlagen</label>
               <div className="flex-field">
-                <input type="text" id="bouwlagen" name="bouwlagen" required />
+                <input type="text" id="bouwlagen" name="bouwlagen" />
                 <span>st</span>
               </div>
             </div>
