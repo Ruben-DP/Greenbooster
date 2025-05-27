@@ -1,8 +1,7 @@
-// app/actions/woningActions.ts
+// Fixed woningActions.ts
 "use server";
 import clientPromise from "@/lib/mongoDB";
 import { revalidatePath } from "next/cache";
-// import { berekenAfgeleideWaarden } from "./rekenblad";
 
 export async function createWoning(formData: FormData) {
   try {
@@ -29,8 +28,8 @@ export async function createWoning(formData: FormData) {
         voorkostenScenario: formData.get("voorkostenScenario"),
         nieuwLabel: formData.get("nieuwLabel"),
         labelStappen: formData.get("labelStappen"),
-        huidigVerbruik: Number(formData.get("huidigVerbruik")),
-        huidigEnergieprijs: Number(formData.get("huidigEnergieprijs")),
+        huidigVerbruik: Number(formData.get("huidigEnergieVerbruik")), // FIXED: mapping correct field
+        huidigEnergieprijs: Number(formData.get("huidigEnergieprijs")), // FIXED: consistent field name
       },
       typeId: typeId,
       isGrondgebonden: formData.get("grondgebonden") === "true",
@@ -53,7 +52,12 @@ export async function createWoning(formData: FormData) {
 
     if (result.acknowledged) {
       revalidatePath("/woningen");
-      return { success: true };
+      return { 
+        success: true,
+        data: {
+          _id: result.insertedId.toString()
+        }
+      };
     }
 
     return {
@@ -73,6 +77,7 @@ export async function updateWoning(id: string, formData: FormData) {
   try {
     const client = await clientPromise;
     const collection = client.db("Greenbooster").collection("woningen");
+    const { ObjectId } = require('mongodb');
 
     // Convert FormData to object and parse nested structure
     const updateData = {
@@ -80,9 +85,36 @@ export async function updateWoning(id: string, formData: FormData) {
         projectNumber: formData.get("projectNumber"),
         complexName: formData.get("complexName"),
         aantalVHE: Number(formData.get("aantalVHE")),
-        // ... other fields
+        adres: formData.get("adres"),
+        postcode: formData.get("postcode"),
+        plaats: formData.get("plaats"),
+        renovatieJaar: Number(formData.get("renovatieJaar")),
+        bouwPeriode: formData.get("bouwPeriode"),
       },
-      // ... other sections
+      energyDetails: {
+        huidigLabel: formData.get("huidigLabel"),
+        huidigEnergie: Number(formData.get("huidigEnergie")),
+        voorkostenScenario: formData.get("voorkostenScenario"),
+        nieuwLabel: formData.get("nieuwLabel"),
+        labelStappen: formData.get("labelStappen"),
+        huidigVerbruik: Number(formData.get("huidigEnergieVerbruik")), // FIXED: consistent field mapping
+        huidigEnergieprijs: Number(formData.get("huidigEnergieprijs")), // FIXED: consistent field name
+      },
+      typeId: formData.get("typeId"),
+      isGrondgebonden: formData.get("grondgebonden") === "true",
+      isPortiekflat: formData.get("portiekflat") === "true",
+      isGalerieflat: formData.get("galerieflat") === "true",
+      dimensions: {
+        breed: formData.get("breed"),
+        diepte: formData.get("diepte"),
+        goothoogte: formData.get("goothoogte"),
+        nokhoogte: formData.get("nokhoogte"),
+        aantalwoningen: formData.get("aantalwoningen"),
+        kopgevels: formData.get("kopgevels"),
+        breedtecomplex: formData.get("breedtecomplex"),
+        portieken: formData.get("portieken"),
+        bouwlagen: formData.get("bouwlagen")
+      }
     };
 
     const result = await collection.updateOne(

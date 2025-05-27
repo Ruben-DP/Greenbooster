@@ -636,6 +636,8 @@ export default function SettingsPage() {
         .settings-page {
           padding: 20px;
           max-width: 1600px;
+          height:100vh;
+          overflow-y:scroll;
         }
 
         .settings-title {

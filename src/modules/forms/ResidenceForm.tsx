@@ -1,3 +1,4 @@
+// Fixed ResidenceForm.tsx with consistent field naming
 import React, { useEffect, useState } from "react";
 import { TextField } from "../fields/TextField";
 import { SelectField } from "../fields/SelectField";
@@ -260,13 +261,10 @@ const ResidenceForm = ({
         </div>
       </div>
       
-      {/* Type selection section */}
-
-      
       <div className="form__section">
         <h4 className="form__heading">Energie details</h4>
         <div className="form__fields">
-          <TextField
+          {/* <TextField
             label="Huidig label"
             value={getValue(
               "energyDetails.huidigLabel",
@@ -282,8 +280,8 @@ const ResidenceForm = ({
                 next
               )
             }
-          />
-          <TextField
+          /> */}
+          {/* <TextField
             label="Huidig energie"
             value={String(
               getValue(
@@ -316,8 +314,8 @@ const ResidenceForm = ({
                 next
               )
             }
-          />
-          <TextField
+          /> */}
+          {/* <TextField
             label="Nieuw label"
             value={getValue(
               "energyDetails.nieuwLabel",
@@ -348,9 +346,10 @@ const ResidenceForm = ({
                 next
               )
             }
-          />
+          /> */}
+          {/* FIXED: Changed field name to match ProjectForm */}
           <TextField
-            label="Huidig verbruik"
+            label="Huidig energieverbruik"
             value={String(
               getValue(
                 "energyDetails.huidigVerbruik",
@@ -367,20 +366,21 @@ const ResidenceForm = ({
               )
             }
           />
+          {/* FIXED: Changed field name to be consistent with ProjectForm */}
           <TextField
-            label="Huidig energieprijs kWh"
+            label="Huidige energieprijs"
             value={String(
               getValue(
-                "energyDetails.huidigEnergiePrijs",
-                item.energyDetails?.huidigEnergiePrijs
+                "energyDetails.huidigEnergieprijs",
+                item.energyDetails?.huidigEnergieprijs
               )
             )}
             type="number"
             isEditing={isEditing}
             onChange={(next) =>
               handleChange(
-                "energyDetails.huidigEnergiePrijs",
-                item.energyDetails?.huidigEnergiePrijs,
+                "energyDetails.huidigEnergieprijs",
+                item.energyDetails?.huidigEnergieprijs,
                 Number(next)
               )
             }

@@ -1,6 +1,7 @@
+// Fixed Residence.tsx with auto-selection of newly created residence
 import { searchDocuments } from "@/app/actions/crudActions";
 import { useEffect, useState } from "react";
-import { Pencil } from "lucide-react"; // Import the Pencil icon from lucide-react
+import { Pencil } from "lucide-react";
 
 interface ProjectInformation {
   projectNumber: string;
@@ -20,7 +21,7 @@ interface EnergyDetails {
   nieuwLabel: string;
   labelStappen: string;
   huidigVerbruik: number;
-  huidigEnergieprijs: number;
+  huidigEnergieprijs: number; // FIXED: consistent field name
 }
 
 interface Woning {
@@ -41,6 +42,7 @@ interface RoomDimensions {
 interface WoningType {
   _id: string;
   naam: string;
+  type?: string; // Add the type field
   voorGevelKozijnen: {
     voordeur: RoomDimensions;
     toilet: RoomDimensions;
@@ -63,6 +65,7 @@ interface WoningType {
     badkamer: RoomDimensions;
     hal: RoomDimensions;
     toilet: RoomDimensions;
+    hoogte: number;
   };
 }
 
@@ -88,7 +91,7 @@ export default function Residence({
   const [selectedId, setSelectedId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false); // New state to track edit mode
+  const [isEditing, setIsEditing] = useState(false);
 
   const fetchTypeDetails = async (typeId: string) => {
     if (!typeId) return;
@@ -102,7 +105,6 @@ export default function Residence({
       if (Array.isArray(response) && response.length > 0) {
         const typeData = response[0];
         setTypeDetails(typeData);
-        // Pass type data up to parent
         if (onTypeSelect) {
           onTypeSelect(typeData);
         }
@@ -118,7 +120,16 @@ export default function Residence({
       const response = await searchDocuments<Woning>("woningen");
       if (Array.isArray(response)) {
         setWoningen(response);
-        if (!selectedId && response.length > 0) {
+        
+        // Check if there's a newly created woning to select
+        const selectedWoningId = localStorage.getItem('selectedWoningId');
+        if (selectedWoningId) {
+          // Clear the localStorage item after using it
+          localStorage.removeItem('selectedWoningId');
+          setSelectedId(selectedWoningId);
+          await fetchWoning(selectedWoningId);
+        } else if (!selectedId && response.length > 0) {
+          // Default to first woning if no specific one is requested
           setSelectedId(response[0]._id);
           await fetchWoning(response[0]._id);
         }
@@ -149,7 +160,9 @@ export default function Residence({
           if (Array.isArray(typeResponse) && typeResponse.length > 0) {
             const typeData = typeResponse[0];
             setTypeDetails(typeData);
-            selectedResidence(residence, typeData, residenceType || "");
+            // Pass the type.type field as residenceType, fallback to type.naam
+            const typeString = typeData.type || typeData.naam || "";
+            selectedResidence(residence, typeData, typeString);
           }
         }
       }
@@ -175,11 +188,9 @@ export default function Residence({
     const newId = event.target.value;
     setSelectedId(newId);
     fetchWoning(newId);
-    // Automatically disable edit mode after selection
     setIsEditing(false);
   };
 
-  // Toggle edit mode
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
   };
@@ -218,9 +229,9 @@ export default function Residence({
           <Pencil size={18} />
         </button>
       </div>
-      {residenceType && (
+      {typeDetails && (
         <div className="residence__type">
-          Type woning: <span>{residenceType}</span>
+          Type woning: <span>{typeDetails.type || typeDetails.naam}</span>
         </div>
       )}
     </div>

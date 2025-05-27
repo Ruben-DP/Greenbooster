@@ -1,3 +1,4 @@
+// Fixed ProjectForm.tsx
 "use client";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useFormStatus } from "react-dom";
@@ -70,8 +71,8 @@ export default function ProjectForm() {
   const [selectedType, setSelectedType] = useState<BuildingType | null>(null);
   const [createNewType, setCreateNewType] = useState<boolean>(false);
   const [newTypeData, setNewTypeData] = useState<TypeFormData>({
-    naam: "",
-    type: "grondgebonden",
+    naam: "", // Keep empty - will be required when creating new type
+    type: "", // Change from "grondgebonden" to empty - will be required when creating new type
     voorgevelKozijnen: {
       voordeur: { breedte: null, hoogte: null },
       toilet: { breedte: null, hoogte: null },
@@ -226,17 +227,15 @@ export default function ProjectForm() {
 
   async function handleSubmit(formData: FormData) {
     try {
-      // If creating a new type, first save it to the database
       let typeId = selectedType?._id;
 
       if (createNewType) {
-        // Validate required fields for new type
-        if (!newTypeData.naam) {
-          toast.error("Naam van woningtype is vereist");
+        // Enhanced validation for new type
+        if (!newTypeData.naam || !newTypeData.type) {
+          toast.error("Naam en type van woningtype zijn vereist");
           return;
         }
 
-        // Create new type
         const typeResponse = await createDocument("types", newTypeData);
         if (!typeResponse.success) {
           toast.error(
@@ -248,15 +247,18 @@ export default function ProjectForm() {
         toast.success("Nieuw woningtype succesvol aangemaakt");
       }
 
-      // Attach the type ID to the form data
       if (typeId) {
         formData.append("typeId", typeId);
       }
 
-      // Create woning with the type ID (existing or newly created)
       const result = await createWoning(formData);
       if (result.success) {
         toast.success("Woning succesvol opgeslagen");
+
+        if (result.data?._id) {
+          localStorage.setItem("selectedWoningId", result.data._id);
+        }
+
         window.location.href = "/kosten-berekening";
       } else {
         toast.error(result.error || "Er is iets misgegaan");
@@ -266,7 +268,6 @@ export default function ProjectForm() {
       toast.error("Er is een fout opgetreden bij het opslaan");
     }
   }
-
   return (
     <section className="project-form">
       <form action={handleSubmit}>
@@ -328,7 +329,7 @@ export default function ProjectForm() {
             </div>
             <div className="project-form__field">
               <label htmlFor="bouwPeriode">Bouwperiode</label>
-              <select id="bouwPeriode" name="bouwPeriode">
+              <select id="bouwPeriode" name="bouwPeriode" required>
                 <option value="">Selecteer een periode</option>
                 <option value="tot 1965">tot 1965</option>
                 <option value="1965-1974">1965-1974</option>
@@ -344,7 +345,6 @@ export default function ProjectForm() {
           <h2 className="tile-title">Type</h2>
           <div className="project-form__field">
             <label htmlFor="typeId">Type flat/woning</label>
-            {/* Replace the standard select with ImageSelect */}
             <ImageSelect
               id="typeId"
               name="typeId"
@@ -352,6 +352,7 @@ export default function ProjectForm() {
               onChange={handleTypeChange}
               options={buildingTypeOptions}
               disabled={createNewType}
+              required={!createNewType} // Required only when NOT creating new type
               label="" // Empty label since we already have one above
             />
           </div>
@@ -365,23 +366,6 @@ export default function ProjectForm() {
             <label htmlFor="createTypeToggle">Nieuw woningtype aanmaken</label>
           </div>
           <h2 className=" mt-64 tile-title">Energie details</h2>
-          {/* <div className="project-form__field">
-              <label htmlFor="huidigLabel">Huidig label</label>
-              <select type="text" id="huidigLabel" name="huidigLabel" required>
-                <option value="">Selecteer energielabel</option>
-                <option value="A++++">A++++</option>
-                <option value="A+++">A+++</option>
-                <option value="A++">A++</option>
-                <option value="A+">A+</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="G">G</option>
-              </select>
-            </div> */}
           <div className="project-form__field">
             <label htmlFor="huidigEnergieVerbruik">
               Huidig energieverbruik
@@ -391,65 +375,25 @@ export default function ProjectForm() {
                 type="text"
                 id="huidigEnergieVerbruik"
                 name="huidigEnergieVerbruik"
+                required
               />
               <span>kWh/m2</span>
             </div>
           </div>
 
+          {/* FIXED: Changed name to match ResidenceForm */}
           <div className="project-form__field">
             <label htmlFor="huidigEnergieprijs">Huidige energieprijs</label>
             <div className="flex-field">
               <input
-                type="text"
+                type="number"
                 id="huidigEnergieprijs"
                 name="huidigEnergieprijs"
+                step=".01"
               />
               <span>€/kWh</span>
             </div>
           </div>
-
-          {/* <div className="project-form__field">
-              <label htmlFor="voorkostenScenario">Voorkosten scenario</label>
-              <select id="voorkostenScenario" name="voorkostenScenario">
-                <option value="">Selecteer scenario</option>
-                <option value="label_b">Label B</option>
-                <option value="label_a">Label A</option>
-                <option value="gasloos">Gasloos</option>
-                <option value="30kw">&#60;30kW/m2</option>
-                <option value="schone_woning">
-                  Schone woning / Gezond wonen
-                </option>
-                <option value="bio_circulair">Bio-circulair</option>
-                <option value="isolatie_2030">
-                  Voldoet aan isolatiestandaard 2030
-                </option>
-                <option value="schil_isolatie">
-                  Schil isolatie - besparing energie (SV/gas)
-                </option>
-                <option value="arnhem">Arnhem</option>
-                <option value="leeg">LEEG</option>
-              </select>
-            </div> */}
-          {/* <div className="project-form__field">
-              <label htmlFor="nieuwLabel">Nieuw label</label>
-              <input
-                type="text"
-                id="nieuwLabel"
-                name="nieuwLabel"
-                readOnly
-                value="-"
-              />
-            </div> */}
-          {/* <div className="project-form__field">
-              <label htmlFor="labelStappen">Label stappen</label>
-              <input
-                type="text"
-                id="labelStappen"
-                name="labelStappen"
-                readOnly
-                value="-"
-              />
-            </div> */}
         </div>
 
         <div className="project-form__col3">
@@ -457,16 +401,16 @@ export default function ProjectForm() {
           <div className="project-form__fields">
             <div className="grouped">
               <div className="project-form__field">
-                <label htmlFor="breed">Breed</label>
+                <label htmlFor="breed">Breedte</label>
                 <div className="flex-field">
-                  <input type="text" id="breed" name="breed" />
+                  <input type="text" id="breed" name="breed" required />
                   <span>m1</span>
                 </div>
               </div>
               <div className="project-form__field">
                 <label htmlFor="diepte">Diepte</label>
                 <div className="flex-field">
-                  <input type="text" id="diepte" name="diepte" />
+                  <input type="text" id="diepte" name="diepte" required />
                   <span>m1</span>
                 </div>
               </div>
@@ -540,33 +484,6 @@ export default function ProjectForm() {
                 <span>st</span>
               </div>
             </div>
-            {/* <div className="grouped">
-              <div className="project-form__field">
-                <label htmlFor="aantalHoekWoningen">Aantal hoekwoningen</label>
-                <div className="flex-field">
-                  <input
-                    type="text"
-                    id="aantalHoekWoningen"
-                    name="aantalHoekWoningen"
-                  />
-                  <span>st</span>
-                </div>
-              </div>
-              <div className="project-form__field">
-                <label htmlFor="reductiePerHoekwoning">
-                  Reductie per hoekwoning
-                </label>
-                <div className="flex-field">
-                  <input
-                    type="number"
-                    id="reductiePerHoekwoning"
-                    name="reductiePerHoekwoning"
-                    required
-                  />
-                  <span>%</span>
-                </div>
-              </div>
-            </div> */}
           </div>
         </div>
 
@@ -579,6 +496,7 @@ export default function ProjectForm() {
               onValueChange={handleNewTypeDataChange}
               containerClassName="project-form__fields"
               compact={true}
+              isCreatingNewType={true} // Add this line
             />
           </div>
         )}

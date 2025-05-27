@@ -504,11 +504,11 @@
   "_id": {
     "$oid": "67addb579cd4c22a604d6f20"
   },
-  "name": "10. Suprafil",
+  "name": "10. Suprafil inclusief correctie kopegevel",
   "group": "gevel buiten",
   "measure_prices": [
     {
-      "name": "Suprafil",
+      "name": "Suprafil ",
       "calculation": [
         {
           "type": "variable",
@@ -526,9 +526,53 @@
           "value": "aantalWoningen",
           "position": 2,
           "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
         }
       ],
-      "price": 30
+      "price": 20,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Suprafil kopgevel correctie",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "NettoGevelOppervlak",
+          "id": "NettoGevelOppervlak"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "0.3",
+          "id": "0.3"
+        }
+      ],
+      "price": 30,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
     }
   ],
   "heat_demand": {
@@ -609,7 +653,7 @@
   "group": "dak",
   "measure_prices": [
     {
-      "name": "Onbekende naam",
+      "name": "iSoEasyPro Rd3.7",
       "calculation": [
         {
           "type": "variable",
@@ -987,7 +1031,75 @@
       "cycleStart": 1,
       "cycle": 24
     }
-  ]
+  ],
+  "heat_demand": {
+    "portiek": [
+      {
+        "value": "0",
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "gallerij": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "grondgebonden": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ]
+  }
 },
 {
   "_id": {
@@ -1996,7 +2108,34 @@
       }
     ]
   },
-  "nuisance": 7
+  "nuisance": 7,
+  "mjob_prices": [
+    {
+      "name": "Vervangen voorzetwand",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "NettoGevelOppervlak",
+          "id": "NettoGevelOppervlak"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 83.43,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 48
+    }
+  ]
 },
 {
   "_id": {
@@ -2004,7 +2143,31 @@
   },
   "name": "40. Nieuwe kunststof kozijnen met triple-glas (U=0.6)",
   "group": "kozijnen",
-  "measure_prices": [],
+  "measure_prices": [
+    {
+      "name": "Leveren en plaatsen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakTotaal",
+          "id": "kozijnOppervlakTotaal"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 680,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
   "heat_demand": {
     "portiek": [
       {
@@ -2073,7 +2236,164 @@
       }
     ]
   },
-  "nuisance": 3
+  "nuisance": 3,
+  "mjob_prices": [
+    {
+      "name": "Hang- en sluitwerk controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 1.4,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 10,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 3,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Glas vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 235.1,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 24,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Kitwerk herstel",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 53,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Kozijn reinigen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 13.58,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 6,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Kozijn vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 665.89,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 48
+    }
+  ]
 },
 {
   "_id": {
@@ -2081,7 +2401,31 @@
   },
   "name": "41. Nieuwe kunststof kozijnen met triple-glas (U=0.6) inclusief nieuwe deuren balkons",
   "group": "kozijnen",
-  "measure_prices": [],
+  "measure_prices": [
+    {
+      "name": "Leveren en plaatsen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakTotaal",
+          "id": "kozijnOppervlakTotaal"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 680,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
   "heat_demand": {
     "portiek": [
       {
@@ -2150,7 +2494,112 @@
       }
     ]
   },
-  "nuisance": 3
+  "nuisance": 3,
+  "mjob_prices": [
+    {
+      "name": "Hang- en sluitwerk controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 4,
+      "unit": "m2",
+      "cycleStart": 10,
+      "cycle": 10,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m1",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Glas vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 235.1,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 24,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Kitwerk herstel",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 15,
+      "cycle": 15
+    }
+  ]
 },
 {
   "_id": {
@@ -2164,12 +2613,12 @@
       "calculation": [
         {
           "type": "variable",
-          "value": "",
-          "id": ""
+          "value": "oppervlakteKelder",
+          "id": "oppervlakteKelder"
         },
         {
           "type": "operator",
-          "value": "+"
+          "value": ""
         },
         {
           "type": "variable",
@@ -2181,7 +2630,102 @@
       "unit": "m2"
     }
   ],
-  "nuisance": 1
+  "nuisance": 1,
+  "mjob_prices": [
+    {
+      "name": "HWC platen controle/herstellen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlakteKelder",
+          "id": "oppervlakteKelder"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 99.5,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 48
+    }
+  ],
+  "heat_demand": {
+    "portiek": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "gallerij": [
+      {
+        "value": "0",
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "grondgebonden": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ]
+  }
 },
 {
   "_id": {
@@ -2282,7 +2826,112 @@
       }
     ]
   },
-  "nuisance": 5
+  "nuisance": 5,
+  "mjob_prices": [
+    {
+      "name": "HR-ketel onderhoud",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 122.76,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 1,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2516.57,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 18,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen expansievat",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 266.94,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 12,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen CV-pomp",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 434.72,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 12
+    }
+  ]
 },
 {
   "_id": {
@@ -2290,7 +2939,31 @@
   },
   "name": "91. CV vervangen van electrische boiler",
   "group": "ruimteverwarming",
-  "measure_prices": [],
+  "measure_prices": [
+    {
+      "name": "CV",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2750,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
   "heat_demand": {
     "portiek": [
       {
@@ -2359,7 +3032,112 @@
       }
     ]
   },
-  "nuisance": 5
+  "nuisance": 5,
+  "mjob_prices": [
+    {
+      "name": "HR-ketel onderhoud",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 122.76,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 1,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2516.57,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 18,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen expansievat",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 266.94,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 12,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen CV-pomp",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 434.72,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 12
+    }
+  ]
 },
 {
   "_id": {
@@ -2367,8 +3145,85 @@
   },
   "name": "110. LED algemene ruimten op sensoren",
   "group": "diversen",
-  "measure_prices": [],
-  "nuisance": 1
+  "measure_prices": [
+    {
+      "name": "LED verlichting elke verdieping in elk trappenhuis",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "portieken",
+          "id": "portieken"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 1250,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "nuisance": 1,
+  "mjob_prices": [
+    {
+      "name": "LED algemene ruimte controle /vervangen LED lampen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 25.77,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 6,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "LED algemene ruimte vervanging met bewegingsensor",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 163.75,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 24
+    }
+  ]
 },
 {
   "_id": {
@@ -2376,7 +3231,54 @@
   },
   "name": "111. Kooktoestel electrisch + pannen",
   "group": "diversen",
-  "measure_prices": [],
+  "measure_prices": [
+    {
+      "name": "Electrische kookplaat opbouw Electrolux 4 zones -perilex",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 450,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Pannenset 9 delig ISENVI",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 135,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
   "nuisance": 1
 },
 {
@@ -2987,7 +3889,75 @@
       "price": 7.5,
       "unit": "m2"
     }
-  ]
+  ],
+  "heat_demand": {
+    "portiek": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "gallerij": [
+      {
+        "value": "0",
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "grondgebonden": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ]
+  }
 },
 {
   "_id": {
@@ -3702,13 +4672,66 @@
       "price": 1,
       "unit": "m2"
     }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Voorzetwand vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "NettoGevelOppervlak",
+          "id": "NettoGevelOppervlak"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 83.43,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 48,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Voorzetwand aanvullen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "NettoGevelOppervlak",
+          "id": "NettoGevelOppervlak"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 0,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 48
+    }
   ]
 },
 {
   "_id": {
     "$oid": "67d7e233f210c6fba1e4166d"
   },
-  "name": "Nieuwe kunststof kozijnen met hr++-glas (U=1.2 - spouw 16mm)",
+  "name": "42. Nieuwe kunststof kozijnen met hr++-glas (U=1.2 - spouw 16mm)",
   "group": "kozijnen",
   "heat_demand": {
     "portiek": [
@@ -3779,13 +4802,142 @@
     ]
   },
   "nuisance": 3,
-  "measure_prices": []
+  "measure_prices": [
+    {
+      "name": "Leveren en plaatsen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakTotaal",
+          "id": "kozijnOppervlakTotaal"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 680,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Hang- en sluitwerk controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m2",
+      "cycleStart": 7,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 3,
+      "unit": "m1",
+      "cycleStart": 7,
+      "cycle": 25,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Glas vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 134.99,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 24,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Kitwerk herstel",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 7,
+      "cycle": 15
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7e2cdf210c6fba1e4166e"
   },
-  "name": "Nieuwe kunststof kozijnen met hr++-glas (U=1.2 - spouw 16mm) inclusief nieuwe deuren balkons",
+  "name": "43. Nieuwe kunststof kozijnen met hr++-glas (U=1.2 - spouw 16mm) inclusief nieuwe deuren balkons",
   "group": "kozijnen",
   "heat_demand": {
     "portiek": [
@@ -3856,13 +5008,142 @@
     ]
   },
   "nuisance": 3,
-  "measure_prices": []
+  "measure_prices": [
+    {
+      "name": "Leveren en plaatsen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakTotaal",
+          "id": "kozijnOppervlakTotaal"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 680,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Hang- en sluitwerk controle / vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 7,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers controle / vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 7,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Glas vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 24,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Kitwerk herstel",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 35,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 7,
+      "cycle": 7
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7e335f210c6fba1e4166f"
   },
-  "name": "Nieuwe voordeur (hout)",
+  "name": "44. Nieuwe voordeur (hout)",
   "group": "kozijnen",
   "nuisance": 3,
   "heat_demand": {
@@ -3933,13 +5214,116 @@
       }
     ]
   },
-  "measure_prices": []
+  "measure_prices": [
+    {
+      "name": "Leveren en plaatsen houtendeur met paneel/glas - compleet",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 1375,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 1
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Voordeur algehele check",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 35,
+      "unit": "stuk",
+      "cycleStart": 10,
+      "cycle": 10,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers/tochtstrip controle / vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekVoordeur",
+          "id": "omtrekVoordeur"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 23.92,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 24,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Hang- en sluitwerk controle / vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 75,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 10
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7e422f210c6fba1e41670"
   },
-  "name": "Vervangen bestaande gevelkozijnen door hout finiti naaldhout HR+++",
+  "name": "45. Vervangen bestaande gevelkozijnen door hout finiti naaldhout HR+++",
   "group": "kozijnen",
   "nuisance": 2,
   "heat_demand": {
@@ -4010,13 +5394,344 @@
       }
     ]
   },
-  "measure_prices": []
+  "measure_prices": [
+    {
+      "name": "Slopen en afvoeren van de bestaande gevelkozijnen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        }
+      ],
+      "price": 30,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Bevestigingsmateriaal",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        }
+      ],
+      "price": 5.5,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen finiti naaldhout gevelkozijnen met een hoge isolatiewaarde",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        }
+      ],
+      "price": 433.12,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen van ventilatieroosters aanname 4 stuks per woning",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 250,
+      "unit": "woning",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Aftimmeren 3/4 rondom de kozijnen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "-"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "vensterbankLengte",
+          "id": "vensterbankLengte"
+        }
+      ],
+      "price": 12.5,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen kitwerk op rugvulling",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        }
+      ],
+      "price": 4.5,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen vensterbanken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "vensterbankLengte",
+          "id": "vensterbankLengte"
+        }
+      ],
+      "price": 41.5,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen aluminium waterslagen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "vensterbankLengte",
+          "id": "vensterbankLengte"
+        }
+      ],
+      "price": 55,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Wegterrreinkraan 40 tons",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 75,
+      "unit": "",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Keukendeur algehele check",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 35,
+      "unit": "stuk",
+      "cycleStart": 10,
+      "cycle": 5,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers/tochtstrip controle / vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekAchterdeur",
+          "id": "omtrekAchterdeur"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 9,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 8,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Hang- en sluitwerk controle / vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 75,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 10,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Schilderwerk bijwerken schilderwerk",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekAchterdeur",
+          "id": "omtrekAchterdeur"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 13,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 7
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7e499f210c6fba1e41671"
   },
-  "name": "Vervangen bestaande gevelkozijnen door hout finiti naaldhout Vacuüm glas",
+  "name": "46. Vervangen bestaande gevelkozijnen door hout finiti naaldhout Vacuüm glas",
   "group": "kozijnen",
   "heat_demand": {
     "portiek": [
@@ -4087,13 +5802,318 @@
     ]
   },
   "nuisance": 2,
-  "measure_prices": []
+  "measure_prices": [
+    {
+      "name": "Slopen en afvoeren van de bestaande gevelkozijnen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        }
+      ],
+      "price": 30,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Bevestigingsmateriaal",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        }
+      ],
+      "price": 5.5,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen finiti naaldhout gevelkozijnen met een hoge isolatiewaarde",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        }
+      ],
+      "price": 506.9,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen van ventilatieroosters aanname 4 stuks per woning",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 250,
+      "unit": "woning",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "aftimmeren 3/4 rondom de kozijnen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "-"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "vensterbankLengte",
+          "id": "vensterbankLengte"
+        }
+      ],
+      "price": 12.5,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen kitwerk op rugvulling",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        }
+      ],
+      "price": 4.5,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen vensterbanken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "vensterbankLengte",
+          "id": "vensterbankLengte"
+        }
+      ],
+      "price": 41.5,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Leveren en aanbrengen aluminium waterslagen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "vensterbankLengte",
+          "id": "vensterbankLengte"
+        }
+      ],
+      "price": 55,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Wegterrreinkraan 40 tons",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 75,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Keukendeur algehele check",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 35,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 5,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers/tochtstrip controle / vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekAchterdeur",
+          "id": "omtrekAchterdeur"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 9,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 8,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Hang- en sluitwerk controle / vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 75,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 10
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7e502f210c6fba1e41672"
   },
-  "name": "Bestaande houten kozijnen dubbelglas voorzien van hr++-glas (U=1.2 - spouw 16mm)",
+  "name": "47. Bestaande houten kozijnen dubbelglas voorzien van hr++-glas (U=1.2 - spouw 16mm)",
   "group": "kozijnen",
   "heat_demand": {
     "portiek": [
@@ -4164,13 +6184,194 @@
     ]
   },
   "nuisance": 2,
-  "measure_prices": []
+  "measure_prices": [
+    {
+      "name": "HR++ glas, inmeten verwijderen en plaatsen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        }
+      ],
+      "price": 170,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Hang- en sluitwerk controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 7.5,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 10,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 3,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 8,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Glas vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 175.35,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Kitwerk herstel",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 3.5,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 8,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Gevelkozijnen schilderen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 10.7,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 8,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Raamwerk schilderen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 9.6,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 8
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7ed7ef210c6fba1e41673"
   },
-  "name": "Bestaande houten kozijnen enkelglas voorzien van hr++-glas (U=1.2 - spouw 16mm)",
+  "name": "48. Bestaande houten kozijnen enkelglas voorzien van hr++-glas (U=1.2 - spouw 16mm)",
   "group": "kozijnen",
   "nuisance": 2,
   "heat_demand": {
@@ -4241,16 +6442,339 @@
       }
     ]
   },
-  "measure_prices": []
+  "measure_prices": [
+    {
+      "name": "HR++ glas, verwijderen en plaatsen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 170,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Aanpassen raamhout ivm dikte glas",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 5,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Hang- en sluitwerk controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m2",
+      "cycleStart": 25,
+      "cycle": 25,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 3,
+      "unit": "m1",
+      "cycleStart": 20,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Glas vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 175.35,
+      "unit": "m2",
+      "cycleStart": 20,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Kitwerk herstel",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 3.5,
+      "unit": "m1",
+      "cycleStart": 20,
+      "cycle": 2,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Gevelkozijnen schilderen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 10.7,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 8,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Raamwerk schilderen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 9.6,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 8
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7edcef210c6fba1e41674"
   },
   "group": "kozijnen",
-  "name": "Toeslag glas indien U0.8 i.p.v. 1.2",
+  "name": "49. Toeslag glas indien U0.8 i.p.v. 1.2",
   "nuisance": 2,
-  "measure_prices": []
+  "measure_prices": [
+    {
+      "name": "Toeslag glas U0.8 op U1.0/1.1",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 15,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Hogere vervaningswaarde vervanging glas",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 10,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 25,
+      "cycle": 25
+    }
+  ],
+  "heat_demand": {
+    "portiek": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "gallerij": [
+      {
+        "value": "0",
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "grondgebonden": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ]
+  }
 },
 {
   "_id": {
@@ -4258,7 +6782,7 @@
   },
   "group": "kozijnen",
   "nuisance": 2,
-  "name": "Bestaande kozijnen voorzien van hr++-glas (U=1.2 - spouw 16mm) inclusief nieuwe deuren balkons",
+  "name": "50. Bestaande kozijnen voorzien van hr++-glas (U=1.2 - spouw 16mm) inclusief nieuwe deuren balkons",
   "heat_demand": {
     "portiek": [
       {
@@ -4326,13 +6850,195 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "mjob_prices": [
+    {
+      "name": "Hang- en sluitwerk controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakteWoning",
+          "id": "kozijnOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 25,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Rubbers controle en vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 3,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 8,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Glas vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "glasOppervlakteWoning",
+          "id": "glasOppervlakteWoning"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Kitwerk herstel",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 35,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 2,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Gevelkozijnen schilderen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekKozijnen",
+          "id": "omtrekKozijnen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 10.7,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 8,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Raamwerk schilderen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 9.6,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 8
+    }
+  ],
+  "measure_prices": [
+    {
+      "name": "Leveren HR++ glas, inmeten verwijderen en plaatsen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOppervlakTotaal",
+          "id": "kozijnOppervlakTotaal"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 170,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7eec2f210c6fba1e41676"
   },
-  "name": "Dakramen vervangen (enkelglas naar hr++ glas)",
+  "name": "51. Dakramen vervangen (enkelglas naar hr++ glas)",
   "group": "kozijnen",
   "nuisance": 2,
   "heat_demand": {
@@ -4360,7 +7066,7 @@
     ],
     "gallerij": [
       {
-        "value": 0,
+        "value": "01",
         "period": "tot 1965"
       },
       {
@@ -4402,13 +7108,140 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "mjob_prices": [
+    {
+      "name": "Dakraam controle aansluitingen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 70.95,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 48,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Dakraam vervangen - kunststof dubbelwandig",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 355,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 18,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Dakraam reinigen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 10.43,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 3
+    }
+  ],
+  "measure_prices": [
+    {
+      "name": "Leveren dakraam, type GGL SK06-2070 1140x1180",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 941.7,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Monteren dakraam + aftimmeren",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 230,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7ef03f210c6fba1e41677"
   },
-  "name": "ZR-roosters",
+  "name": "53. ZR-roosters",
   "group": "kozijnen",
   "nuisance": 2,
   "heat_demand": {
@@ -4436,7 +7269,7 @@
     ],
     "gallerij": [
       {
-        "value": 0,
+        "value": "0",
         "period": "tot 1965"
       },
       {
@@ -4478,26 +7311,148 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "mjob_prices": [
+    {
+      "name": "ZR-rooster controleren op werking",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "zrRooster",
+          "id": "zrRooster"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 133.37,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 24,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "ZR-rooster schoonmaken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "zrRooster",
+          "id": "zrRooster"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 12.5,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 8
+    }
+  ],
+  "measure_prices": [
+    {
+      "name": "ZR-roosters in elke kamer 1 deel (=kozijn-raam)",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "zrRooster",
+          "id": "zrRooster"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 100,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d7ef36f210c6fba1e41678"
   },
-  "name": "Panelen in kozijnen",
+  "name": "52. Panelen in kozijnen",
   "group": "kozijnen",
-  "nuisance": 2
-},
-{
-  "_id": {
-    "$oid": "67d81425f210c6fba1e41679"
-  },
-  "name": "61. Brandwerende foam ",
-  "group": "bergingen",
-  "nuisance": 1,
-  "measure_prices": [
+  "nuisance": 2,
+  "mjob_prices": [
     {
-      "name": "Leveren en monteren HWC platen - compleet",
+      "name": "Tochtprofielen rondom ramen controleren",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 7.38,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 24,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Tochtprofielen rondom ramen vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 23.92,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 24,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Tochtprofielen rondom deuren controleren",
       "calculation": [
         {
           "type": "variable",
@@ -4514,10 +7469,387 @@
           "id": ""
         }
       ],
+      "price": 7.38,
+      "unit": "m1",
+      "cycleStart": 1,
+      "cycle": 24,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Tochtprofielen rondom deuren vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 23.92,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 24
+    }
+  ],
+  "measure_prices": [
+    {
+      "name": "Tochtstrippen leveren kozijnen, type …..",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 5,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Monteren tochtstrippen kozijnen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 0,
+      "unit": "m2",
+      "includeLabor": true,
+      "laborNorm": 0.1
+    },
+    {
+      "name": "Tochtstrippen leveren deuren, type …",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekVoordeur",
+          "id": "omtrekVoordeur"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "omtrekAchterdeur",
+          "id": "omtrekAchterdeur"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 5,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Monteren tochtstrippen deuren",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "omtrekVoordeur",
+          "id": "omtrekVoordeur"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "omtrekDraaidelen",
+          "id": "omtrekDraaidelen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 0,
+      "unit": "m1",
+      "includeLabor": true,
+      "laborNorm": 0.12
+    },
+    {
+      "name": "Kierdichting rondom kozijnen buitenpuien",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "kozijnOmtrekTotaal",
+          "id": "kozijnOmtrekTotaal"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 2.55,
+      "unit": "m1",
+      "includeLabor": true,
+      "laborNorm": 0.05
+    }
+  ],
+  "heat_demand": {
+    "portiek": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "gallerij": [
+      {
+        "value": "0",
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "grondgebonden": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ]
+  }
+},
+{
+  "_id": {
+    "$oid": "67d81425f210c6fba1e41679"
+  },
+  "name": "61. Brandwerende foam ",
+  "group": "bergingen",
+  "nuisance": 1,
+  "measure_prices": [
+    {
+      "name": "Leveren en monteren HWC platen - compleet",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlakteKelder",
+          "id": "oppervlakteKelder"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
       "price": 25,
       "unit": "m2"
     }
-  ]
+  ],
+  "mjob_prices": [
+    {
+      "name": "Brandwerende foam controle/herstellen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlakteKelder",
+          "id": "oppervlakteKelder"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 15
+    }
+  ],
+  "heat_demand": {
+    "portiek": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "gallerij": [
+      {
+        "value": "0",
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "grondgebonden": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ]
+  }
 },
 {
   "_id": {
@@ -4593,7 +7925,137 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "SV unit",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 1500,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "HR-ketel onderhoud",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 122.76,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 1,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2516.57,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 18,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen expansievat",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 266.94,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 12,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen CV-pomp",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 434.72,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 12
+    }
+  ]
 },
 {
   "_id": {
@@ -4669,7 +8131,137 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "CV",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 1500,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "HR-ketel onderhoud",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 122.76,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 1,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2516.57,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 18,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen expansievat",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 266.94,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 12,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "HR-ketel vervangen CV-pomp",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 434.72,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 12
+    }
+  ]
 },
 {
   "_id": {
@@ -4745,7 +8337,140 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "Leiding bij CV (heen-retour)",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0.75,
+      "unit": "m2",
+      "includeLabor": true,
+      "laborNorm": 0.1
+    },
+    {
+      "name": "2x horizontale leiding (beide heen en retour = 4x)",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "5",
+          "id": "5"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "breedte",
+          "id": "breedte"
+        }
+      ],
+      "price": 0.75,
+      "unit": "m2",
+      "includeLabor": true,
+      "laborNorm": 0.1
+    },
+    {
+      "name": "1x kruipruimte 75% van diepte woning (heen-retour)",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "diepte",
+          "id": "diepte"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "0.75",
+          "id": "0.75"
+        }
+      ],
+      "price": 0.75,
+      "unit": "m2",
+      "includeLabor": true,
+      "laborNorm": 0.1
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "CV leidingwerk controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 50,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 10,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "CV leidingwerk vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 40
+    }
+  ]
 },
 {
   "_id": {
@@ -4821,13 +8546,91 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "Leveren thermostaat radiatoren - 4 stuks per woning",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "4",
+          "id": "4"
+        }
+      ],
+      "price": 119,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Radiatoren controle thermostaatkranen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "zrRooster",
+          "id": "zrRooster"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 15,
+      "unit": "stuk",
+      "cycleStart": 2,
+      "cycle": 8,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Radiatoren vervangen thermostaatkranen ",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "zrRooster",
+          "id": "zrRooster"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 65.34,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 36
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d81b2ff210c6fba1e4167f"
   },
-  "name": "96. Wamtepomp boiler",
+  "name": "96. Warmtepomp boiler",
   "group": "ruimteverwarming",
   "nuisance": 4,
   "heat_demand": {
@@ -4897,13 +8700,92 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "Warmtepomp boiler",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 6250,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 2
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Warmtepomp boiler lucht/lucht controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 125,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 6,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Warmtepomp boiler lucht/lucht vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2888,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 25,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d81b9df210c6fba1e41680"
   },
-  "name": "97. Wamtepomp boiler ipv electrische boiler",
+  "name": "97. Warmtepomp boiler ipv electrische boiler",
   "group": "ruimteverwarming",
   "nuisance": 4,
   "heat_demand": {
@@ -4973,13 +8855,91 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "Warmtepomp boiler",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 6250,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 2
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Warmtepomp boiler lucht/lucht controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 125,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 6,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Warmtepomp boiler lucht/lucht vervangen thermostaatkranen 5 st per appartement",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2888,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 25
+    }
+  ]
 },
 {
   "_id": {
     "$oid": "67d81bf8f210c6fba1e41681"
   },
-  "name": "98. Wamtepomp boiler ipv geiser",
+  "name": "98. Warmtepomp boiler ipv geiser",
   "group": "ruimteverwarming",
   "nuisance": 5,
   "heat_demand": {
@@ -5049,7 +9009,85 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "Warmtepomp",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 6250,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 2
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Warmtepomp boiler lucht/lucht controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 125,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 6,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Warmtepomp boiler lucht/lucht vervangen thermostaatkranen 5 st per appartement",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2888,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 25
+    }
+  ]
 },
 {
   "_id": {
@@ -5125,7 +9163,111 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "Hybride warmtepomp",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 6250,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 2
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Warmtepomp boiler controle thermostaatkranen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 50,
+      "unit": "stuk",
+      "cycleStart": 20,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Warmtepomp boiler vervangen thermostaatkranen 5 st per appartement",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 35,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 25,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Warmtepomp boiler vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 6300,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 25
+    }
+  ]
 },
 {
   "_id": {
@@ -5201,7 +9343,131 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "Bestaande SV unit afkoppelen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 1
+    },
+    {
+      "name": "Leveren nieuwe SV unit",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 650,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Monteren SV unit",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 25,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 4
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "SV unit vervangen controle thermostaatkranen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 5,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 7,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "SV unit vervangen vervangen thermostaatkranen 5 st per appartement",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 35,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 25
+    }
+  ]
 },
 {
   "_id": {
@@ -5277,7 +9543,85 @@
       }
     ]
   },
-  "nuisance": 4
+  "nuisance": 4,
+  "measure_prices": [
+    {
+      "name": "Spaarpomp",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 6250,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 2
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Warmtepomp controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 50,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 7,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Warmtepomp vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 850,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 25
+    }
+  ]
 },
 {
   "_id": {
@@ -5353,7 +9697,85 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "Warmtepomp",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 6250,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 2
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Warmtepomp controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 31,
+      "unit": "stuk",
+      "cycleStart": 0,
+      "cycle": 1,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Warmtepomp vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 0,
+      "cycle": 0
+    }
+  ]
 },
 {
   "_id": {
@@ -5429,7 +9851,85 @@
         "period": "1988-1991"
       }
     ]
-  }
+  },
+  "measure_prices": [
+    {
+      "name": "Warmtepomp",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 6250,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 2
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Warmtepomp controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 35,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 2,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Warmtepomp vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2500,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 15
+    }
+  ]
 },
 {
   "_id": {
@@ -5529,6 +10029,111 @@
       "unit": "stuk",
       "includeLabor": false,
       "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "PV-panelen vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalPVPanelenGGB",
+          "id": "aantalPVPanelenGGB"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 405.21,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 40,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Omvormers vervangen - micro omvormers",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 750,
+      "unit": "stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Bekabeling herstellen en nazien aansluitingen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 350,
+      "unit": "stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "PV-panelen schoonmaken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlaktePVPanelenGGB",
+          "id": "oppervlaktePVPanelenGGB"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 2.5,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 2,
+      "cycle": 4
     }
   ]
 },
@@ -5640,6 +10245,130 @@
       "includeLabor": false,
       "laborNorm": 0
     }
+  ],
+  "mjob_prices": [
+    {
+      "name": "PV-panelen vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalPVPanelenGGB",
+          "id": "aantalPVPanelenGGB"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "/"
+        },
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        }
+      ],
+      "price": 150,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 40,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Omvormers vervangen - micro omvormers",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 750,
+      "unit": "stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Bekabeling herstellen en nazien aansluitingen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 350,
+      "unit": "stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "PV-panelen schoonmaken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlaktePVPanelenGGB",
+          "id": "oppervlaktePVPanelenGGB"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "/"
+        },
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        }
+      ],
+      "price": 2.5,
+      "unit": "m2",
+      "cycleStart": 2,
+      "cycle": 4,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    }
   ]
 },
 {
@@ -5741,6 +10470,111 @@
       "includeLabor": false,
       "laborNorm": 0
     }
+  ],
+  "mjob_prices": [
+    {
+      "name": "PV-panelen vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalPVPanelenGGB",
+          "id": "aantalPVPanelenGGB"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 150,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 40,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Omvormers vervangen - micro omvormers",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 750,
+      "unit": "stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Bekabeling herstellen en nazien aansluitingen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 350,
+      "unit": "stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "PV-panelen schoonmaken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlaktePVPanelenGGB",
+          "id": "oppervlaktePVPanelenGGB"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        }
+      ],
+      "price": 2.5,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 2,
+      "cycle": 4
+    }
   ]
 },
 {
@@ -5774,7 +10608,7 @@
     ],
     "gallerij": [
       {
-        "value": 0,
+        "value": "0",
         "period": "tot 1965"
       },
       {
@@ -5842,6 +10676,111 @@
       "includeLabor": false,
       "laborNorm": 0
     }
+  ],
+  "mjob_prices": [
+    {
+      "name": "PV-panelen vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalPVPanelenKop",
+          "id": "aantalPVPanelenKop"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 150,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 40,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Omvormers vervangen - micro omvormers",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "/"
+        },
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        }
+      ],
+      "price": 750,
+      "unit": "stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Bekabeling herstellen en nazien aansluitingen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "/"
+        },
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        }
+      ],
+      "price": 350,
+      "unit": "stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "PV-panelen schoonmaken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlaktePVPanelenKop",
+          "id": "oppervlaktePVPanelenKop"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2.5,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 2,
+      "cycle": 4
+    }
   ]
 },
 {
@@ -5875,7 +10814,7 @@
     ],
     "gallerij": [
       {
-        "value": 0,
+        "value": "0",
         "period": "tot 1965"
       },
       {
@@ -5930,7 +10869,32 @@
         },
         {
           "type": "operator",
-          "value": ""
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "bouwlagen",
+          "id": "bouwlagen"
+        }
+      ],
+      "price": 450,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "PV-panelen - kop vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalPVPanelenKop",
+          "id": "aantalPVPanelenKop"
+        },
+        {
+          "type": "operator",
+          "value": "+"
         },
         {
           "type": "variable",
@@ -5938,10 +10902,194 @@
           "id": ""
         }
       ],
-      "price": 450,
+      "price": 150,
       "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 40,
       "includeLabor": false,
+      "laborHours": 0,
       "laborNorm": 0
+    },
+    {
+      "name": "Omvormers - kop vervangen - micro omvormers",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "/"
+        },
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        }
+      ],
+      "price": 750,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Bekabeling - kop herstellen en nazien aansluitingen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "/"
+        },
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        }
+      ],
+      "price": 350,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "PV-panelen - kop schoonmaken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlaktePVPanelenKop",
+          "id": "oppervlaktePVPanelenKop"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2.5,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 4,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "PV-panelen - langs vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlaktePVPanelenLangs",
+          "id": "oppervlaktePVPanelenLangs"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 150,
+      "unit": "m2",
+      "cycleStart": 10,
+      "cycle": 10,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Omvormers - langs vervangen - micro omvormers",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "/"
+        },
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        }
+      ],
+      "price": 750,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Bekabeling - langs herstellen en nazien aansluitingen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "/"
+        },
+        {
+          "type": "variable",
+          "value": "2",
+          "id": "2"
+        }
+      ],
+      "price": 350,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "PV-panelen - langs schoonmaken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "oppervlaktePVPanelenLangs",
+          "id": "oppervlaktePVPanelenLangs"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2.5,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 4
     }
   ]
 },
@@ -6159,6 +11307,85 @@
       "includeLabor": false,
       "laborNorm": 0
     }
+  ],
+  "mjob_prices": [
+    {
+      "name": "MV controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 54.87,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 1,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "MV vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 790.24,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "MV ventilatiekanalen reinigen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 68.75,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 1
+    }
   ]
 },
 {
@@ -6305,6 +11532,85 @@
       "unit": "stuk",
       "includeLabor": false,
       "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "MV controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 54.87,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 1,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "MV vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 790.24,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "MV ventilatiekanalen reinigen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 68.75,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 1
     }
   ]
 },
@@ -6453,6 +11759,137 @@
       "includeLabor": false,
       "laborNorm": 0
     }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Collectieve WP - 1 per trappenhuis vervanging",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Collectieve WP - 1 per trappenhuis onderhoud",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 4,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Voorraadvat (150ltr) vervanging (indien noodzakelijk)",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Booster WP onderhoud",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 4,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Booster WP en Aansluitset vervanging",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 20
+    }
   ]
 },
 {
@@ -6600,6 +12037,59 @@
       "includeLabor": false,
       "laborNorm": 0
     }
+  ],
+  "mjob_prices": [
+    {
+      "name": "WTW schoonmaken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "m2",
+      "cycleStart": 1,
+      "cycle": 3,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "WTW vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "m2",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 0,
+      "cycle": 1
+    }
   ]
 },
 {
@@ -6723,6 +12213,85 @@
       "unit": "stuk",
       "includeLabor": false,
       "laborNorm": 0
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "MV controle",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 54.87,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 1,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "MV vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalSlaapkamers",
+          "id": "aantalSlaapkamers"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 790.24,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "MV ventilatiekanalen reinigen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 68.75,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 1
     }
   ]
 },
@@ -7013,6 +12582,163 @@
       "includeLabor": false,
       "laborNorm": 0
     }
+  ],
+  "mjob_prices": [
+    {
+      "name": "ClimaRad schoonmaken - vervangen filters",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 86,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 2,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "ClimaRad vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 2750,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "K-fan schoonmaken",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 9,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 4,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "K-fan vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 275,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 20,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "S-fan schoonmaken - filters vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 50,
+      "unit": "stuk",
+      "cycleStart": 1,
+      "cycle": 2,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "S-fan vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 785,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 20
+    }
   ]
 },
 {
@@ -7021,7 +12747,55 @@
   },
   "group": "diversen",
   "name": "112. Kooktoestel inclusief oven en pannen",
-  "nuisance": 1
+  "nuisance": 1,
+  "measure_prices": [
+    {
+      "name": "Electrisch fornuis inductie - koken + oven - perilex - Inventum",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 495,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Pannenset 9 delig ISENVI",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 135,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ]
 },
 {
   "_id": {
@@ -7029,7 +12803,151 @@
   },
   "group": "diversen",
   "name": "113. Waterbesparende kranen",
-  "nuisance": 1
+  "nuisance": 1,
+  "measure_prices": [
+    {
+      "name": "Logis HG KMK 160 chroom (7182000)",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 75,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Logis 1-hendel wastafelmengkraan 70 CoolStart (71072000)",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 56,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Crometta 100 1-jet (7.5ltr)/Unica C 65 cm glijstang set (26655400)",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 56,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Logis 1-greeps douchemengkraan chroom  (71600000)",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 65,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Montage",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 1.5
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Onderhoudskosten vervangen kranen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 250,
+      "unit": "per stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 10
+    }
+  ]
 },
 {
   "_id": {
@@ -7037,7 +12955,55 @@
   },
   "group": "diversen",
   "name": "114. Coaching",
-  "nuisance": 1
+  "nuisance": 1,
+  "measure_prices": [
+    {
+      "name": "Nazorg ",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 8
+    },
+    {
+      "name": "Informatiemateriaal",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 20,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ]
 },
 {
   "_id": {
@@ -7045,7 +13011,206 @@
   },
   "group": "diversen",
   "name": "115. Monitoring",
-  "nuisance": 1
+  "nuisance": 1,
+  "measure_prices": [
+    {
+      "name": "Uingo controller",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 150,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 3
+    },
+    {
+      "name": "Breakoutbox - PV-panelen/laadpaal/water",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 16.5,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 1
+    },
+    {
+      "name": "P3 fasen productiepulsmeter",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 67.5,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    },
+    {
+      "name": "Uitleg systeem",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 0,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 1
+    }
+  ],
+  "mjob_prices": [
+    {
+      "name": "Monitoring systeem vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 150,
+      "unit": "per stuk",
+      "cycleStart": 25,
+      "cycle": 25,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Sensoren kWh meters vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 145,
+      "unit": "per stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Sensoren CO2 meters vervangen",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 62,
+      "unit": "per stuk",
+      "cycleStart": 15,
+      "cycle": 15,
+      "includeLabor": false,
+      "laborHours": 0,
+      "laborNorm": 0
+    },
+    {
+      "name": "Monitoring rapportage jaarlijke rapportage - automatisch",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "+"
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 31,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0,
+      "cycleStart": 1,
+      "cycle": 1
+    }
+  ]
 },
 {
   "_id": {
@@ -7053,5 +13218,176 @@
   },
   "group": "diversen",
   "name": "116. Opstartkosten",
-  "nuisance": 1
+  "nuisance": 1,
+  "measure_prices": [
+    {
+      "name": "Uitvoeringskosten",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 50,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 2
+    },
+    {
+      "name": "Steigerwerk",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 75,
+      "unit": "stuk",
+      "includeLabor": true,
+      "laborNorm": 2
+    },
+    {
+      "name": "Parkeerkosten",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": ""
+        },
+        {
+          "type": "variable",
+          "value": "",
+          "id": ""
+        }
+      ],
+      "price": 25,
+      "unit": "stuk",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "682b187d44dee24106d6958d"
+  },
+  "name": "54. Panelen in kozijnen",
+  "group": "kozijnen",
+  "measure_prices": [
+    {
+      "name": "Panelen in kozijn",
+      "calculation": [
+        {
+          "type": "variable",
+          "value": "aantalWoningen",
+          "id": "aantalWoningen"
+        },
+        {
+          "type": "operator",
+          "value": "*"
+        },
+        {
+          "type": "variable",
+          "value": "zrRooster",
+          "id": "zrRooster"
+        }
+      ],
+      "price": 100,
+      "unit": "m1",
+      "includeLabor": false,
+      "laborNorm": 0
+    }
+  ],
+  "heat_demand": {
+    "portiek": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "gallerij": [
+      {
+        "value": "0",
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ],
+    "grondgebonden": [
+      {
+        "value": 0,
+        "period": "tot 1965"
+      },
+      {
+        "value": 0,
+        "period": "1965-1974"
+      },
+      {
+        "value": 0,
+        "period": "1975-1982"
+      },
+      {
+        "value": 0,
+        "period": "1983-1987"
+      },
+      {
+        "value": 0,
+        "period": "1988-1991"
+      }
+    ]
+  }
 }]

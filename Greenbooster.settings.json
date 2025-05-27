@@ -1,0 +1,25 @@
+[{
+  "_id": {
+    "$oid": "68107ece33925113b5e4fc8f"
+  },
+  "hourlyLaborCost": 55,
+  "profitPercentage": 0,
+  "cornerHouseCorrection": -10,
+  "inflationPercentage": 1,
+  "vatPercentage": 21,
+  "abkMaterieel": 10,
+  "afkoop": 3,
+  "algemeneKosten": 7,
+  "bankgarantie": 0.05,
+  "carPiDicVerzekering": 0.41,
+  "huurdersbegeleiding": 4,
+  "kostenPlanuitwerking": 3,
+  "nazorgService": 0.2,
+  "planvoorbereiding": 2,
+  "risico": 2,
+  "winst": 2,
+  "customValue1": 0,
+  "customValue1Name": "",
+  "customValue2": 0,
+  "customValue2Name": ""
+}]

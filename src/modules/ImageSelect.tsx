@@ -31,6 +31,7 @@ export default function ImageSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<ImageSelectOption | null>(null);
   const selectRef = useRef<HTMLDivElement>(null);
+  const hiddenSelectRef = useRef<HTMLSelectElement>(null); // Add ref for hidden select
 
   // Set initial selected option based on value
   useEffect(() => {
@@ -59,6 +60,11 @@ export default function ImageSelect({
     setSelectedOption(option);
     setIsOpen(false);
     
+    // Update the hidden select's value - THIS IS THE KEY FIX
+    if (hiddenSelectRef.current) {
+      hiddenSelectRef.current.value = option.value;
+    }
+    
     // Create a synthetic change event
     const syntheticEvent = {
       target: {
@@ -72,19 +78,30 @@ export default function ImageSelect({
   };
 
   return (
-    <div className={label ? "project-form__field" : ""} ref={selectRef}>
+    <div className={label ? "project-form__field" : ""} ref={selectRef} style={{ position: 'relative' }}>
       {label && <label htmlFor={id}>{label}{required && <span className="required">*</span>}</label>}
       
-      {/* Hidden native select for form submission */}
+      {/* Hidden native select for form submission - ADD REF HERE */}
       <select 
+        ref={hiddenSelectRef}
         id={id}
         name={name}
         value={value}
         onChange={onChange}
         required={required}
         disabled={disabled}
-        style={{ display: 'none' }}
+        style={{ 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          opacity: 0,
+          pointerEvents: 'none',
+          zIndex: -1
+        }}
       >
+        <option value="">Kies woning type</option> {/* Add empty option for validation */}
         {options.map(option => (
           <option key={option.value} value={option.value}>
             {option.label}

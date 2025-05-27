@@ -9,7 +9,7 @@ type WindowDimensions = {
 
 type BuildingType = {
   naam: string;
-  type: string; // Added the type property for the building type
+  type: string;
   voorgevelKozijnen: {
     voordeur: WindowDimensions;
     toilet: WindowDimensions;
@@ -57,11 +57,11 @@ type Props = {
   isEditing: boolean;
   pendingChanges?: Record<string, { newValue: any }>;
   onChange?: (path: string, oldValue: any, newValue: any) => void;
-  // New prop for simpler value changes (just path and new value)
   onValueChange?: (path: string, value: any) => void;
-  // Optional styling props
   containerClassName?: string;
   compact?: boolean;
+  // New prop to indicate if this is for creating a new type
+  isCreatingNewType?: boolean;
 };
 
 const WindowInputs = ({
@@ -109,7 +109,8 @@ const TypeForm = ({
   onChange,
   onValueChange,
   containerClassName = "",
-  compact = false
+  compact = false,
+  isCreatingNewType = false
 }: Props) => {
   if (!item) return null;
 
@@ -118,10 +119,8 @@ const TypeForm = ({
 
   const handleChange = (path: string, old: any, next: any) => {
     if (onChange) {
-      // Admin panel mode - use onChange with old value tracking
       onChange(path, old, next);
     } else if (onValueChange) {
-      // Simple mode - just pass path and new value
       onValueChange(path, next);
     }
   };
@@ -138,17 +137,17 @@ const TypeForm = ({
         <div className="title-fields-container" style={{ display: "flex", gap: "20px" }}>
           <TextField
             label="Naam"
-            value={getValue("naam", item.naam)}
+            value={getValue("naam", item.naam) || ""}
             type="text"
-            required={true}
+            required={isCreatingNewType}
             isEditing={isEditing}
             onChange={(next) => handleChange("naam", item.naam, next)}
           />
           <SelectField
             label="Type"
-            value={getValue("type", item.type)}
+            value={getValue("type", item.type) || ""}
             options={buildingTypes}
-            required={true}
+            required={isCreatingNewType}
             isEditing={isEditing}
             onChange={(next) => handleChange("type", item.type, next)}
           />
