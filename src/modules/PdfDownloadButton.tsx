@@ -171,30 +171,49 @@ const PdfDownloadButton = ({
       const currentLabel = energyInfo.huidigLabel || "?";
       const newLabel = determineEnergyLabel(currentEnergyUsage, totalHeatDemand);
       
-      // Header with logo
+      // Header with dual logos
       try {
-        const logoImagePath = `/images/giesbersLogo.png`;
-        const logoData = await getImageAsBase64WithDimensions(logoImagePath);
+        // Giesbers logo (left side)
+        const giesbersLogoPath = `/images/giesbersLogo.png`;
+        const giesbersLogoData = await getImageAsBase64WithDimensions(giesbersLogoPath);
         
-        // Set max dimensions for logo (50% bigger)
-        const maxLogoWidth = 90;  // Was 60, now 90 (50% increase)
-        const maxLogoHeight = 37.5;  // Was 25, now 37.5 (50% increase)
+        // Alpha logo (right side of Giesbers logo)
+        const alphaLogoPath = `/images/alphaLogo.png`;
+        const alphaLogoData = await getImageAsBase64WithDimensions(alphaLogoPath);
         
-        // Calculate proper dimensions maintaining aspect ratio
-        const logoDimensions = calculateContainDimensions(
-          logoData.width, 
-          logoData.height, 
+        // Set max dimensions for both logos
+        const maxLogoWidth = 70;  // Slightly smaller to fit both
+        const maxLogoHeight = 35;
+        
+        // Calculate proper dimensions for Giesbers logo
+        const giesbersDimensions = calculateContainDimensions(
+          giesbersLogoData.width, 
+          giesbersLogoData.height, 
           maxLogoWidth, 
           maxLogoHeight
         );
         
-        doc.addImage(logoData.base64, 'PNG', 20, 10, logoDimensions.width, logoDimensions.height);
+        // Calculate proper dimensions for Alpha logo
+        const alphaDimensions = calculateContainDimensions(
+          alphaLogoData.width, 
+          alphaLogoData.height, 
+          maxLogoWidth, 
+          maxLogoHeight
+        );
+        
+        // Position Alpha logo on the left (switched position)
+        doc.addImage(alphaLogoData.base64, 'PNG', 20, 4, alphaDimensions.width, alphaDimensions.height);
+        
+        // Position Giesbers logo next to Alpha logo with some spacing (switched position)
+        const giesbersLogoX = 20 + alphaDimensions.width + 15; // 15mm gap between logos
+        doc.addImage(giesbersLogoData.base64, 'PNG', giesbersLogoX, 12, giesbersDimensions.width, giesbersDimensions.height);
+        
       } catch (error) {
-        // Fallback to text if logo fails
-        console.warn('Could not load logo image, using text fallback');
+        // Fallback to text if logos fail
+        console.warn('Could not load logo images, using text fallback');
         doc.setFontSize(20);
         doc.setTextColor(29, 112, 184);
-        doc.text("Giesbers", 20, 20);
+        doc.text("Giesbers & Alpha", 20, 20);
         
         doc.setFontSize(14);
         doc.setTextColor(0, 0, 0);
@@ -218,7 +237,7 @@ const PdfDownloadButton = ({
           maxLabelHeight
         );
         
-        // Position from top-right, accounting for actual image size (moved down to align better with text)
+        // Position from top-right, positioned lower for better alignment
         const labelX = pageWidth - 20 - labelDimensions.width;
         doc.addImage(labelData.base64, 'PNG', labelX, 35, labelDimensions.width, labelDimensions.height);
       } catch (error) {
@@ -253,10 +272,13 @@ const PdfDownloadButton = ({
       currentY += 6;
       addInfoLine("Bouwjaar", new Date().getFullYear().toString());
       
-      // Right column
+      // Right column - add "Energielabel" text without value, then TCO and other info
       currentY = 50;
-      addInfoLine("Nieuw label", newLabel, rightColX);
-      currentY += 6;
+      
+      // Add "Energielabel" label only (no value, image will show the actual label)
+      doc.setFont("helvetica", "bold");
+      doc.text("Energielabel", rightColX, currentY);
+      currentY += 8;
       
       // Calculate and display budget breakdown
       const breakdown = calculateBudgetBreakdown();
@@ -305,8 +327,23 @@ const PdfDownloadButton = ({
         const measureText = `${measure.name}`;
         const priceText = `€ ${formatPrice(measure.price || 0)}`;
         
+        // Calculate available width for measure text (leave space for price)
+        const priceWidth = doc.getTextWidth(priceText);
+        const availableWidth = pageWidth - 30 - 20 - priceWidth - 10; // 30 (text start) + 20 (right margin) + priceWidth + 10 (gap)
+        
+        // Truncate text if it's too long
+        let displayText = measureText;
+        if (doc.getTextWidth(measureText) > availableWidth) {
+          // Find the maximum characters that fit
+          let truncated = measureText;
+          while (doc.getTextWidth(truncated + "...") > availableWidth && truncated.length > 0) {
+            truncated = truncated.slice(0, -1);
+          }
+          displayText = truncated + "...";
+        }
+        
         // Indent text to account for the dot
-        doc.text(measureText, 30, currentY);
+        doc.text(displayText, 30, currentY);
         doc.text(priceText, pageWidth - 20, currentY, { align: "right" });
         currentY += 8;
       });
