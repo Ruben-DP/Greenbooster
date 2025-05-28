@@ -269,7 +269,7 @@ export default function ProjectForm() {
     }
   }
   return (
-    <section className="project-form">
+    <section className="project-form hi-tim">
       <form action={handleSubmit}>
         <div className="project-form__submit">
           <button
