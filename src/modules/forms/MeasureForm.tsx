@@ -676,6 +676,7 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
             }
           />
           <div className="group">
+           <div className="group">
             <TextField
               label="Groep"
               value={getValue("group", data.group)}
@@ -683,9 +684,10 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
               required={false}
               isEditing={isEditing}
               onChange={(next) =>
-                handleChange("group", getValue("group", data.group), next)
+                handleChange("group", getValue("group", data.group), next.toLowerCase())
               }
             />
+          </div>
           </div>
         </div>
 

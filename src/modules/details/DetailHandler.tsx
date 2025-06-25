@@ -42,7 +42,7 @@ export default function DetailHandler({
       fieldId: path,
       label: path.split(".").pop() || path,
       oldValue: String(oldValue),
-      newValue: String(newValue),
+      newValue: newValue, // Changed from String(newValue)
     };
 
     const newPendingChanges = { ...pendingChanges };
@@ -81,7 +81,7 @@ export default function DetailHandler({
 
   return (
     <div className="details-panel">
-          <DetailControls
+      <DetailControls
         isNew={isNew}
         isEditing={isEditing}
         hasChanges={Object.keys(pendingChanges).length > 0}
@@ -121,7 +121,6 @@ export default function DetailHandler({
           pendingChanges={pendingChanges}
         />
       )}
-  
 
       {showConfirmation && (
         <DetailConfirmation
