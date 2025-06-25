@@ -1,3 +1,4 @@
+// src/app/actions/woningActions.ts
 // Fixed woningActions.ts
 "use server";
 import clientPromise from "@/lib/mongoDB";
@@ -45,7 +46,8 @@ export async function createWoning(formData: FormData) {
         breedtecomplex: formData.get("breedtecomplex"),
         portieken: formData.get("portieken"),
         bouwlagen: formData.get("bouwlagen")
-      }
+      },
+      measures: [] // Initialize with an empty array of measures
     };
 
     const result = await collection.insertOne(woningData);
@@ -181,6 +183,38 @@ export async function searchWoningen(searchTerm?: string) {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Search failed",
+    };
+  }
+}
+
+export async function updateWoningMeasures(id: string, measures: any[]) {
+  try {
+    const client = await clientPromise;
+    const collection = client.db("Greenbooster").collection("woningen");
+    const { ObjectId } = require('mongodb');
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { measures: measures } }
+    );
+
+    if (result.modifiedCount === 1 || result.matchedCount === 1) {
+      revalidatePath("/kosten-berekening");
+      return { success: true };
+    }
+
+    return {
+      success: false,
+      error:
+        result.matchedCount === 0
+          ? "Document not found"
+          : "Document found but not modified",
+    };
+  } catch (error) {
+    console.error("Update error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Update failed",
     };
   }
 }

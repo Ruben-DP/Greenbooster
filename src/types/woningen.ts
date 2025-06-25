@@ -1,3 +1,4 @@
+// src/types/woningen.ts
 export interface ProjectInformation {
   projectNumber: string;
   complexName: string;
@@ -27,6 +28,7 @@ export interface RoomDimensions {
 export interface WoningType {
   _id: string;
   naam: string;
+  type?: string;
   voorGevelKozijnen: {
     voordeur: RoomDimensions;
     toilet: RoomDimensions;
@@ -49,6 +51,7 @@ export interface WoningType {
     badkamer: RoomDimensions;
     hal: RoomDimensions;
     toilet: RoomDimensions;
+    hoogte: number;
   };
 }
 
@@ -60,4 +63,16 @@ export interface Woning {
   isGrondgebonden: boolean;
   isPortiekflat: boolean;
   isGalerieflat: boolean;
+  measures?: any[];
+  dimensions: {
+    breed: string;
+    diepte: string;
+    goothoogte: string;
+    nokhoogte: string;
+    aantalwoningen: string;
+    kopgevels: string;
+    breedtecomplex: string;
+    portieken: string;
+    bouwlagen: string;
+  };
 }
