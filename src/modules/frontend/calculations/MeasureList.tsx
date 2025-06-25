@@ -77,6 +77,7 @@ const GROUP_ORDER = [
   "opwek",
   "ventilatie",
   "ruimteverwarming",
+  "elektra",
   "diversen",
 ];
 
