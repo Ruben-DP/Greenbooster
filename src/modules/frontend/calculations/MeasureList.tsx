@@ -19,6 +19,11 @@ interface MeasurePrice {
   unit?: string;
   calculation: Calculation[];
   price?: number;
+  pricesPerType?: {
+    grondgebonden: number;
+    portiek: number;
+    gallerij: number;
+  };
 }
 
 interface MaintenancePrice extends MeasurePrice {
@@ -46,6 +51,8 @@ interface Measure {
   };
   includeLabor?: boolean;
   laborNorm?: number;
+  splitPrices?: boolean;
+  applicableWoningTypes?: string[];
   [key: string]: any;
 }
 
@@ -215,16 +222,6 @@ export default function MeasureList({
       return true;
     }
 
-    // Check if any calculation involves multiplication by zero
-    // const hasZeroMultiplication =
-    //   priceResult.calculations.some(
-    //     (calc: any) => calc.quantity === 0 || calc.unitPrice === 0
-    //   ) ||
-    //   (maintenanceResult.isValid &&
-    //     maintenanceResult.calculations.some(
-    //       (calc: any) => calc.quantity === 0 || calc.unitPrice === 0
-    //     ));
-
     // Check if maintenance calculation has errors (if mjob_prices exists)
     const hasMaintenanceIssue =
       measure.mjob_prices &&
@@ -263,7 +260,6 @@ export default function MeasureList({
       measure.hasOwnProperty("nuisance") && !measure.nuisance;
 
     return (
-      // hasZeroMultiplication ||
       hasMaintenanceIssue || missingHeatDemand || missingNuisanceIndicator
     );
   };
@@ -289,15 +285,6 @@ export default function MeasureList({
     if (totalPrice === 0) {
       warnings.push("Totaalprijs is €0,00");
     }
-
-    // Check if any calculation involves multiplication by zero
-    // const hasZeroMultiplication = priceResult.calculations.some(
-    //   (calc: any) => calc.quantity === 0 || calc.unitPrice === 0
-    // );
-
-    // if (hasZeroMultiplication) {
-    //   warnings.push("Berekening bevat vermenigvuldiging met nul");
-    // }
 
     // Check if maintenance calculation has errors
     if (
@@ -345,41 +332,37 @@ export default function MeasureList({
     return warnings;
   };
 
-  // Modify handleAddMeasure to handle both add and remove
-  // Modify handleAddMeasure to handle both add and remove
   const handleAddMeasure = (measure: Measure) => {
     if (isMeasureSelected(measure)) {
-      // If measure is already selected, remove it
       onSelectMeasure({ ...measure, action: "remove" });
       return;
     }
 
-    // Original add logic
     const heatDemandValue = getHeatDemandValue(
       measure,
       residenceType,
       buildPeriod
     );
 
-    // Calculate the price based on the measure_prices and calculation data
     const priceData = calculateMeasurePrice(
       measure.measure_prices,
-      selectedResidence
+      selectedResidence,
+      residenceType,
+      measure.splitPrices || false
     );
 
-    // Calculate maintenance price based on mjob_prices
     const maintenanceData = calculateMeasurePrice(
       measure.mjob_prices,
-      selectedResidence
+      selectedResidence,
+      residenceType,
+      false // Maintenance prices are not split
     );
 
-    // Calculate 40-year and per-year maintenance costs
     const { total40Years, perYear } = calculateMaintenanceCosts(
       maintenanceData,
       measure.mjob_prices
     );
 
-    // Calculate labor cost if applicable
     let laborCost = 0;
     let laborDetails: Array<{
       name: string;
@@ -388,44 +371,25 @@ export default function MeasureList({
       cost: number;
     }> = [];
 
-    // Check if labor costs should be calculated
-    const shouldCalculateLabor =
-      measure.measure_prices &&
-      Array.isArray(measure.measure_prices) &&
-      measure.measure_prices.some(
-        (item) => item.includeLabor && item.laborNorm && item.laborNorm > 0
-      );
-
-    // Find items with labor costs
     const itemsWithLabor =
       measure.measure_prices?.filter(
         (item) => item.includeLabor && item.laborNorm && item.laborNorm > 0
       ) || [];
 
     if (
-      shouldCalculateLabor &&
       itemsWithLabor.length > 0 &&
       priceData.isValid
     ) {
-      // Calculate labor costs for each item with labor
       itemsWithLabor.forEach((laborItem) => {
-        // If there are calculations, use the result quantity to determine labor hours
         const matchingCalc = priceData.calculations.find(
           (calc) => calc.name === laborItem.name
         );
 
         if (matchingCalc && laborItem.laborNorm) {
-          // Get hourly rate from settings
           const laborHourCost = settings.hourlyLaborCost;
-
-          // Calculate labor cost for this item
           const itemLaborCost =
             laborItem.laborNorm * matchingCalc.quantity * laborHourCost;
-
-          // Add to total labor cost
           laborCost += itemLaborCost;
-
-          // Store details for display
           laborDetails.push({
             name: laborItem.name || "Arbeidskosten",
             norm: laborItem.laborNorm,
@@ -436,19 +400,15 @@ export default function MeasureList({
       });
     }
 
-    // Calculate the base material cost
     const materialCost = priceData.isValid ? priceData.price : 0;
-
-    // Calculate final base cost including labor
     const baseCost = materialCost + laborCost;
 
-    // Add price (including labor), maintenance price, and heat demand value to measure object before passing it up
     const measureWithPrice = {
       ...measure,
-      price: baseCost, // Use baseCost instead of just priceData.price
-      laborCost: laborCost, // Also pass the labor cost separately for reference
-      laborDetails: laborDetails, // Pass labor details for breakdown
-      materialCost: materialCost, // Pass the material cost separately
+      price: baseCost,
+      laborCost: laborCost,
+      laborDetails: laborDetails,
+      materialCost: materialCost,
       priceCalculations: priceData.calculations,
       calculationError: !priceData.isValid ? priceData.errorMessage : undefined,
       maintenancePrice: maintenanceData.isValid
@@ -463,7 +423,6 @@ export default function MeasureList({
       heatDemandValue: heatDemandValue,
     };
 
-    // Add action property to indicate this is an add operation
     onSelectMeasure({ ...measureWithPrice, action: "add" });
   };
 
@@ -476,8 +435,22 @@ export default function MeasureList({
   if (error) return <div>Fout bij laden maatregelen: {error}</div>;
   if (!items || items.length === 0) return <div>Geen maatregelen gevonden</div>;
 
+  const filteredItems = items.filter(item => {
+    if (!item.applicableWoningTypes || item.applicableWoningTypes.length === 0) {
+      return true; // If no types are specified, it's applicable to all
+    }
+    const currentType = residenceType.toLowerCase();
+    if (currentType.includes('portiek')) {
+      return item.applicableWoningTypes.includes('portiek');
+    }
+    if (currentType.includes('galerij') || currentType.includes('gallerij')) {
+      return item.applicableWoningTypes.includes('gallerij');
+    }
+    return item.applicableWoningTypes.includes('grondgebonden');
+  });
+
   // Group items by their group property
-  const groupedItems = items.reduce<GroupedMeasures>((groups, item) => {
+  const groupedItems = filteredItems.reduce<GroupedMeasures>((groups, item) => {
     if (!item) return groups;
     const groupName = item.group || "Overig";
     if (!groups[groupName]) groups[groupName] = [];
@@ -531,23 +504,24 @@ export default function MeasureList({
               .map((measure, index) => {
                 const isExpanded = expandedMeasure === measure.name;
 
-                // Calculate price and get heat demand for this measure
                 const priceResult = selectedResidence
                   ? calculateMeasurePrice(
                       measure.measure_prices,
-                      selectedResidence
+                      selectedResidence,
+                      residenceType,
+                      measure.splitPrices || false
                     )
                   : { isValid: false, price: 0, calculations: [] };
 
-                // Calculate maintenance price
                 const maintenanceResult = selectedResidence
                   ? calculateMeasurePrice(
                       measure.mjob_prices,
-                      selectedResidence
+                      selectedResidence,
+                      residenceType,
+                      false // Maintenance prices are not split
                     )
                   : { isValid: false, price: 0, calculations: [] };
 
-                // Calculate 40-year maintenance costs
                 const { total40Years, perYear } = calculateMaintenanceCosts(
                   maintenanceResult,
                   measure.mjob_prices
@@ -559,12 +533,10 @@ export default function MeasureList({
                   buildPeriod
                 );
 
-                // Calculate final price including labor, profit, and VAT
                 const materialCost = priceResult.isValid
                   ? priceResult.price
                   : 0;
 
-                // Calculate labor cost if applicable
                 let laborCost = 0;
                 let laborDetails: Array<{
                   name: string;
@@ -573,44 +545,25 @@ export default function MeasureList({
                   cost: number;
                 }> = [];
 
-                // Check if labor costs should be calculated
-                const shouldCalculateLabor =
-                  measure.measure_prices &&
-                  Array.isArray(measure.measure_prices) &&
-                  measure.measure_prices.some(
-                    (item) =>
-                      item.includeLabor && item.laborNorm && item.laborNorm > 0
-                  );
-
-                // Find items with labor costs
                 const itemsWithLabor =
                   measure.measure_prices?.filter(
                     (item) =>
                       item.includeLabor && item.laborNorm && item.laborNorm > 0
                   ) || [];
 
-                if (shouldCalculateLabor && itemsWithLabor.length > 0) {
-                  // Calculate labor costs for each item with labor
+                if (itemsWithLabor.length > 0) {
                   itemsWithLabor.forEach((laborItem) => {
-                    // If there are calculations, use the result quantity to determine labor hours
                     const matchingCalc = priceResult.calculations.find(
                       (calc) => calc.name === laborItem.name
                     );
 
                     if (matchingCalc && laborItem.laborNorm) {
-                      // Gebruik het uurtarief uit de database instellingen
                       const laborHourCost = settings.hourlyLaborCost;
-
-                      // Calculate labor cost for this item
                       const itemLaborCost =
                         laborItem.laborNorm *
                         matchingCalc.quantity *
                         laborHourCost;
-
-                      // Add to total labor cost
                       laborCost += itemLaborCost;
-
-                      // Store details for display
                       laborDetails.push({
                         name: laborItem.name || "Arbeidskosten",
                         norm: laborItem.laborNorm,
@@ -621,17 +574,12 @@ export default function MeasureList({
                   });
                 }
 
-                // Calculate final base cost including labor
                 const baseCost = materialCost + laborCost;
 
-                // Bereken het winstpercentage uit de database instellingen
                 const profitMarginRate = settings.profitPercentage / 100;
-
-                // Calculate profit and VAT
                 const withProfit = baseCost * (1 + profitMarginRate);
                 const withVAT = withProfit * (1 + settings.vatPercentage / 100);
 
-                // Check if measure has any calculation issues that should trigger a warning
                 const showWarning = hasCalculationWarning(
                   measure,
                   priceResult,
@@ -640,7 +588,6 @@ export default function MeasureList({
                   withVAT
                 );
 
-                // Get specific warning messages
                 const warningMessages = getWarningMessages(
                   measure,
                   priceResult,
@@ -649,7 +596,6 @@ export default function MeasureList({
                   withVAT
                 );
 
-                // Check if measure has any maintenance jobs
                 const hasMaintenance =
                   measure.mjob_prices &&
                   Array.isArray(measure.mjob_prices) &&
@@ -667,7 +613,6 @@ export default function MeasureList({
                           isExpanded ? "expanded" : ""
                         }`}
                       >
-                        {/* Measure title and toggle button */}
                         <div
                           className="measure__title-area"
                           onClick={() => toggleAccordion(measure.name)}
@@ -677,7 +622,6 @@ export default function MeasureList({
                             <span className="measure__toggle-icon"></span>
                           </button>
                           <span>{measure.name}</span>
-                          {/* Warning icon */}
                           {showWarning && (
                             <AlertTriangle
                               size={18}
@@ -689,7 +633,6 @@ export default function MeasureList({
                           )}
                         </div>
 
-                        {/* Price display and add button */}
                         <div className="measure__actions">
                           {selectedResidence ? (
                             priceResult.isValid ? (
@@ -737,10 +680,8 @@ export default function MeasureList({
                       </div>
                     </div>
 
-                    {/* Expandable details section */}
                     {isExpanded && (
                       <div className="measure__details">
-                        {/* Warning messages section - NEW */}
                         {showWarning && warningMessages.length > 0 && (
                           <div className="measure__warnings">
                             <div className="warning-header">
@@ -757,7 +698,6 @@ export default function MeasureList({
                           </div>
                         )}
 
-                        {/* Price calculation breakdown */}
                         <div className="measure__section">
                           {(measure.nuisance || heatDemandValue > 0) && (
                             <div className="additional-info">
@@ -783,13 +723,9 @@ export default function MeasureList({
                               )}
                             </div>
                           )}
-                          {/* <h4 className="measure__section-title">
-                          Aanschafkosten
-                        </h4> */}
                           {priceResult.isValid &&
                           priceResult.calculations.length > 0 ? (
                             <div className="measure__breakdown">
-                              {/* Material calculations */}
                               {priceResult.calculations.map(
                                 (calc, calcIndex) => (
                                   <div
@@ -811,8 +747,7 @@ export default function MeasureList({
                                 )
                               )}
 
-                              {/* Labor costs - only shown if there are items with labor costs */}
-                              {shouldCalculateLabor &&
+                              {itemsWithLabor.length > 0 &&
                                 laborDetails.length > 0 && (
                                   <>
                                     {laborDetails.map((labor, idx) => (
@@ -842,33 +777,6 @@ export default function MeasureList({
                                   </>
                                 )}
 
-                              {/* Step 1: Add profit margin */}
-                              {/* <div className="measure__breakdown-item subtotal">
-                                <div className="measure__breakdown-name">
-                                  AK + Winst + CAR + Garantie
-                                  <span className="measure__breakdown-formula">
-                                    (toeslag van {settings.profitPercentage}%)
-                                  </span>
-                                </div>
-                                <div className="measure__breakdown-price">
-                                  € {formatPrice(baseCost * profitMarginRate)}
-                                </div>
-                              </div> */}
-
-                              {/* Step 2: Add VAT */}
-                              {/* <div className="measure__breakdown-item">
-                                <div className="measure__breakdown-name">
-                                  BTW
-                                  <span className="measure__breakdown-formula">
-                                    ({settings.vatPercentage}%)
-                                  </span>
-                                </div>
-                                <div className="measure__breakdown-price">
-                                  € {formatPrice(withProfit * VAT_RATE)}
-                                </div>
-                              </div> */}
-
-                              {/* Final total including VAT */}
                               <div className="measure__breakdown-total">
                                 <div>
                                   <strong>
@@ -888,26 +796,19 @@ export default function MeasureList({
                           )}
                         </div>
 
-                        {/* Maintenance calculation breakdown */}
                         {hasMaintenance && (
                           <div className="measure__section maintenance">
-                            {/* <h4 className="measure__section-title">
-                            Onderhoudskosten
-                          </h4> */}
                             {maintenanceResult.isValid &&
                             maintenanceResult.calculations.length > 0 ? (
                               <div className="measure__breakdown">
                                 {maintenanceResult.calculations.map(
                                   (calc, calcIndex) => {
-                                    // Get the original maintenance job to display cycle info
                                     const mjob = measure.mjob_prices?.find(
                                       (j) => j.name === calc.name
                                     );
 
-                                    // Calculate yearly cost for this specific job
                                     let yearlyJobCost = 0;
                                     if (mjob && mjob.cycle && mjob.cycle > 0) {
-                                      // Calculate yearly cost by dividing single occurrence cost by cycle length
                                       yearlyJobCost =
                                         calc.totalPrice / mjob.cycle;
                                     }
@@ -943,7 +844,6 @@ export default function MeasureList({
                                   }
                                 )}
 
-                                {/* 40-year maintenance cost */}
                                 <div className="measure__breakdown-yearly">
                                   <div>
                                     {" "}
@@ -967,7 +867,6 @@ export default function MeasureList({
                                   <div>€ {formatPrice(total40Years)}</div>
                                 </div>
 
-                                {/* Average yearly maintenance cost */}
                               </div>
                             ) : (
                               <div className="measure__breakdown-error">
@@ -986,7 +885,6 @@ export default function MeasureList({
         </div>
       ))}
 
-      {/* Add some CSS for the new warning elements */}
       <style jsx>{`
         .measure__warnings {
           background-color: #fff3e0;

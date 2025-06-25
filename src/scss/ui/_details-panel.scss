@@ -4,9 +4,20 @@
   padding: 3em;
   padding-top: 0;
   overflow-y: scroll;
-  width:auto;
-  margin:0 16px;
-  border-radius:10px;
+  width: auto;
+  margin: 0 16px;
+  border-radius: 10px;
+  .checkbox-label {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap:18px;
+    input {
+      width:auto;
+      height:20px;
+      width:20px;
+    }
+  }
 }
 
 .detail-group {

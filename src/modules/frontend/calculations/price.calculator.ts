@@ -11,6 +11,11 @@ interface MeasurePrice {
   unit?: string;
   calculation: Calculation[];
   price?: number;
+  pricesPerType?: {
+    grondgebonden: number;
+    portiek: number;
+    gallerij: number;
+  };
 }
 
 interface CalculationResult {
@@ -26,7 +31,9 @@ interface CalculationResult {
  */
 export function calculateMeasurePrice(
   measurePrices: MeasurePrice[] | undefined,
-  calculationData: Record<string, any> | null
+  calculationData: Record<string, any> | null,
+  residenceType: string,
+  splitPrices: boolean
 ): CalculationResult {
   // Return early if we don't have the required data
   if (!measurePrices || !calculationData) {
@@ -151,7 +158,18 @@ export function calculateMeasurePrice(
       }
 
       // Calculate final price using the unit price
-      const unitPrice = measurePrice.price || 0;
+      let unitPrice = 0;
+      if (splitPrices && measurePrice.pricesPerType) {
+        if (residenceType.toLowerCase().includes('portiek')) {
+          unitPrice = measurePrice.pricesPerType.portiek ?? measurePrice.price ?? 0;
+        } else if (residenceType.toLowerCase().includes('galerij') || residenceType.toLowerCase().includes('gallerij')) {
+          unitPrice = measurePrice.pricesPerType.gallerij ?? measurePrice.price ?? 0;
+        } else { // 'grondgebonden' and default
+          unitPrice = measurePrice.pricesPerType.grondgebonden ?? measurePrice.price ?? 0;
+        }
+      } else {
+        unitPrice = measurePrice.price || 0;
+      }
       result = evaluationResult * unitPrice;
 
       // Return successful calculation

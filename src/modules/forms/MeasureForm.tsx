@@ -14,7 +14,12 @@ type MeasurePriceItem = {
     value: string;
     id?: string;
   }>;
-  price: number;
+  price?: number;
+  pricesPerType?: {
+    grondgebonden: number;
+    portiek: number;
+    gallerij: number;
+  };
   unit?: string;
   includeLabor?: boolean;
   laborNorm?: number;
@@ -32,6 +37,8 @@ type FormData = {
   measure_prices: MeasurePriceItem[];
   mjob_prices: MaintenancePriceItem[];
   group: string;
+  splitPrices: boolean;
+  applicableWoningTypes: string[];
 };
 
 type Props = {
@@ -75,6 +82,11 @@ const createDefaultPriceItem = (): MeasurePriceItem => ({
     { type: "variable" as const, value: "", id: "" },
   ],
   price: 0,
+  pricesPerType: {
+    grondgebonden: 0,
+    portiek: 0,
+    gallerij: 0,
+  },
   unit: "m2",
   includeLabor: false,
   laborNorm: 0,
@@ -93,6 +105,8 @@ const DEFAULT_DATA = {
   nuisance: 0,
   measure_prices: [],
   mjob_prices: [],
+  splitPrices: false,
+  applicableWoningTypes: [],
 } satisfies Partial<FormData>;
 
 const UNIT_OPTIONS = ["m2", "m1", "stuk", "per stuk", "woning"];
@@ -147,6 +161,11 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
         ? item.calculation.map((calc: any) => ({ ...calc }))
         : [{ type: "variable" as const, value: "", id: "" }],
       price: item.price || 0,
+      pricesPerType: item.pricesPerType || {
+        grondgebonden: 0,
+        portiek: 0,
+        gallerij: 0,
+      },
       unit: item.unit || "m2",
       includeLabor: item.includeLabor || false,
       laborNorm: item.laborNorm || 0,
@@ -167,6 +186,11 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
         ? item.calculation.map((calc: any) => ({ ...calc }))
         : [{ type: "variable" as const, value: "", id: "" }],
       price: item.price || 0,
+      pricesPerType: item.pricesPerType || {
+        grondgebonden: 0,
+        portiek: 0,
+        gallerij: 0,
+      },
       unit: item.unit || "m2",
       cycleStart: item.cycleStart || 0,
       cycle: item.cycle || 1,
@@ -184,6 +208,8 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
     heat_demand: processHeatDemand(item.heat_demand),
     measure_prices: processMeasurePriceItems(item.measure_prices),
     mjob_prices: processMaintenanceItems(item.mjob_prices),
+    splitPrices: item.splitPrices || false,
+    applicableWoningTypes: item.applicableWoningTypes || [],
   };
 
   // Generic function to handle adding a new price item to either measure_prices or mjob_prices
@@ -266,6 +292,14 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
     );
   };
 
+  const handleWoningTypeChange = (woningType: string) => {
+    const currentTypes = getValue("applicableWoningTypes", data.applicableWoningTypes);
+    const newTypes = currentTypes.includes(woningType)
+      ? currentTypes.filter((t: string) => t !== woningType)
+      : [...currentTypes, woningType];
+    handleChange("applicableWoningTypes", currentTypes, newTypes);
+  };
+
   // Render a price section (used for both Begroting and Onderhoudskosten)
   const renderPriceSection = (
     title: string,
@@ -273,6 +307,25 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
   ) => (
     <>
       <h4 className="form__heading">{title}</h4>
+      {priceType === "measure_prices" && (
+        <div className="form__field">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={getValue("splitPrices", item.splitPrices || false)}
+              disabled={!isEditing}
+              onChange={(e) =>
+                handleChange(
+                  "splitPrices",
+                  item.splitPrices || false,
+                  e.target.checked
+                )
+              }
+            />
+            <span className="checkbox-text">Prijzen per woningtype</span>
+          </label>
+        </div>
+      )}
       <div className="form__measures">
         {Array.isArray(data[priceType]) &&
           data[priceType].map((item, idx) => (
@@ -379,31 +432,15 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                 </div>
 
                 <div className="form__price">
-                  <SelectField
-                    label="Eenheid"
-                    value={String(
-                      getValue(`${priceType}[${idx}].unit`, item.unit || "m2")
-                    )}
-                    options={UNIT_OPTIONS}
-                    optionText="Kies eenheid"
-                    required={false}
-                    isEditing={isEditing}
-                    onChange={(next) =>
-                      handleChange(
-                        `${priceType}[${idx}].unit`,
-                        item.unit || "m2",
-                        next
-                      )
-                    }
-                  />
-                  {priceType === "mjob_prices" && (
+                  {getValue("splitPrices", data.splitPrices) &&
+                  priceType === "measure_prices" ? (
                     <>
                       <TextField
-                        label="Start cyclus (jaar)"
+                        label="Prijs Grondgebonden €"
                         value={String(
                           getValue(
-                            `${priceType}[${idx}].cycleStart`,
-                            (item as MaintenancePriceItem).cycleStart || 0
+                            `${priceType}[${idx}].pricesPerType.grondgebonden`,
+                            item.pricesPerType?.grondgebonden || 0
                           )
                         )}
                         type="number"
@@ -411,18 +448,18 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                         isEditing={isEditing}
                         onChange={(next) =>
                           handleChange(
-                            `${priceType}[${idx}].cycleStart`,
-                            (item as MaintenancePriceItem).cycleStart || 0,
+                            `${priceType}[${idx}].pricesPerType.grondgebonden`,
+                            item.pricesPerType?.grondgebonden || 0,
                             Number(next)
                           )
                         }
                       />
                       <TextField
-                        label="Cyclus (elk .. jaar)"
+                        label="Prijs Portiek €"
                         value={String(
                           getValue(
-                            `${priceType}[${idx}].cycle`,
-                            (item as MaintenancePriceItem).cycle || 1
+                            `${priceType}[${idx}].pricesPerType.portiek`,
+                            item.pricesPerType?.portiek || 0
                           )
                         )}
                         type="number"
@@ -430,30 +467,117 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                         isEditing={isEditing}
                         onChange={(next) =>
                           handleChange(
-                            `${priceType}[${idx}].cycle`,
-                            (item as MaintenancePriceItem).cycle || 1,
+                            `${priceType}[${idx}].pricesPerType.portiek`,
+                            item.pricesPerType?.portiek || 0,
+                            Number(next)
+                          )
+                        }
+                      />
+                      <TextField
+                        label="Prijs Galerij €"
+                        value={String(
+                          getValue(
+                            `${priceType}[${idx}].pricesPerType.gallerij`,
+                            item.pricesPerType?.gallerij || 0
+                          )
+                        )}
+                        type="number"
+                        required={false}
+                        isEditing={isEditing}
+                        onChange={(next) =>
+                          handleChange(
+                            `${priceType}[${idx}].pricesPerType.gallerij`,
+                            item.pricesPerType?.gallerij || 0,
+                            Number(next)
+                          )
+                        }
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <SelectField
+                        label="Eenheid"
+                        value={String(
+                          getValue(
+                            `${priceType}[${idx}].unit`,
+                            item.unit || "m2"
+                          )
+                        )}
+                        options={UNIT_OPTIONS}
+                        optionText="Kies eenheid"
+                        required={false}
+                        isEditing={isEditing}
+                        onChange={(next) =>
+                          handleChange(
+                            `${priceType}[${idx}].unit`,
+                            item.unit || "m2",
+                            next
+                          )
+                        }
+                      />
+                      {priceType === "mjob_prices" && (
+                        <>
+                          <TextField
+                            label="Start cyclus (jaar)"
+                            value={String(
+                              getValue(
+                                `${priceType}[${idx}].cycleStart`,
+                                (item as MaintenancePriceItem).cycleStart || 0
+                              )
+                            )}
+                            type="number"
+                            required={false}
+                            isEditing={isEditing}
+                            onChange={(next) =>
+                              handleChange(
+                                `${priceType}[${idx}].cycleStart`,
+                                (item as MaintenancePriceItem).cycleStart || 0,
+                                Number(next)
+                              )
+                            }
+                          />
+                          <TextField
+                            label="Cyclus (elk .. jaar)"
+                            value={String(
+                              getValue(
+                                `${priceType}[${idx}].cycle`,
+                                (item as MaintenancePriceItem).cycle || 1
+                              )
+                            )}
+                            type="number"
+                            required={false}
+                            isEditing={isEditing}
+                            onChange={(next) =>
+                              handleChange(
+                                `${priceType}[${idx}].cycle`,
+                                (item as MaintenancePriceItem).cycle || 1,
+                                Number(next)
+                              )
+                            }
+                          />
+                        </>
+                      )}
+                      <TextField
+                        label="Prijs € "
+                        value={String(
+                          getValue(
+                            `${priceType}[${idx}].price`,
+                            item.price || 0
+                          )
+                        )}
+                        type="number"
+                        required={false}
+                        isEditing={isEditing}
+                        onChange={(next) =>
+                          handleChange(
+                            `${priceType}[${idx}].price`,
+                            item.price || 0,
                             Number(next)
                           )
                         }
                       />
                     </>
                   )}
-                  <TextField
-                    label="Prijs € "
-                    value={String(
-                      getValue(`${priceType}[${idx}].price`, item.price || 0)
-                    )}
-                    type="number"
-                    required={false}
-                    isEditing={isEditing}
-                    onChange={(next) =>
-                      handleChange(
-                        `${priceType}[${idx}].price`,
-                        item.price || 0,
-                        Number(next)
-                      )
-                    }
-                  />
                 </div>
               </div>
 
@@ -563,6 +687,23 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
               }
             />
           </div>
+        </div>
+
+        <h4 className="form__heading">Toepasbare Woningtypes</h4>
+        <div className="form__grid">
+          {['grondgebonden', 'portiek', 'gallerij'].map(type => (
+            <div key={type} className="form__field">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={getValue("applicableWoningTypes", data.applicableWoningTypes).includes(type)}
+                  disabled={!isEditing}
+                  onChange={() => handleWoningTypeChange(type)}
+                />
+                <span className="checkbox-text">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+              </label>
+            </div>
+          ))}
         </div>
 
         <h4 className="form__heading">Warmtebehoefte</h4>
