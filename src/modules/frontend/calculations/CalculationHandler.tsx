@@ -661,6 +661,7 @@ export const CalculationHandler: React.FC<Props> = ({
       "glasOppervlakteWoning"
     ] = `${glasOppervlakVoorTotaal} + ${glasOppervlakAchterTotaal} = ${glasOppervlakteWoning}`;
 
+    
     return {
       kozijnenVoorgevel,
       kozijnenAchtergevel,
