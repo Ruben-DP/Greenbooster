@@ -13,6 +13,7 @@ import ImageSelect from "../ImageSelect";
 interface BuildingType {
   _id: string;
   naam: string;
+  type?: string;
 }
 
 interface WindowDimensions {
@@ -31,7 +32,11 @@ interface TypeFormData {
       raam2: WindowDimensions;
       raam3: WindowDimensions;
     };
-    slaapkamer: {
+    slaapkamer1: {
+      raam1: WindowDimensions;
+      raam2: WindowDimensions;
+    };
+    slaapkamer2: {
       raam1: WindowDimensions;
       raam2: WindowDimensions;
     };
@@ -46,6 +51,7 @@ interface TypeFormData {
     };
     slaapkamer1: {
       raam1: WindowDimensions;
+      raam2: WindowDimensions;
     };
     slaapkamer2: {
       raam1: WindowDimensions;
@@ -81,7 +87,11 @@ export default function ProjectForm() {
         raam2: { breedte: null, hoogte: null },
         raam3: { breedte: null, hoogte: null },
       },
-      slaapkamer: {
+      slaapkamer1: {
+        raam1: { breedte: null, hoogte: null },
+        raam2: { breedte: null, hoogte: null },
+      },
+      slaapkamer2: {
         raam1: { breedte: null, hoogte: null },
         raam2: { breedte: null, hoogte: null },
       },
@@ -96,6 +106,7 @@ export default function ProjectForm() {
       },
       slaapkamer1: {
         raam1: { breedte: null, hoogte: null },
+        raam2: { breedte: null, hoogte: null },
       },
       slaapkamer2: {
         raam1: { breedte: null, hoogte: null },
@@ -152,8 +163,6 @@ export default function ProjectForm() {
       imageSrc = "/images/Era.jpg";
     } else if (typeName.includes("gba")) {
       imageSrc = "/images/Gba.jpg";
-    } else if (typeName.includes("grondgebonden")) {
-      imageSrc = "/images/Grondgebonden.jpg";
     } else if (typeName.includes("heykamp")) {
       imageSrc = "/images/Heykamp.jpg";
     } else if (typeName.includes("intervam")) {
@@ -470,20 +479,23 @@ export default function ProjectForm() {
                 <span>m1</span>
               </div>
             </div>
-            <div className="project-form__field">
+            {/* <div className="project-form__field">
               <label htmlFor="portieken">Aantal portieken</label>
               <div className="flex-field">
                 <input type="text" id="portieken" name="portieken" required />
                 <span>st</span>
               </div>
-            </div>
-            <div className="project-form__field">
-              <label htmlFor="bouwlagen">Bouwlagen</label>
-              <div className="flex-field">
-                <input type="text" id="bouwlagen" name="bouwlagen" />
-                <span>st</span>
+            </div> */}
+            {(createNewType ? newTypeData.type : selectedType?.type) !==
+              "grondgebonden" && (
+              <div className="project-form__field">
+                <label htmlFor="bouwlagen">Bouwlagen</label>
+                <div className="flex-field">
+                  <input type="text" id="bouwlagen" name="bouwlagen" />
+                  <span>st</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 

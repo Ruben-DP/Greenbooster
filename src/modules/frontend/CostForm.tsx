@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { MeasureProvider } from "@/contexts/DataContext";
 import Budget from "./calculations/Budget";
 import MeasureList from "./calculations/MeasureList";
@@ -240,6 +241,18 @@ function PageContent() {
     }
 
     console.log("Actie: Maatregel toevoegen");
+
+    // Check if a measure from the same group is already selected
+    if (
+      measure.group &&
+      selectedMeasures.some((m) => m.group === measure.group)
+    ) {
+      toast.error(
+        `Er is al een maatregel uit '${measure.group}' geselecteerd, verwijder deze om een nieuwe maatregel te selecteren.`
+      );
+      console.groupEnd();
+      return;
+    }
 
     // Check if measure already exists
     const measureExists = selectedMeasures.some((m) => m.name === measure.name);
@@ -794,7 +807,7 @@ function PageContent() {
                   selectedMeasures={selectedMeasures}
                   totalBudget={totalBudget}
                   totalHeatDemand={totalHeatDemand}
-                  settings={settings} 
+                  settings={settings}
                 />
               </div>
             </div>

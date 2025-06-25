@@ -31,15 +31,13 @@ export default function ImageSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<ImageSelectOption | null>(null);
   const selectRef = useRef<HTMLDivElement>(null);
-  const hiddenSelectRef = useRef<HTMLSelectElement>(null); // Add ref for hidden select
-
-  // Set initial selected option based on value
+  const hiddenSelectRef = useRef<HTMLSelectElement>(null); 
+  
   useEffect(() => {
     const option = options.find(opt => opt.value === value);
     setSelectedOption(option || null);
   }, [value, options]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
@@ -53,19 +51,16 @@ export default function ImageSelect({
     };
   }, []);
 
-  // Create a synthetic event to pass to the onChange handler
   const handleSelect = (option: ImageSelectOption) => {
     if (disabled) return;
     
     setSelectedOption(option);
     setIsOpen(false);
     
-    // Update the hidden select's value - THIS IS THE KEY FIX
     if (hiddenSelectRef.current) {
       hiddenSelectRef.current.value = option.value;
     }
-    
-    // Create a synthetic change event
+
     const syntheticEvent = {
       target: {
         id,
@@ -81,7 +76,6 @@ export default function ImageSelect({
     <div className={label ? "project-form__field" : ""} ref={selectRef} style={{ position: 'relative' }}>
       {label && <label htmlFor={id}>{label}{required && <span className="required">*</span>}</label>}
       
-      {/* Hidden native select for form submission - ADD REF HERE */}
       <select 
         ref={hiddenSelectRef}
         id={id}
@@ -101,7 +95,7 @@ export default function ImageSelect({
           zIndex: -1
         }}
       >
-        <option value="">Kies woning type</option> {/* Add empty option for validation */}
+        <option value="">Kies woning type</option> 
         {options.map(option => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -109,7 +103,6 @@ export default function ImageSelect({
         ))}
       </select>
       
-      {/* Custom select UI */}
       <div 
         className={`image-select ${disabled ? 'disabled' : ''}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -163,7 +156,6 @@ export default function ImageSelect({
         )}
       </div>
       
-      {/* CSS for the custom select */}
       <style jsx>{`
         .image-select {
           position: relative;

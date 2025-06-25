@@ -18,7 +18,11 @@ type BuildingType = {
       raam2: WindowDimensions;
       raam3: WindowDimensions;
     };
-    slaapkamer: {
+    slaapkamer1: {
+      raam1: WindowDimensions;
+      raam2: WindowDimensions;
+    };
+    slaapkamer2: {
       raam1: WindowDimensions;
       raam2: WindowDimensions;
     };
@@ -31,10 +35,11 @@ type BuildingType = {
       raam2: WindowDimensions;
       raam3: WindowDimensions;
     };
-    slaapkamer1: {
+    slaapkamer3: {
       raam1: WindowDimensions;
+      raam2: WindowDimensions;
     };
-    slaapkamer2: {
+    slaapkamer4: {
       raam1: WindowDimensions;
       raam2: WindowDimensions;
     };
@@ -42,8 +47,10 @@ type BuildingType = {
   ruimten: {
     woonkamer: WindowDimensions;
     achterkamer: WindowDimensions;
-    slaapkamer: WindowDimensions;
+    slaapkamer1: WindowDimensions;
     slaapkamer2: WindowDimensions;
+    slaapkamer3: WindowDimensions;
+    slaapkamer4: WindowDimensions;
     keuken: WindowDimensions;
     badkamer: WindowDimensions;
     hal: WindowDimensions;
@@ -188,13 +195,27 @@ const TypeForm = ({
               ))}
             </div>
             <div className="form__group">
-              <h5>Slaapkamer</h5>
+              <h5>Slaapkamer 1</h5>
               {["raam1", "raam2"].map((raam) => (
                 <WindowInputs
                   key={raam}
-                  basePath={`voorgevelKozijnen.slaapkamer.${raam}`}
+                  basePath={`voorgevelKozijnen.slaapkamer1.${raam}`}
                   label={`Raam ${raam.slice(-1)}`}
-                  dimensions={item.voorgevelKozijnen?.slaapkamer?.[raam]}
+                  dimensions={item.voorgevelKozijnen?.slaapkamer1?.[raam]}
+                  isEditing={isEditing}
+                  getValue={getValue}
+                  handleChange={handleChange}
+                />
+              ))}
+            </div>
+            <div className="form__group">
+              <h5>Slaapkamer 2</h5>
+              {["raam1", "raam2"].map((raam) => (
+                <WindowInputs
+                  key={raam}
+                  basePath={`voorgevelKozijnen.slaapkamer2.${raam}`}
+                  label={`Raam ${raam.slice(-1)}`}
+                  dimensions={item.voorgevelKozijnen?.slaapkamer2?.[raam]}
                   isEditing={isEditing}
                   getValue={getValue}
                   handleChange={handleChange}
@@ -237,24 +258,27 @@ const TypeForm = ({
               ))}
             </div>
             <div className="form__group">
-              <h5>Slaapkamer 1</h5>
-              <WindowInputs
-                basePath="achtergevelKozijnen.slaapkamer1.raam1"
-                label="Raam 1"
-                dimensions={item.achtergevelKozijnen?.slaapkamer1?.raam1}
-                isEditing={isEditing}
-                getValue={getValue}
-                handleChange={handleChange}
-              />
-            </div>
-            <div className="form__group">
-              <h5>Slaapkamer 2</h5>
+              <h5>Slaapkamer 3</h5>
               {["raam1", "raam2"].map((raam) => (
                 <WindowInputs
                   key={raam}
-                  basePath={`achtergevelKozijnen.slaapkamer2.${raam}`}
+                  basePath={`achtergevelKozijnen.slaapkamer3.${raam}`}
                   label={`Raam ${raam.slice(-1)}`}
-                  dimensions={item.achtergevelKozijnen?.slaapkamer2?.[raam]}
+                  dimensions={item.achtergevelKozijnen?.slaapkamer3?.[raam]}
+                  isEditing={isEditing}
+                  getValue={getValue}
+                  handleChange={handleChange}
+                />
+              ))}
+            </div>
+            <div className="form__group">
+              <h5>Slaapkamer 4</h5>
+              {["raam1", "raam2"].map((raam) => (
+                <WindowInputs
+                  key={raam}
+                  basePath={`achtergevelKozijnen.slaapkamer4.${raam}`}
+                  label={`Raam ${raam.slice(-1)}`}
+                  dimensions={item.achtergevelKozijnen?.slaapkamer4?.[raam]}
                   isEditing={isEditing}
                   getValue={getValue}
                   handleChange={handleChange}
@@ -270,17 +294,18 @@ const TypeForm = ({
             {[
               "woonkamer",
               "achterkamer",
-              "slaapkamer",
+              "slaapkamer1",
               "slaapkamer2",
+              "slaapkamer3",
+              "slaapkamer4",
               "keuken",
               "badkamer",
-              "hal",
               "toilet",
             ].map((ruimte) => (
               <WindowInputs
                 key={ruimte}
                 basePath={`ruimten.${ruimte}`}
-                label={ruimte}
+                label={ruimte.charAt(0).toUpperCase() + ruimte.slice(1)}
                 dimensions={item.ruimten?.[ruimte]}
                 isEditing={isEditing}
                 getValue={getValue}

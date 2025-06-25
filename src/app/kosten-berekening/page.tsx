@@ -1,3 +1,4 @@
+import Footer from "@/modules/footer/Footer";
 import CostForm from "@/modules/frontend/CostForm";
 import Hero from "@/modules/frontend/Hero";
 import Step from "@/modules/frontend/Step";
@@ -16,6 +17,7 @@ export default function Page() {
           richColors
           closeButton
         />
+        <Footer/>
       </div>
     </>
   );
