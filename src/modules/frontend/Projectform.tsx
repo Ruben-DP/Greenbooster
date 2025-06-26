@@ -64,8 +64,10 @@ interface TypeFormData {
   ruimten: {
     woonkamer: WindowDimensions;
     achterkamer: WindowDimensions;
-    slaapkamer: WindowDimensions;
+    slaapkamer1: WindowDimensions;
     slaapkamer2: WindowDimensions;
+    slaapkamer3: WindowDimensions;
+    slaapkamer4: WindowDimensions;
     keuken: WindowDimensions;
     badkamer: WindowDimensions;
     hal: WindowDimensions;
@@ -119,8 +121,10 @@ export default function ProjectForm() {
     ruimten: {
       woonkamer: { breedte: null, hoogte: null },
       achterkamer: { breedte: null, hoogte: null },
-      slaapkamer: { breedte: null, hoogte: null },
+      slaapkamer1: { breedte: null, hoogte: null },
       slaapkamer2: { breedte: null, hoogte: null },
+      slaapkamer3: { breedte: null, hoogte: null },
+      slaapkamer4: { breedte: null, hoogte: null },
       keuken: { breedte: null, hoogte: null },
       badkamer: { breedte: null, hoogte: null },
       hal: { breedte: null, hoogte: null },

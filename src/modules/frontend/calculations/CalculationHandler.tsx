@@ -220,19 +220,30 @@ export const CalculationHandler: React.FC<Props> = ({
 
     // Calculate aantalSlaapkamers (number of bedrooms)
     let aantalSlaapkamers = 0;
-    if (woningType.ruimten && woningType.ruimten.slaapkamers) {
-      aantalSlaapkamers = Array.isArray(woningType.ruimten.slaapkamers)
-        ? woningType.ruimten.slaapkamers.length
-        : woningType.ruimten.slaapkamers;
+    if (woningType.ruimten) {
+      const definedSlaapkamers = Object.keys(woningType.ruimten).filter(
+        (key) => {
+          const isSlaapkamer = key.startsWith("slaapkamer");
+          const hasDimensions =
+            woningType.ruimten[key] &&
+            woningType.ruimten[key].breedte > 0 &&
+            woningType.ruimten[key].hoogte > 0;
+          return isSlaapkamer && hasDimensions;
+        }
+      );
+      aantalSlaapkamers = definedSlaapkamers.length;
+    }
+
+    if (aantalSlaapkamers > 0) {
       explanations[
         "aantalSlaapkamers"
-      ] = `Aantal slaapkamers in woningType = ${aantalSlaapkamers}`;
+      ] = `Aantal gedefinieerde slaapkamers in woningType = ${aantalSlaapkamers}`;
     } else {
-      // Default value if not specified
+      // Fallback to default if no bedrooms are defined with valid dimensions
       aantalSlaapkamers = 3;
       explanations[
         "aantalSlaapkamers"
-      ] = `Standaard waarde voor aantal slaapkamers = ${aantalSlaapkamers}`;
+      ] = `Geen slaapkamers met valide afmetingen gevonden, standaard waarde wordt gebruikt = ${aantalSlaapkamers}`;
     }
 
     return {
@@ -661,7 +672,6 @@ export const CalculationHandler: React.FC<Props> = ({
       "glasOppervlakteWoning"
     ] = `${glasOppervlakVoorTotaal} + ${glasOppervlakAchterTotaal} = ${glasOppervlakteWoning}`;
 
-    
     return {
       kozijnenVoorgevel,
       kozijnenAchtergevel,
