@@ -293,7 +293,10 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
   };
 
   const handleWoningTypeChange = (woningType: string) => {
-    const currentTypes = getValue("applicableWoningTypes", data.applicableWoningTypes);
+    const currentTypes = getValue(
+      "applicableWoningTypes",
+      data.applicableWoningTypes
+    );
     const newTypes = currentTypes.includes(woningType)
       ? currentTypes.filter((t: string) => t !== woningType)
       : [...currentTypes, woningType];
@@ -389,11 +392,9 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                         ) : (
                           <SelectField
                             label="Variabele"
-                            value={String(
-                              getValue(
-                                `${priceType}[${idx}].calculation[${valIdx}].value`,
-                                formula.value || ""
-                              )
+                            value={getValue(
+                              `${priceType}[${idx}].calculation[${valIdx}].value`,
+                              formula.value || ""
                             )}
                             dynamicOptions={{
                               collection: "variables",
@@ -402,17 +403,21 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                             optionText="Kies variabele"
                             required={false}
                             isEditing={isEditing}
-                            onChange={(value, id) =>
+                            onChange={(value, id) => {
+                              // Create a new object for the updated calculation entry
+                              const updatedFormula = {
+                                ...formula,
+                                value: value || "",
+                                id: id || "",
+                              };
+
+                              // Pass the updated object to the handleChange function for the entire calculation entry
                               handleChange(
                                 `${priceType}[${idx}].calculation[${valIdx}]`,
                                 formula,
-                                {
-                                  ...formula,
-                                  value: value || "",
-                                  id: id || "",
-                                }
-                              )
-                            }
+                                updatedFormula
+                              );
+                            }}
                           />
                         )}
                       </div>
@@ -676,33 +681,42 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
             }
           />
           <div className="group">
-           <div className="group">
-            <TextField
-              label="Groep"
-              value={getValue("group", data.group)}
-              type="text"
-              required={false}
-              isEditing={isEditing}
-              onChange={(next) =>
-                handleChange("group", getValue("group", data.group), next.toLowerCase())
-              }
-            />
-          </div>
+            <div className="group">
+              <TextField
+                label="Groep"
+                value={getValue("group", data.group)}
+                type="text"
+                required={false}
+                isEditing={isEditing}
+                onChange={(next) =>
+                  handleChange(
+                    "group",
+                    getValue("group", data.group),
+                    next.toLowerCase()
+                  )
+                }
+              />
+            </div>
           </div>
         </div>
 
         <h4 className="form__heading">Toepasbare Woningtypes</h4>
         <div className="form__grid">
-          {['grondgebonden', 'portiek', 'gallerij'].map(type => (
+          {["grondgebonden", "portiek", "gallerij"].map((type) => (
             <div key={type} className="form__field">
               <label className="checkbox-label">
                 <input
                   type="checkbox"
-                  checked={getValue("applicableWoningTypes", data.applicableWoningTypes).includes(type)}
+                  checked={getValue(
+                    "applicableWoningTypes",
+                    data.applicableWoningTypes
+                  ).includes(type)}
                   disabled={!isEditing}
                   onChange={() => handleWoningTypeChange(type)}
                 />
-                <span className="checkbox-text">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                <span className="checkbox-text">
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </span>
               </label>
             </div>
           ))}
