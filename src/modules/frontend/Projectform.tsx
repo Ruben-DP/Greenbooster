@@ -42,22 +42,25 @@ interface TypeFormData {
     };
   };
   achtergevelKozijnen: {
-    achterdeur: WindowDimensions;
-    keuken: WindowDimensions;
+    achterdeur: { breedte: null; hoogte: null };
+    keuken: { breedte: null; hoogte: null };
     woonkamer: {
-      raam1: WindowDimensions;
-      raam2: WindowDimensions;
-      raam3: WindowDimensions;
+      raam1: { breedte: null; hoogte: null };
+      raam2: { breedte: null; hoogte: null };
+      raam3: { breedte: null; hoogte: null };
     };
-    slaapkamer1: {
-      raam1: WindowDimensions;
-      raam2: WindowDimensions;
+    slaapkamer3: {
+      // Corrected from slaapkamer1
+      raam1: { breedte: null; hoogte: null };
+      raam2: { breedte: null; hoogte: null };
     };
-    slaapkamer2: {
-      raam1: WindowDimensions;
-      raam2: WindowDimensions;
+    slaapkamer4: {
+      // Corrected from slaapkamer2
+      raam1: { breedte: null; hoogte: null };
+      raam2: { breedte: null; hoogte: null };
     };
   };
+
   ruimten: {
     woonkamer: WindowDimensions;
     achterkamer: WindowDimensions;
@@ -104,11 +107,11 @@ export default function ProjectForm() {
         raam2: { breedte: null, hoogte: null },
         raam3: { breedte: null, hoogte: null },
       },
-      slaapkamer1: {
+      slaapkamer3: { // Corrected from slaapkamer1
         raam1: { breedte: null, hoogte: null },
         raam2: { breedte: null, hoogte: null },
       },
-      slaapkamer2: {
+      slaapkamer4: { // Corrected from slaapkamer2
         raam1: { breedte: null, hoogte: null },
         raam2: { breedte: null, hoogte: null },
       },

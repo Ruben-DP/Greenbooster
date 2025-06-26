@@ -47,6 +47,8 @@ export interface WoningType {
     achterkamer: RoomDimensions;
     slaapkamer: RoomDimensions;
     slaapkamer2: RoomDimensions;
+    slaapkamer3: RoomDimensions; // Add this line
+    slaapkamer4: RoomDimensions;
     keuken: RoomDimensions;
     badkamer: RoomDimensions;
     hal: RoomDimensions;
