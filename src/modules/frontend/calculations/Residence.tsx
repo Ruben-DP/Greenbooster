@@ -1,7 +1,10 @@
-// Fixed Residence.tsx with auto-selection of newly created residence
+// src/modules/frontend/calculations/Residence.tsx
+"use client";
 import { searchDocuments } from "@/app/actions/crudActions";
 import { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
+
+// ... (interfaces remain the same)
 
 interface ProjectInformation {
   projectNumber: string;
@@ -21,7 +24,7 @@ interface EnergyDetails {
   nieuwLabel: string;
   labelStappen: string;
   huidigVerbruik: number;
-  huidigEnergieprijs: number; // FIXED: consistent field name
+  huidigEnergieprijs: number;
 }
 
 interface Woning {
@@ -82,7 +85,6 @@ interface ResidenceProps {
 export default function Residence({
   selectedResidence,
   onTypeSelect,
-  residenceType,
 }: ResidenceProps) {
   const [woningen, setWoningen] = useState<Woning[]>([]);
   const [selectedWoning, setSelectedWoning] = useState<Woning | null>(null);
@@ -121,17 +123,16 @@ export default function Residence({
       if (Array.isArray(response)) {
         setWoningen(response);
         
-        // Check if there's a newly created woning to select
-        const selectedWoningId = localStorage.getItem('selectedWoningId');
-        if (selectedWoningId) {
-          // Clear the localStorage item after using it
-          localStorage.removeItem('selectedWoningId');
-          setSelectedId(selectedWoningId);
-          await fetchWoning(selectedWoningId);
-        } else if (!selectedId && response.length > 0) {
-          // Default to first woning if no specific one is requested
-          setSelectedId(response[0]._id);
-          await fetchWoning(response[0]._id);
+        const storedWoningId = localStorage.getItem('selectedResidenceId');
+        let idToSelect = storedWoningId;
+
+        if (!idToSelect && response.length > 0) {
+          idToSelect = response[0]._id;
+        }
+        
+        if (idToSelect) {
+            setSelectedId(idToSelect);
+            await fetchWoning(idToSelect);
         }
       }
     } catch (error) {
@@ -160,7 +161,6 @@ export default function Residence({
           if (Array.isArray(typeResponse) && typeResponse.length > 0) {
             const typeData = typeResponse[0];
             setTypeDetails(typeData);
-            // Pass the type.type field as residenceType, fallback to type.naam
             const typeString = typeData.type || typeData.naam || "";
             selectedResidence(residence, typeData, typeString);
           }
@@ -187,6 +187,7 @@ export default function Residence({
   ) => {
     const newId = event.target.value;
     setSelectedId(newId);
+    localStorage.setItem('selectedResidenceId', newId);
     fetchWoning(newId);
     setIsEditing(false);
   };
