@@ -23,11 +23,11 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/pwq8zgw.css" />
       </head>
-      <PasswordProtection>
-        <body className={`${inter.variable} antialiased`}>
+      <body className={`${inter.variable} antialiased`}>
+        <PasswordProtection>
           <main>{children}</main>
-        </body>
-      </PasswordProtection>
+        </PasswordProtection>
+      </body>
     </html>
   );
 }

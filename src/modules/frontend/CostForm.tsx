@@ -207,15 +207,15 @@ function PageContent() {
       return;
     }
 
-    if (
-      measure.group &&
-      selectedMeasures.some((m) => m.group === measure.group)
-    ) {
-      toast.error(
-        `Er is al een maatregel uit '${measure.group}' geselecteerd, verwijder deze om een nieuwe maatregel te selecteren.`
-      );
-      return;
-    }
+    // if (
+    //   measure.group &&
+    //   selectedMeasures.some((m) => m.group === measure.group)
+    // ) {
+    //   toast.error(
+    //     `Er is al een maatregel uit '${measure.group}' geselecteerd, verwijder deze om een nieuwe maatregel te selecteren.`
+    //   );
+    //   return;
+    // }
 
     const measureExists = selectedMeasures.some((m) => m.name === measure.name);
     if (measureExists) {

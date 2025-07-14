@@ -37,8 +37,16 @@ export default function DetailConfirmation({
             {Object.values(changes).map((change) => (
               <div key={change.fieldId} className="change-item">
                 <p className="change-label">{change.label}</p>
-                <p className="change-old">{change.oldValue || "Empty"}</p>
-                <p className="change-new">{change.newValue || "Empty"}</p>
+                <p className="change-old">
+                  {typeof change.oldValue === "object"
+                    ? JSON.stringify(change.oldValue)
+                    : change.oldValue || "Empty"}
+                </p>
+                <p className="change-new">
+                  {typeof change.newValue === "object"
+                    ? JSON.stringify(change.newValue)
+                    : change.newValue || "Empty"}
+                </p>
               </div>
             ))}
           </div>

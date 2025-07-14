@@ -403,21 +403,13 @@ const MeasureForm = ({ item, isEditing, pendingChanges, onChange }: Props) => {
                             optionText="Kies variabele"
                             required={false}
                             isEditing={isEditing}
-                            onChange={(value, id) => {
-                              // Create a new object for the updated calculation entry
-                              const updatedFormula = {
-                                ...formula,
-                                value: value || "",
-                                id: id || "",
-                              };
-
-                              // Pass the updated object to the handleChange function for the entire calculation entry
+                            onChange={(next) =>
                               handleChange(
-                                `${priceType}[${idx}].calculation[${valIdx}]`,
-                                formula,
-                                updatedFormula
-                              );
-                            }}
+                                `${priceType}[${idx}].calculation[${valIdx}].value`,
+                                formula.value,
+                                next
+                              )
+                            }
                           />
                         )}
                       </div>

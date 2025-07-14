@@ -36,15 +36,14 @@ const CALCULATION_VARIABLES = [
   "kopgevels",
   "portieken",
   "breedteWoningPlusHoogte",
-  
-  
+
   // Gevel calculations
   "gevelOppervlakVoor",
   "gevelOppervlakAchter",
   "gevelOppervlakTotaal",
   "gevelOppervlakNetto",
   "brutoKopgevelOppervlak",
-  
+
   // Dak calculations
   "dakOppervlak",
   "dakOppervlakTotaal",
@@ -54,13 +53,13 @@ const CALCULATION_VARIABLES = [
   "dakTotaalMetOverhang",
   "lengteDakvlak",
   "lengteDakvlakPlusBreedteWoning",
-  
+
   // Vloer calculations
   "vloerOppervlak",
   "vloerOppervlakTotaal",
   "vloerOppervlakteBeganeGrond",
   "oppervlakteKelder", // Hier is de nieuwe variabele toegevoegd
-  
+
   // Kozijn measurements
   "kozijnOppervlakVoorTotaal",
   "kozijnOppervlakAchterTotaal",
@@ -69,17 +68,17 @@ const CALCULATION_VARIABLES = [
   "kozijnOmtrekTotaal",
   "kozijnOppervlakteWoning",
   "glasOppervlakteWoning",
-  
+
   // Kozijn by size categories
-  "kozijn05", 
-  "kozijn10", 
-  "kozijn15", 
-  "kozijn20", 
-  "kozijn25", 
-  "kozijn30", 
-  "kozijn35", 
+  "kozijn05",
+  "kozijn10",
+  "kozijn15",
+  "kozijn20",
+  "kozijn25",
+  "kozijn30",
+  "kozijn35",
   "kozijn40",
-  
+
   // Window perimeter measurements
   "vensterbankLengte",
   "vensterbankLengteTotaal",
@@ -87,20 +86,20 @@ const CALCULATION_VARIABLES = [
   "omtrekAchterdeur",
   "omtrekKozijnen",
   "omtrekDraaidelen",
-  
+
   // Plinth and other perimeter measurements
   "vloerplintLengte",
   "vloerplintLengteTotaal",
   "omtrekSandwichElementen",
-  
+
   // Room measurements
   "oppervlakteHal",
   "aantalSlaapkamers",
-  
+
   // Ventilation
   "zrRooster",
   "zrRoosterLengte",
-  
+
   // PV Panel measurements
   "aantalPVPanelenGGB",
   "oppervlaktePVPanelenGGB",
@@ -108,13 +107,13 @@ const CALCULATION_VARIABLES = [
   "oppervlaktePVPanelenKop",
   "aantalPVPanelenLangs",
   "oppervlaktePVPanelenLangs",
-  
+
   // Project totals
   "projectGevelOppervlak",
   "projectKozijnenOppervlak",
   "projectDakOppervlak",
   "projectOmtrek",
-  
+
   // Backward compatibility with old variable names
   "AantalWoningen",
   "Dakoppervlak",
@@ -125,21 +124,53 @@ const CALCULATION_VARIABLES = [
   "VensterbankLengte",
   "VloerOppervlakteBeganeGrond",
   "OmtrekKozijnen",
-  
+
   // Common constants
-  "0.3",
+  "0.05",
+  "0.10",
+  "0.15",
+  "0.20",
+  "0.25",
+  "0.30",
+  "0.35",
+  "0.40",
+  "0.45",
+  "0.50",
+  "0.55",
+  "0.60",
+  "0.65",
+  "0.70",
   "0.75",
-  "1.1",
+  "0.80",
+  "0.85",
+  "0.90",
+  "0.95",
+  "1.00",
   "1.05",
-  "2",
+  "1.10",
+  "1.15",
+  "1.20",
+  "1.25",
+  "1.30",
+  "1.35",
+  "1.40",
+  "1.45",
+  "1.50",
+  "1.55",
+  "1.60",
+  "1.65",
+  "1.70",
+  "1.75",
+  "1.80",
+  "1.85",
+  "1.90",
+  "1.95",
+  "2.00",
   "2.39",
   "3",
   "4",
   "5",
-  "0.1",
-  "0.05",
-  "477"
-
+  "477",
 ];
 
 export function SelectField({
@@ -153,14 +184,13 @@ export function SelectField({
   optionText,
   dynamicOptions,
 }: SelectFieldProps) {
-  
   // Convert the static variables into option objects
-  const staticOptions = CALCULATION_VARIABLES.map(variable => ({
+  const staticOptions = CALCULATION_VARIABLES.map((variable) => ({
     label: variable,
     value: variable,
     id: variable, // Using the variable name as the ID for simplicity
   }));
-  
+
   // Use provided options if available, otherwise use static variables
   const finalOptions = providedOptions
     ? Array.isArray(providedOptions)
