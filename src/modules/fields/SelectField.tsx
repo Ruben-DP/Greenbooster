@@ -25,7 +25,7 @@ interface SelectFieldProps {
 // Comprehensive list of calculation variables matching the calculation output
 const CALCULATION_VARIABLES = [
   // Basic measurements (from woningSpecifiek)
-  "breedte",
+"breedte",
   "diepte",
   "gootHoogte",
   "nokHoogte",
@@ -58,7 +58,7 @@ const CALCULATION_VARIABLES = [
   "vloerOppervlak",
   "vloerOppervlakTotaal",
   "vloerOppervlakteBeganeGrond",
-  "oppervlakteKelder", // Hier is de nieuwe variabele toegevoegd
+  "oppervlakteKelder",
 
   // Kozijn measurements
   "kozijnOppervlakVoorTotaal",
@@ -68,6 +68,8 @@ const CALCULATION_VARIABLES = [
   "kozijnOmtrekTotaal",
   "kozijnOppervlakteWoning",
   "glasOppervlakteWoning",
+  "aantalKozijnen", // New
+  "kozijnBreedteTotaal", //New
 
   // Kozijn by size categories
   "kozijn05",
@@ -95,10 +97,6 @@ const CALCULATION_VARIABLES = [
   // Room measurements
   "oppervlakteHal",
   "aantalSlaapkamers",
-
-  // Ventilation
-  "zrRooster",
-  "zrRoosterLengte",
 
   // PV Panel measurements
   "aantalPVPanelenGGB",

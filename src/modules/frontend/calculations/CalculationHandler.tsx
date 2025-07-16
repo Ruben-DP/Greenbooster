@@ -121,6 +121,8 @@ interface CalculationResults {
   omtrekAchterdeur: number;
   oppervlakteHal: number;
   aantalSlaapkamers: number;
+  aantalKozijnen: number;
+  kozijnBreedteTotaal: number;
 }
 
 interface Props {
@@ -347,6 +349,7 @@ export const CalculationHandler: React.FC<Props> = ({
     // Kozijnen
     console.groupCollapsed("Kozijnen Berekeningen");
     logExplanationsByPrefix(explanations, "kozijn");
+
     console.groupEnd();
 
     // Vloer
@@ -661,7 +664,29 @@ export const CalculationHandler: React.FC<Props> = ({
     const glasOppervlakteWoning =
       glasOppervlakVoorTotaal + glasOppervlakAchterTotaal;
 
-    // Add explanations for glass surface totals
+    const aantalKozijnen =
+      kozijnenVoorgevel.length + kozijnenAchtergevel.length;
+    const kozijnBreedteTotaal = [
+      ...kozijnenVoorgevel,
+      ...kozijnenAchtergevel,
+    ].reduce((sum, k) => sum + k.breedte, 0);
+
+    // Create a detailed explanation string
+    const breedteDetails = [...kozijnenVoorgevel, ...kozijnenAchtergevel]
+      .map((k) => `${k.type}: ${k.breedte.toFixed(2)}m`)
+      .join(" + ");
+
+    explanations[
+      "kozijnAantal"
+    ] = `Aantal voorgevel kozijnen (${kozijnenVoorgevel.length}) + Aantal achtergevel kozijnen (${kozijnenAchtergevel.length}) = ${aantalKozijnen}`;
+
+    // Updated explanation with more detail
+    explanations[
+      "kozijnBreedteTotaal"
+    ] = `Som van alle kozijn breedtes = ${breedteDetails} = ${kozijnBreedteTotaal.toFixed(
+      2
+    )}m`;
+
     explanations[
       "glasOppervlakVoorTotaal"
     ] = `Som van alle voorgevel kozijn netto oppervlaktes = ${glasOppervlakVoorTotaal}`;
@@ -685,6 +710,8 @@ export const CalculationHandler: React.FC<Props> = ({
       glasOppervlakVoorTotaal,
       glasOppervlakAchterTotaal,
       glasOppervlakteWoning,
+      aantalKozijnen,
+      kozijnBreedteTotaal,
     };
   };
 
