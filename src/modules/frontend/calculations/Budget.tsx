@@ -6,14 +6,17 @@ import { Settings } from "@/types/settings";
 
 interface BudgetProps {
   totalAmount: number;
+  numberOfUnits?: number;
 }
 
-export default function Budget({ totalAmount }: BudgetProps) {
+export default function Budget({
+  totalAmount,
+  numberOfUnits = 0,
+}: BudgetProps) {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Fetch settings from database
   useEffect(() => {
     const fetchSettings = async () => {
       try {
@@ -32,7 +35,6 @@ export default function Budget({ totalAmount }: BudgetProps) {
     fetchSettings();
   }, []);
 
-  // Format currency values
   const formatCurrency = (amount: number) => {
     return amount.toLocaleString("nl-NL", {
       minimumFractionDigits: 2,
@@ -40,65 +42,40 @@ export default function Budget({ totalAmount }: BudgetProps) {
     });
   };
 
-  // Calculate budget breakdown with all factors from settings
   const calculateBudgetBreakdown = () => {
     if (!settings) return null;
 
-    // Start with base amount (direct costs)
     const directCosts = Math.max(0, totalAmount);
 
-    
     const customValue1Amount = directCosts > 0 ? settings.customValue1 || 0 : 0;
-    const customValue2Amount =  directCosts > 0 ? settings.customValue2 || 0 : 0;
+    const customValue2Amount = directCosts > 0 ? settings.customValue2 || 0 : 0;
 
-    // Subtotal after direct costs and custom values
     const subtotalDirectAndCustom =
       directCosts + customValue1Amount + customValue2Amount;
 
-    // ABK / Materieel
     const abkMaterieelAmount =
       subtotalDirectAndCustom * (settings.abkMaterieel / 100);
-
-    // Subtotal after ABK
     const subtotalAfterABK = subtotalDirectAndCustom + abkMaterieelAmount;
 
-    // Afkoop
     const afkoopAmount = subtotalDirectAndCustom * (settings.afkoop / 100);
-
-    // Subtotal "Directe kosten + ABK + Afkoop"
     const subtotalDirectABKAfkoop = subtotalAfterABK + afkoopAmount;
 
-    // Kosten t.b.v. nadere planuitwerking
     const planuitwerkingAmount =
       subtotalDirectAndCustom * (settings.kostenPlanuitwerking / 100);
-
-    // Subtotal after planuitwerking
     const subtotalAfterPlanuitwerking =
       subtotalDirectABKAfkoop + planuitwerkingAmount;
 
-    // Nazorg / Service
     const nazorgServiceAmount =
       subtotalDirectAndCustom * (settings.nazorgService / 100);
-
-    // CAR / PI / DIC verzekering
     const carPiDicAmount =
       subtotalDirectAndCustom * (settings.carPiDicVerzekering / 100);
-
-    // Bankgarantie
     const bankgarantieAmount =
       subtotalDirectAndCustom * (settings.bankgarantie / 100);
-
-    // Algemene kosten (AK)
     const algemeneKostenAmount =
       subtotalDirectAndCustom * (settings.algemeneKosten / 100);
-
-    // Risico
     const risicoAmount = subtotalDirectAndCustom * (settings.risico / 100);
-
-    // Winst
     const winstAmount = subtotalDirectAndCustom * (settings.winst / 100);
 
-    // Subtotal "Bouwkosten"
     const subtotalBouwkosten =
       subtotalAfterPlanuitwerking +
       nazorgServiceAmount +
@@ -108,26 +85,22 @@ export default function Budget({ totalAmount }: BudgetProps) {
       risicoAmount +
       winstAmount;
 
-    // Bijkomende kosten: Planvoorbereiding
     const planvoorbereidingAmount =
       subtotalDirectAndCustom * (settings.planvoorbereiding / 100);
-
-    // Bijkomende kosten: Huurdersbegeleiding
     const huurdersbegeleidingAmount =
       subtotalDirectAndCustom * (settings.huurdersbegeleiding / 100);
 
-    // Subtotal after Bijkomende kosten
     const subtotalAfterBijkomendeKosten =
       subtotalBouwkosten + planvoorbereidingAmount + huurdersbegeleidingAmount;
 
-    // Total offering excluding VAT
     const totalExclVAT = subtotalAfterBijkomendeKosten;
-
-    // BTW (VAT)
     const vat = totalExclVAT * (settings.vatPercentage / 100);
-
-    // Final amount including VAT
     const finalAmount = totalExclVAT + vat;
+
+    const pricePerUnitInclVAT =
+      numberOfUnits > 0 ? finalAmount / numberOfUnits : 0;
+    const pricePerUnitExclVAT =
+      numberOfUnits > 0 ? totalExclVAT / numberOfUnits : 0;
 
     return {
       directCosts,
@@ -153,12 +126,13 @@ export default function Budget({ totalAmount }: BudgetProps) {
       totalExclVAT,
       vat,
       finalAmount,
+      pricePerUnitInclVAT,
+      pricePerUnitExclVAT,
     };
   };
 
   const breakdown = calculateBudgetBreakdown();
 
-  // Toggle expanded view
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
   };
@@ -192,9 +166,31 @@ export default function Budget({ totalAmount }: BudgetProps) {
             <span className="budget__vat-note">incl. BTW</span>
           </div>
 
+          {/* --- AANPASSING HIER --- */}
+          {breakdown && (
+            <div className="budget__total-excl-vat">
+              <span>
+                (€ {formatCurrency(breakdown.totalExclVAT)} excl. BTW)
+              </span>
+            </div>
+          )}
+
+          {breakdown && numberOfUnits > 0 && (
+            <div className="budget__unit-prices">
+              <div className="budget__unit-price-line">
+                <span>Prijs per eenheid (incl. BTW)</span>
+                <span>€ {formatCurrency(breakdown.pricePerUnitInclVAT)}</span>
+              </div>
+              <div className="budget__unit-price-line">
+                <span>Prijs per eenheid (excl. BTW)</span>
+                <span>€ {formatCurrency(breakdown.pricePerUnitExclVAT)}</span>
+              </div>
+            </div>
+          )}
+
           {isExpanded && breakdown && (
             <div className="budget__breakdown">
-              {/* Section 1: Direct costs and custom values */}
+              {/* Rest van de uitklapbare details... */}
               <div className="budget__section">
                 <div className="budget__line budget__line--main">
                   <span>Directe kosten</span>
@@ -226,7 +222,6 @@ export default function Budget({ totalAmount }: BudgetProps) {
                 </div>
               </div>
 
-              {/* Section 2: ABK */}
               <div className="budget__section">
                 <div className="budget__line">
                   <span>
@@ -241,7 +236,6 @@ export default function Budget({ totalAmount }: BudgetProps) {
                 </div>
               </div>
 
-              {/* Section 3: Afkoop */}
               <div className="budget__section">
                 <div className="budget__line">
                   <span>Afkoop ({settings.afkoop}%)</span>
@@ -256,7 +250,6 @@ export default function Budget({ totalAmount }: BudgetProps) {
                 </div>
               </div>
 
-              {/* Section 4: Planuitwerking */}
               <div className="budget__section">
                 <div className="budget__line">
                   <span>
@@ -276,7 +269,6 @@ export default function Budget({ totalAmount }: BudgetProps) {
                 </div>
               </div>
 
-              {/* Section 5: Various percentages leading to Bouwkosten */}
               <div className="budget__section">
                 <div className="budget__line">
                   <span>Nazorg / Service ({settings.nazorgService}%)</span>
@@ -318,7 +310,6 @@ export default function Budget({ totalAmount }: BudgetProps) {
                 </div>
               </div>
 
-              {/* Section 6: Bijkomende kosten */}
               <div className="budget__section">
                 <div className="budget__line">
                   <span>Planvoorbereiding ({settings.planvoorbereiding}%)</span>
@@ -337,7 +328,6 @@ export default function Budget({ totalAmount }: BudgetProps) {
                 </div>
               </div>
 
-              {/* Section 7: Final totals */}
               <div className="budget__section">
                 <div className="budget__line budget__line--subtotal">
                   <span>Totale aanbieding excl. BTW</span>
@@ -360,17 +350,47 @@ export default function Budget({ totalAmount }: BudgetProps) {
       )}
 
       <style jsx>{`
-        .budget {
-          display: flex;
-          flex-direction: column;
+        .budget__unit-prices {
+          margin-top: 16px;
+          padding-top: 12px;
+          border-top: 1px solid #eaeaea;
         }
 
-        .budget__header {
+        .budget__unit-price-line {
           display: flex;
           justify-content: space-between;
           align-items: center;
         }
 
+        /* Styling voor de eerste regel: Prijs per eenheid (incl. BTW) */
+        .budget__unit-price-line:first-child {
+          font-size: 16px;
+          margin-bottom: 4px;
+        }
+
+        .budget__unit-price-line:first-child span:last-child {
+          font-weight: 600;
+          color: #1a1a1a;
+        }
+
+        /* Styling voor de tweede regel: Prijs per eenheid (excl. BTW) */
+        .budget__unit-price-line:last-child {
+          font-size: 14px;
+          color: #666;
+        }
+
+        .budget__unit-price-line:last-child span:last-child {
+          font-weight: 400; /* Normaal gewicht */
+        }
+        .budget {
+          display: flex;
+          flex-direction: column;
+        }
+        .budget__header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
         .budget__toggle-btn {
           background: transparent;
           border: none;
@@ -383,49 +403,65 @@ export default function Budget({ totalAmount }: BudgetProps) {
           transition: background-color 0.2s;
           min-width: 92px;
         }
-
         .budget__toggle-btn:hover {
           background: rgba(67, 97, 238, 0.1);
         }
-
         .budget__amount {
           display: flex;
           align-items: baseline;
-          margin-bottom: 10px;
+          /* margin-bottom: 10px; */ /* Verwijderd voor betere uitlijning met nieuwe regel */
           justify-content: center;
         }
 
+        /* --- NIEUWE STYLE VOOR TOTAAL EXCL. BTW --- */
+        .budget__total-excl-vat {
+          text-align: center;
+          font-size: 14px;
+          color: #666;
+          margin-top: -4px;
+          margin-bottom: 16px;
+        }
+
+        .budget__unit-prices {
+          margin-top: 12px;
+          padding-top: 12px;
+          border-top: 1px solid #eaeaea;
+        }
+        .budget__unit-price-line {
+          display: flex;
+          justify-content: space-between;
+          font-size: 15px;
+          margin-bottom: 6px;
+          color: #333;
+        }
+        .budget__unit-price-line span:last-child {
+          font-weight: 600;
+        }
         .budget__currency {
           font-size: 24px;
           font-weight: bold;
           margin-right: 4px;
         }
-
         .budget__sum {
           font-size: 32px;
           font-weight: bold;
         }
-
         .budget__vat-note {
           font-size: 14px;
           color: #666;
           margin-left: 8px;
         }
-
         .budget__breakdown {
           margin-top: 16px;
           border-top: 1px solid #eaeaea;
           padding-top: 16px;
         }
-
         .budget__section {
           margin-bottom: 16px;
         }
-
         .budget__section:last-child {
           margin-bottom: 0;
         }
-
         .budget__heading {
           font-weight: 600;
           font-size: 15px;
@@ -433,14 +469,12 @@ export default function Budget({ totalAmount }: BudgetProps) {
           padding-bottom: 4px;
           border-bottom: 1px solid #eaeaea;
         }
-
         .budget__line {
           display: flex;
           justify-content: space-between;
           font-size: 14px;
           margin-bottom: 8px;
         }
-
         .budget__line span {
           font-size: 15px;
         }
@@ -450,31 +484,26 @@ export default function Budget({ totalAmount }: BudgetProps) {
         .budget__line--main {
           font-weight: 600;
         }
-
         .budget__line--subtotal {
           border-top: 1px dashed #eaeaea;
           padding-top: 8px;
           margin-top: 8px;
         }
-
         .budget__line--subtotal span {
           font-weight: 600;
         }
-
         .budget__line--final span {
           font-weight: 700;
           font-size: 18px;
           padding-top: 12px;
           margin-top: 12px;
         }
-
         .budget__loading {
           font-size: 16px;
           color: #666;
           text-align: center;
           padding: 20px 0;
         }
-
         .budget__error {
           font-size: 16px;
           color: #e53e3e;

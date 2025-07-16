@@ -15,8 +15,6 @@ import { EnergyLabel } from "./calculations/EnergyLabel";
 import { calculateMeasurePrice } from "./calculations/price.calculator";
 import { updateWoningMeasures } from "@/app/actions/woningActions";
 
-// ... (interfaces remain the same)
-
 interface Measure {
   name: string;
   group?: string;
@@ -101,7 +99,6 @@ interface CalculationResults {
   calculationExplanations?: Record<string, string>;
 }
 
-
 function PageContent() {
   const [selectedResidence, setSelectedResidence] = useState<Woning | null>(
     null
@@ -142,7 +139,7 @@ function PageContent() {
 
     fetchSettings();
   }, []);
-    
+
   useEffect(() => {
     if (selectedResidence?._id) {
       updateWoningMeasures(selectedResidence._id, selectedMeasures);
@@ -221,18 +218,18 @@ function PageContent() {
     if (measureExists) {
       return;
     }
-    
+
     if (calculations) {
-        const heatDemandValue = getHeatDemandValue(
-            measure,
-            selectedType?.type || "",
-            selectedResidence?.projectInformation?.bouwPeriode || ""
-          );
-      
-          measure.heatDemandValue = heatDemandValue;
-      
-          setSelectedMeasures((prev) => [...prev, measure]);
-          setTotalBudget((prev) => prev + (measure.price || 0));
+      const heatDemandValue = getHeatDemandValue(
+        measure,
+        selectedType?.type || "",
+        selectedResidence?.projectInformation?.bouwPeriode || ""
+      );
+
+      measure.heatDemandValue = heatDemandValue;
+
+      setSelectedMeasures((prev) => [...prev, measure]);
+      setTotalBudget((prev) => prev + (measure.price || 0));
     }
   };
 
@@ -429,7 +426,10 @@ function PageContent() {
             currentEnergyUsage={selectedResidence?.energyDetails.huidigVerbruik}
             totalWarmth={totalHeatDemand}
           />
-          <Budget totalAmount={totalBudget} />
+          <Budget
+            totalAmount={totalBudget}
+            numberOfUnits={calculations?.woningSpecifiek?.aantalWoningen}
+          />
           <Stats
             selectedMeasures={selectedMeasures}
             totalHeatDemand={totalHeatDemand}
