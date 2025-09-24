@@ -1,13 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 import { getSettings, updateSettings } from "@/app/actions/settingsActions";
-import { Settings } from "@/types/settings";
+import { Settings, CustomField } from "@/types/settings";
 
 export default function SettingsPage() {
   // Default values to handle the initial state before data is loaded
   const defaultSettings: Settings = {
     hourlyLaborCost: 51,
+    profitPercentage: 5,
     vatPercentage: 21,
     inflationPercentage: 1,
     cornerHouseCorrection: -10,
@@ -32,6 +34,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [customFields, setCustomFields] = useState<CustomField[]>([]);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -44,13 +47,36 @@ export default function SettingsPage() {
           
           // Only copy values that are valid (not undefined, not null, not NaN)
           Object.keys(result.data).forEach(key => {
-            if (result.data[key] !== undefined && result.data[key] !== null && 
-                (typeof result.data[key] !== 'number' || !isNaN(result.data[key]))) {
-              mergedSettings[key] = result.data[key];
+            if ((result.data as any)[key] !== undefined && (result.data as any)[key] !== null && 
+                (typeof (result.data as any)[key] !== 'number' || !isNaN((result.data as any)[key]))) {
+              (mergedSettings as any)[key] = (result.data as any)[key];
             }
           });
           
           setSettings(mergedSettings);
+          
+          // Initialize custom fields from settings
+          if (result.data.customFields && Array.isArray(result.data.customFields)) {
+            setCustomFields(result.data.customFields);
+          } else {
+            // Initialize with legacy custom fields if they exist
+            const legacyFields: CustomField[] = [];
+            if (result.data.customValue1Name && result.data.customValue1 !== undefined) {
+              legacyFields.push({
+                id: 'legacy-1',
+                name: result.data.customValue1Name,
+                value: result.data.customValue1
+              });
+            }
+            if (result.data.customValue2Name && result.data.customValue2 !== undefined) {
+              legacyFields.push({
+                id: 'legacy-2',
+                name: result.data.customValue2Name,
+                value: result.data.customValue2
+              });
+            }
+            setCustomFields(legacyFields);
+          }
         }
       } catch (error) {
         console.error("Error fetching settings:", error);
@@ -85,6 +111,30 @@ export default function SettingsPage() {
     }
   };
 
+  // Custom field management functions
+  const addCustomField = () => {
+    const newField: CustomField = {
+      id: `custom-${Date.now()}`,
+      name: `Custom field ${customFields.length + 1}`,
+      value: 0
+    };
+    setCustomFields(prev => [...prev, newField]);
+  };
+
+  const removeCustomField = (id: string) => {
+    setCustomFields(prev => prev.filter(field => field.id !== id));
+  };
+
+  const updateCustomField = (id: string, fieldName: 'name' | 'value', value: string | number) => {
+    setCustomFields(prev => 
+      prev.map(field => 
+        field.id === id 
+          ? { ...field, [fieldName]: value }
+          : field
+      )
+    );
+  };
+
   const handleSave = async () => {
     try {
       // Log the settings we're trying to save
@@ -95,31 +145,34 @@ export default function SettingsPage() {
       
       if (existingResult.success && existingResult.data) {
         // Only update the fields that already exist in the backend data
-        const safeSettings = {};
+        const safeSettings: Partial<Settings> = {};
         
         // Only include fields that already exist in the backend response
         Object.keys(existingResult.data).forEach(key => {
-          if (settings[key] !== undefined) {
-            safeSettings[key] = settings[key];
+          if ((settings as any)[key] !== undefined) {
+            (safeSettings as any)[key] = (settings as any)[key];
           }
         });
         
         // Add custom fields - these might be new so they may not exist in backend yet
-        const customFields = [
+        const legacyCustomFields = [
           'customValue1', 'customValue1Name', 
           'customValue2', 'customValue2Name'
         ];
         
-        customFields.forEach(field => {
-          if (settings[field] !== undefined) {
-            safeSettings[field] = settings[field];
+        legacyCustomFields.forEach(field => {
+          if ((settings as any)[field] !== undefined) {
+            (safeSettings as any)[field] = (settings as any)[field];
           }
         });
+        
+        // Add the new custom fields array
+        safeSettings.customFields = customFields;
         
         console.log("Safe settings to save:", safeSettings);
         
         // Update with only the fields that existed in the original response
-        const result = await updateSettings(safeSettings);
+        const result = await updateSettings(safeSettings as Settings);
         if (result.success) {
           toast.success("Instellingen succesvol opgeslagen");
           setIsEditing(false);
@@ -129,7 +182,7 @@ export default function SettingsPage() {
           if (refreshResult.success && refreshResult.data) {
             setSettings({
               ...defaultSettings,
-              ...refreshResult.data
+              ...(refreshResult.data as any)
             });
           }
         } else {
@@ -550,84 +603,86 @@ export default function SettingsPage() {
         <div className="settings-card">
           <div className="settings-header">
             <h2>Extra velden eindblad</h2>
+            {isEditing && (
+              <button
+                type="button"
+                onClick={addCustomField}
+                className="add-field-button"
+                title="Voeg nieuw veld toe"
+              >
+                <span className="plus-icon">+</span>
+                Nieuw veld
+              </button>
+            )}
           </div>
 
           <div className="settings-form">
-            {/* Custom Field 1 */}
-            <div className="custom-field-group">
-              <div className="settings-field">
-                <label htmlFor="customValue1Name">Veld 1 Naam</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    id="customValue1Name"
-                    name="customValue1Name"
-                    value={settings.customValue1Name}
-                    onChange={handleChange}
-                    placeholder="Naam van aangepast veld 1"
-                  />
-                ) : (
-                  <div className="settings-value">
-                    {settings.customValue1Name}
-                  </div>
-                )}
-              </div>
-
-              <div className="settings-field">
-                <label htmlFor="customValue1">Bedrag (€)</label>
-                {isEditing ? (
-                  <div className="input-with-symbol">
+            {customFields.map((field, index) => (
+              <div key={field.id} className="custom-field-group">
+                <div className="custom-field-header">
+                  <span className="field-number">Veld {index + 1}</span>
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={() => removeCustomField(field.id)}
+                      className="remove-field-button"
+                      title="Verwijder veld"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+                
+                <div className="settings-field">
+                  <label htmlFor={`customField-${field.id}-name`}>Naam</label>
+                  {isEditing ? (
                     <input
-                      type="number"
-                      id="customValue1"
-                      name="customValue1"
-                      value={settings.customValue1}
-                      onChange={handleChange}
+                      type="text"
+                      id={`customField-${field.id}-name`}
+                      value={field.name}
+                      onChange={(e) => updateCustomField(field.id, 'name', e.target.value)}
+                      placeholder="Naam van het veld"
                     />
-                  </div>
-                ) : (
-                  <div className="settings-value">{settings.customValue1}</div>
-                )}
-              </div>
-            </div>
+                  ) : (
+                    <div className="settings-value">
+                      {field.name}
+                    </div>
+                  )}
+                </div>
 
-            {/* Custom Field 2 */}
-            <div className="custom-field-group">
-              <div className="settings-field">
-                <label htmlFor="customValue2Name">Veld 2 Naam</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    id="customValue2Name"
-                    name="customValue2Name"
-                    value={settings.customValue2Name}
-                    onChange={handleChange}
-                    placeholder="Naam van aangepast veld 2"
-                  />
-                ) : (
-                  <div className="settings-value">
-                    {settings.customValue2Name}
-                  </div>
+                <div className="settings-field">
+                  <label htmlFor={`customField-${field.id}-value`}>Bedrag (€)</label>
+                  {isEditing ? (
+                    <div className="input-with-symbol">
+                      <input
+                        type="number"
+                        id={`customField-${field.id}-value`}
+                        value={field.value}
+                        onChange={(e) => updateCustomField(field.id, 'value', parseFloat(e.target.value) || 0)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="settings-value">{field.value}</div>
+                  )}
+                </div>
+              </div>
+            ))}
+            
+            {customFields.length === 0 && (
+              <div className="no-custom-fields">
+                <p>Geen extra velden toegevoegd</p>
+                {isEditing && (
+                  <button
+                    type="button"
+                    onClick={addCustomField}
+                    className="add-first-field-button"
+                  >
+                    <span className="plus-icon">+</span>
+                    Voeg eerste veld toe
+                  </button>
                 )}
               </div>
-
-              <div className="settings-field">
-                <label htmlFor="customValue2">Bedrag (€)</label>
-                {isEditing ? (
-                  <div className="input-with-symbol">
-                    <input
-                      type="number"
-                      id="customValue2"
-                      name="customValue2"
-                      value={settings.customValue2}
-                      onChange={handleChange}
-                    />
-                  </div>
-                ) : (
-                  <div className="settings-value">{settings.customValue2}</div>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -801,6 +856,90 @@ export default function SettingsPage() {
           height: 200px;
           font-size: 18px;
           color: #666;
+        }
+
+        /* Custom fields styles */
+        .settings-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .add-field-button, .add-first-field-button {
+          background-color: var(--accent-color, #4361ee);
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          transition: background-color 0.2s;
+        }
+
+        .add-field-button:hover, .add-first-field-button:hover {
+          background-color: var(--accent-color-dark, #3a56d4);
+          opacity: 0.9;
+        }
+
+        .plus-icon {
+          font-size: 16px;
+          font-weight: bold;
+        }
+
+        .custom-field-group {
+          border: 1px solid #e0e0e0;
+          border-radius: 8px;
+          padding: 16px;
+          margin-bottom: 16px;
+          background-color: #fafafa;
+        }
+
+        .custom-field-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid #e0e0e0;
+        }
+
+        .field-number {
+          font-weight: 600;
+          color: #666;
+          font-size: 14px;
+        }
+
+        .remove-field-button {
+          background: none;
+          color: #dc2626;
+          border: none;
+          padding: 4px;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+
+        .remove-field-button:hover {
+          color: #b91c1c;
+          background-color: rgba(220, 38, 38, 0.1);
+        }
+
+        .no-custom-fields {
+          text-align: center;
+          padding: 40px 20px;
+          color: #666;
+        }
+
+        .no-custom-fields p {
+          margin-bottom: 16px;
+          font-size: 16px;
         }
 
         @media (max-width: 768px) {

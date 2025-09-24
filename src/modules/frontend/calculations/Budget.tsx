@@ -47,34 +47,44 @@ export default function Budget({
 
     const directCosts = Math.max(0, totalAmount);
 
-    const customValue1Amount = directCosts > 0 ? settings.customValue1 || 0 : 0;
-    const customValue2Amount = directCosts > 0 ? settings.customValue2 || 0 : 0;
+    // Calculate custom fields amounts
+    const customFieldsAmounts = settings.customFields?.map(field => ({
+      name: field.name,
+      amount: directCosts > 0 ? field.value || 0 : 0
+    })) || [];
 
-    const subtotalDirectAndCustom =
-      directCosts + customValue1Amount + customValue2Amount;
+    // Legacy support for old custom fields
+    const legacyCustomValue1Amount = directCosts > 0 ? settings.customValue1 || 0 : 0;
+    const legacyCustomValue2Amount = directCosts > 0 ? settings.customValue2 || 0 : 0;
+
+    // Calculate total custom fields amount
+    const totalCustomFieldsAmount = customFieldsAmounts.reduce((sum, field) => sum + field.amount, 0) + 
+                                   legacyCustomValue1Amount + legacyCustomValue2Amount;
+
+    const subtotalDirectAndCustom = directCosts + totalCustomFieldsAmount;
 
     const abkMaterieelAmount =
-      subtotalDirectAndCustom * (settings.abkMaterieel / 100);
+      subtotalDirectAndCustom * ((settings.abkMaterieel || 0) / 100);
     const subtotalAfterABK = subtotalDirectAndCustom + abkMaterieelAmount;
 
-    const afkoopAmount = subtotalDirectAndCustom * (settings.afkoop / 100);
+    const afkoopAmount = subtotalDirectAndCustom * ((settings.afkoop || 0) / 100);
     const subtotalDirectABKAfkoop = subtotalAfterABK + afkoopAmount;
 
     const planuitwerkingAmount =
-      subtotalDirectAndCustom * (settings.kostenPlanuitwerking / 100);
+      subtotalDirectAndCustom * ((settings.kostenPlanuitwerking || 0) / 100);
     const subtotalAfterPlanuitwerking =
       subtotalDirectABKAfkoop + planuitwerkingAmount;
 
     const nazorgServiceAmount =
-      subtotalDirectAndCustom * (settings.nazorgService / 100);
+      subtotalDirectAndCustom * ((settings.nazorgService || 0) / 100);
     const carPiDicAmount =
-      subtotalDirectAndCustom * (settings.carPiDicVerzekering / 100);
+      subtotalDirectAndCustom * ((settings.carPiDicVerzekering || 0) / 100);
     const bankgarantieAmount =
-      subtotalDirectAndCustom * (settings.bankgarantie / 100);
+      subtotalDirectAndCustom * ((settings.bankgarantie || 0) / 100);
     const algemeneKostenAmount =
-      subtotalDirectAndCustom * (settings.algemeneKosten / 100);
-    const risicoAmount = subtotalDirectAndCustom * (settings.risico / 100);
-    const winstAmount = subtotalDirectAndCustom * (settings.winst / 100);
+      subtotalDirectAndCustom * ((settings.algemeneKosten || 0) / 100);
+    const risicoAmount = subtotalDirectAndCustom * ((settings.risico || 0) / 100);
+    const winstAmount = subtotalDirectAndCustom * ((settings.winst || 0) / 100);
 
     const subtotalBouwkosten =
       subtotalAfterPlanuitwerking +
@@ -86,9 +96,9 @@ export default function Budget({
       winstAmount;
 
     const planvoorbereidingAmount =
-      subtotalDirectAndCustom * (settings.planvoorbereiding / 100);
+      subtotalDirectAndCustom * ((settings.planvoorbereiding || 0) / 100);
     const huurdersbegeleidingAmount =
-      subtotalDirectAndCustom * (settings.huurdersbegeleiding / 100);
+      subtotalDirectAndCustom * ((settings.huurdersbegeleiding || 0) / 100);
 
     const subtotalAfterBijkomendeKosten =
       subtotalBouwkosten + planvoorbereidingAmount + huurdersbegeleidingAmount;
@@ -104,8 +114,10 @@ export default function Budget({
 
     return {
       directCosts,
-      customValue1Amount,
-      customValue2Amount,
+      customFieldsAmounts,
+      legacyCustomValue1Amount,
+      legacyCustomValue2Amount,
+      totalCustomFieldsAmount,
       subtotalDirectAndCustom,
       abkMaterieelAmount,
       subtotalAfterABK,
@@ -196,23 +208,15 @@ export default function Budget({
                   <span>Directe kosten</span>
                   <span>€ {formatCurrency(breakdown.directCosts)}</span>
                 </div>
-                {settings.customValue1 > 0 && (
-                  <div className="budget__line">
-                    <span>{settings.customValue1Name || "Extra veld 1"}</span>
-                    <span>
-                      € {formatCurrency(breakdown.customValue1Amount)}
-                    </span>
-                  </div>
-                )}
-
-                {settings.customValue2 > 0 && (
-                  <div className="budget__line">
-                    <span>{settings.customValue2Name || "Extra veld 2"}</span>
-                    <span>
-                      € {formatCurrency(breakdown.customValue2Amount)}
-                    </span>
-                  </div>
-                )}
+                {/* Display custom fields */}
+                {breakdown.customFieldsAmounts.map((field, index) => (
+                  field.amount > 0 && (
+                    <div key={`custom-field-${index}`} className="budget__line">
+                      <span>{field.name}</span>
+                      <span>€ {formatCurrency(field.amount)}</span>
+                    </div>
+                  )
+                ))}
 
                 <div className="budget__line budget__line--subtotal">
                   <span>Subtotaal</span>
