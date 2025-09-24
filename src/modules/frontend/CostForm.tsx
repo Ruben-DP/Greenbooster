@@ -11,6 +11,7 @@ import { Woning, WoningType } from "@/types/woningen";
 import { CalculationHandler } from "./calculations/CalculationHandler";
 import SelectedMeasures from "./calculations/SelectMeasures";
 import PdfDownloadButton from "../PdfDownloadButton";
+import SaveProfileButton from "../residenceProfile/SaveProfileButton";
 import { EnergyLabel } from "./calculations/EnergyLabel";
 import { calculateMeasurePrice } from "./calculations/price.calculator";
 import { updateWoningMeasures } from "@/app/actions/woningActions";
@@ -457,6 +458,16 @@ function PageContent() {
                   totalBudget={totalBudget}
                   totalHeatDemand={totalHeatDemand}
                   settings={settings}
+                />
+              </div>
+              <div className="saveProfile">
+                <SaveProfileButton
+                  woningId={selectedResidence?._id || ""}
+                  typeId={selectedType?._id || ""}
+                  measures={selectedMeasures}
+                  totalBudget={totalBudget}
+                  totalHeatDemand={totalHeatDemand}
+                  isDisabled={!selectedResidence || !selectedType || selectedMeasures.length === 0}
                 />
               </div>
             </div>

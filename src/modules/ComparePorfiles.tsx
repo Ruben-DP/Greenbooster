@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 
 import { searchDocuments } from "@/app/actions/crudActions";
 import { getSettings } from "@/app/actions/settingsActions";
-import { Flame, ReceiptEuro, Volume1, Home, MapPin, Calendar, Building } from "lucide-react";
+import { getSavedProfiles, deleteProfile } from "./residenceProfile/saveProfile";
+import { Flame, ReceiptEuro, Volume1, Home, MapPin, Calendar, Building, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Woning {
@@ -51,6 +52,28 @@ interface WoningType {
   type?: string;
 }
 
+interface ProfileMeasure {
+  id: string;
+  name: string;
+  group?: string;
+  price?: number;
+  heatDemandValue?: number;
+  maintenanceCostPerYear?: number;
+}
+
+interface Profile {
+  _id: string;
+  name: string;
+  woningId: string;
+  typeId: string;
+  measures: ProfileMeasure[];
+  totalBudget: number;
+  totalHeatDemand: number;
+  savedAt: string;
+  woningName?: string;
+  typeName?: string;
+}
+
 interface Settings {
   _id?: string;
   hourlyLaborCost: number;     
@@ -61,30 +84,50 @@ interface Settings {
 }
 
 const CompareProfiles = () => {
-  const [woningen, setWoningen] = useState<Woning[]>([]);
-  const [selectedWoningen, setSelectedWoningen] = useState<string[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [residenceDetails, setResidenceDetails] = useState<Record<string, Woning>>({});
   const [typeDetails, setTypeDetails] = useState<Record<string, WoningType>>({});
   const [settings, setSettings] = useState<Settings | null>(null);
 
-  const loadWoningen = async () => {
+  const loadProfiles = async () => {
     setIsLoading(true);
     try {
-      const response = await searchDocuments<Woning>("woningen");
-      if (Array.isArray(response)) {
-        setWoningen(response);
-        
-        const typeIds = [...new Set(response.map((w) => w.typeId))];
+      const result = await getSavedProfiles();
+      if (result.success && result.data) {
+        setProfiles(result.data as Profile[]);
+
+        const woningIds = [...new Set(result.data.map((p) => p.woningId))];
+        const typeIds = [...new Set(result.data.map((p) => p.typeId))];
+
+        await loadResidenceDetails(woningIds);
         await loadTypeDetails(typeIds);
       } else {
-        setError("Failed to load woningen");
+        setError(result.message || "Failed to load profiles");
       }
     } catch (error) {
-      console.error("Error loading woningen:", error);
-      setError("An error occurred while loading woningen");
+      console.error("Error loading profiles:", error);
+      setError("An error occurred while loading profiles");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadResidenceDetails = async (ids: string[]) => {
+    try {
+      for (const id of ids) {
+        const response = await searchDocuments("woningen", id, "_id");
+        if (response && response.length > 0) {
+          setResidenceDetails((prev) => ({
+            ...prev,
+            [id]: response[0],
+          }));
+        }
+      }
+    } catch (error) {
+      console.error("Error loading residence details:", error);
     }
   };
 
@@ -117,18 +160,37 @@ const CompareProfiles = () => {
   };
 
   useEffect(() => {
-    loadWoningen();
+    loadProfiles();
     loadSettings();
   }, []);
 
+  const handleDeleteProfile = async (id: string) => {
+    if (confirm("Weet je zeker dat je dit profiel wilt verwijderen?")) {
+      try {
+        const result = await deleteProfile(id);
+        if (result.success) {
+          toast.success(result.message || "Profiel verwijderd");
+          setSelectedProfiles((prev) =>
+            prev.filter((profileId) => profileId !== id)
+          );
+          loadProfiles();
+        } else {
+          toast.error(result.message || "Kon profiel niet verwijderen");
+        }
+      } catch (error) {
+        console.error("Error deleting profile:", error);
+        toast.error("Er is een fout opgetreden bij het verwijderen");
+      }
+    }
+  };
 
-  const toggleWoningSelection = (id: string) => {
-    setSelectedWoningen((prev) => {
+  const toggleProfileSelection = (id: string) => {
+    setSelectedProfiles((prev) => {
       if (prev.includes(id)) {
-        return prev.filter((woningId) => woningId !== id);
+        return prev.filter((profileId) => profileId !== id);
       } else {
         if (prev.length >= 3) {
-          toast.info("Je kunt maximaal 3 woningen vergelijken");
+          toast.info("Je kunt maximaal 3 profielen vergelijken");
           return prev;
         }
         return [...prev, id];
@@ -147,12 +209,12 @@ const CompareProfiles = () => {
     return { finalAmount };
   };
 
-  const woningenForComparison = woningen.filter((woning) =>
-    selectedWoningen.includes(woning._id)
+  const profilesForComparison = profiles.filter((profile) =>
+    selectedProfiles.includes(profile._id)
   );
 
-  const sortedWoningen = [...woningen].sort(
-    (a, b) => a.projectInformation.adres.localeCompare(b.projectInformation.adres)
+  const sortedProfiles = [...profiles].sort(
+    (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
   );
 
   const formatPrice = (price: number) => {
@@ -164,82 +226,61 @@ const CompareProfiles = () => {
     });
   };
 
-  const getMeasureGroups = (selectedWoningen: Woning[]) => {
+  const getMeasureGroups = (selectedProfiles: Profile[]) => {
     const allGroups = new Set<string>();
 
-    selectedWoningen.forEach((woning) => {
-      if (woning.measures) {
-        woning.measures.forEach((measure: any) => {
-          if (measure.group) {
-            allGroups.add(measure.group);
-          } else {
-            allGroups.add("Overig");
-          }
-        });
-      }
+    selectedProfiles.forEach((profile) => {
+      profile.measures.forEach((measure) => {
+        if (measure.group) {
+          allGroups.add(measure.group);
+        } else {
+          allGroups.add("Overig");
+        }
+      });
     });
 
     return Array.from(allGroups).sort();
   };
 
-  const getMeasuresForGroup = (woning: Woning, group: string) => {
-    if (!woning.measures) return [];
-    return woning.measures.filter((measure: any) =>
+  const getMeasuresForGroup = (profile: Profile, group: string) => {
+    return profile.measures.filter((measure) =>
       group === "Overig" ? !measure.group : measure.group === group
     );
   };
 
-  const getTotalMaintenanceCost = (woning: Woning) => {
-    if (!woning.measures) return 0;
-    const total = woning.measures.reduce(
-      (sum: number, measure: any) => {
-        const value = measure.maintenanceCostPerYear;
-        return sum + (typeof value === 'number' ? value : 0);
-      },
+  const getTotalMaintenanceCost = (profile: Profile) => {
+    return profile.measures.reduce(
+      (sum, measure) => sum + (measure.maintenanceCostPerYear || 0),
       0
     );
-    return typeof total === 'number' ? total : 0;
   };
 
-  const getTotalBudget = (woning: Woning) => {
-    if (!woning.measures) return 0;
-    const total = woning.measures.reduce(
-      (sum: number, measure: any) => {
-        const value = measure.price;
-        return sum + (typeof value === 'number' ? value : 0);
-      },
-      0
-    );
-    return typeof total === 'number' ? total : 0;
-  };
-
-  const getTotalHeatDemand = (woning: Woning) => {
-    if (!woning.measures) return 0;
-    const total = woning.measures.reduce(
-      (sum: number, measure: any) => {
-        const value = measure.heatDemandValue;
-        return sum + (typeof value === 'number' ? value : 0);
-      },
-      0
-    );
-    return typeof total === 'number' ? total : 0;
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("nl-NL", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   if (isLoading) {
-    return <div className="compare-profiles loading">Woningen laden...</div>;
+    return <div className="compare-profiles loading">Profielen laden...</div>;
   }
 
   if (error) {
     return <div className="compare-profiles error">Fout: {error}</div>;
   }
 
-  if (woningen.length === 0) {
+  if (profiles.length === 0) {
     return (
       <div className="compare-profiles empty">
         <div className="empty-message">
-          <h3>Geen woningen gevonden</h3>
+          <h3>Geen opgeslagen profielen</h3>
           <p>
-            Er zijn geen woningen beschikbaar om te vergelijken.
+            Ga naar de <a href="/kosten-berekening">Kosten berekening</a> pagina
+            om een profiel op te slaan.
           </p>
         </div>
       </div>
@@ -249,36 +290,45 @@ const CompareProfiles = () => {
   return (
     <div className="compare-profiles">
       <div className="profiles-container">
-        <h3 className="section-title">Beschikbare woningen</h3>
+        <h3 className="section-title">Opgeslagen profielen</h3>
         <p className="section-description">
-          Selecteer maximaal 3 woningen om te vergelijken
+          Selecteer maximaal 3 profielen om te vergelijken
         </p>
 
         <div className="profiles-grid">
-          {sortedWoningen.map((woning) => {
-            const type = typeDetails[woning.typeId];
-            const isSelected = selectedWoningen.includes(woning._id);
-            const totalBudget = getTotalBudget(woning);
-            const totalHeatDemand = getTotalHeatDemand(woning);
+          {sortedProfiles.map((profile) => {
+            const residence = residenceDetails[profile.woningId];
+            const type = typeDetails[profile.typeId];
+            const isSelected = selectedProfiles.includes(profile._id);
 
             return (
               <div
-                key={woning._id}
+                key={profile._id}
                 className={`profile-card ${isSelected ? "selected" : ""}`}
-                onClick={() => toggleWoningSelection(woning._id)}
+                onClick={() => toggleProfileSelection(profile._id)}
               >
                 <div className="profile-header">
-                  <h3 className="profile-name">{woning.projectInformation.adres}</h3>
+                  <h3 className="profile-name">{profile.name}</h3>
+                  <button
+                    className="delete-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProfile(profile._id);
+                    }}
+                    title="Verwijder profiel"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
 
                 <div className="profile-details">
                   <div className="detail-row">
                     <span className="detail-label">
                       <Home size={14} className="detail-icon" />
-                      Adres:
+                      Woning:
                     </span>
                     <span className="detail-value">
-                      {woning.projectInformation.adres}
+                      {residence?.projectInformation?.adres || "Onbekend"}
                     </span>
                   </div>
                   <div className="detail-row">
@@ -296,7 +346,7 @@ const CompareProfiles = () => {
                       Maatregelen:
                     </span>
                     <span className="detail-value">
-                      {woning.measures?.length || 0}
+                      {profile.measures.length}
                     </span>
                   </div>
                   <div className="detail-row">
@@ -305,7 +355,7 @@ const CompareProfiles = () => {
                       Direct kosten:
                     </span>
                     <span className="detail-value">
-                      {formatPrice(totalBudget)}
+                      {formatPrice(profile.totalBudget)}
                     </span>
                   </div>
                   <div className="detail-row highlight-row">
@@ -314,7 +364,7 @@ const CompareProfiles = () => {
                       Warmtebehoefte:
                     </span>
                     <span className="detail-value heat-value">
-                      {typeof totalHeatDemand === 'number' ? totalHeatDemand.toFixed(1) : '0.0'} kWh/m²
+                      {profile.totalHeatDemand.toFixed(1)} kWh/m²
                     </span>
                   </div>
                 </div>
@@ -328,17 +378,17 @@ const CompareProfiles = () => {
         </div>
       </div>
 
-      {woningenForComparison.length > 0 && (
+      {profilesForComparison.length > 0 && (
         <div className="comparison-container">
           <h2 className="tile-title">Vergelijking</h2>
 
           <div className="comparison-table">
-            {/* Table header - woningen names */}
+            {/* Table header - profile names */}
             <div className="comparison-header">
               <div className="header-cell category-header">Vergelijking</div>
-              {woningenForComparison.map((woning) => (
-                <div key={woning._id} className="header-cell profile-header">
-                  {woning.projectInformation.adres}
+              {profilesForComparison.map((profile) => (
+                <div key={profile._id} className="header-cell profile-header">
+                  {profile.name}
                 </div>
               ))}
             </div>
@@ -347,7 +397,7 @@ const CompareProfiles = () => {
             <div className="comparison-section">
               <div className="section-title-row">
                 <div className="category-header">Woning informatie</div>
-                {Array(woningenForComparison.length)
+                {Array(profilesForComparison.length)
                   .fill(0)
                   .map((_, i) => (
                     <div key={`woning-info-header-${i}`} className="header-cell empty-cell"></div>
@@ -359,11 +409,14 @@ const CompareProfiles = () => {
                   <Home size={16} className="indicator-icon" />
                   <span>Adres</span>
                 </div>
-                {woningenForComparison.map((woning) => (
-                  <div key={woning._id} className="data-cell">
-                    {woning.projectInformation.adres}
-                  </div>
-                ))}
+                {profilesForComparison.map((profile) => {
+                  const residence = residenceDetails[profile.woningId];
+                  return (
+                    <div key={profile._id} className="data-cell">
+                      {residence?.projectInformation?.adres || "Onbekend"}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="comparison-row">
@@ -371,11 +424,14 @@ const CompareProfiles = () => {
                   <MapPin size={16} className="indicator-icon" />
                   <span>Plaats</span>
                 </div>
-                {woningenForComparison.map((woning) => (
-                  <div key={woning._id} className="data-cell">
-                    {woning.projectInformation.plaats}
-                  </div>
-                ))}
+                {profilesForComparison.map((profile) => {
+                  const residence = residenceDetails[profile.woningId];
+                  return (
+                    <div key={profile._id} className="data-cell">
+                      {residence?.projectInformation?.plaats || "Onbekend"}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="comparison-row">
@@ -383,10 +439,10 @@ const CompareProfiles = () => {
                   <Building size={16} className="indicator-icon" />
                   <span>Gebouwtype</span>
                 </div>
-                {woningenForComparison.map((woning) => {
-                  const type = typeDetails[woning.typeId];
+                {profilesForComparison.map((profile) => {
+                  const type = typeDetails[profile.typeId];
                   return (
-                    <div key={woning._id} className="data-cell">
+                    <div key={profile._id} className="data-cell">
                       {type?.naam || "Onbekend"}
                     </div>
                   );
@@ -398,11 +454,14 @@ const CompareProfiles = () => {
                   <Calendar size={16} className="indicator-icon" />
                   <span>Bouwperiode</span>
                 </div>
-                {woningenForComparison.map((woning) => (
-                  <div key={woning._id} className="data-cell">
-                    {woning.projectInformation.bouwPeriode}
-                  </div>
-                ))}
+                {profilesForComparison.map((profile) => {
+                  const residence = residenceDetails[profile.woningId];
+                  return (
+                    <div key={profile._id} className="data-cell">
+                      {residence?.projectInformation?.bouwPeriode || "Onbekend"}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="comparison-row">
@@ -410,22 +469,28 @@ const CompareProfiles = () => {
                   <Home size={16} className="indicator-icon" />
                   <span>Aantal VHE</span>
                 </div>
-                {woningenForComparison.map((woning) => (
-                  <div key={woning._id} className="data-cell">
-                    {woning.projectInformation.aantalVHE}
-                  </div>
-                ))}
+                {profilesForComparison.map((profile) => {
+                  const residence = residenceDetails[profile.woningId];
+                  return (
+                    <div key={profile._id} className="data-cell">
+                      {residence?.projectInformation?.aantalVHE || "Onbekend"}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="comparison-row">
                 <div className="category-cell">
                   <span>Huidig energielabel</span>
                 </div>
-                {woningenForComparison.map((woning) => (
-                  <div key={woning._id} className="data-cell">
-                    {woning.energyDetails.huidigLabel}
-                  </div>
-                ))}
+                {profilesForComparison.map((profile) => {
+                  const residence = residenceDetails[profile.woningId];
+                  return (
+                    <div key={profile._id} className="data-cell">
+                      {residence?.energyDetails?.huidigLabel || "Onbekend"}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -433,7 +498,7 @@ const CompareProfiles = () => {
             <div className="comparison-section">
               <div className="section-title-row">
                 <div className="category-header">Resultaten</div>
-                {Array(woningenForComparison.length)
+                {Array(profilesForComparison.length)
                   .fill(0)
                   .map((_, i) => (
                     <div key={`results-header-${i}`} className="header-cell empty-cell"></div>
@@ -445,9 +510,9 @@ const CompareProfiles = () => {
                   <ReceiptEuro size={16} className="indicator-icon" />
                   <span>Directe kosten</span>
                 </div>
-                {woningenForComparison.map((woning) => (
-                  <div key={woning._id} className="data-cell">
-                    {formatPrice(getTotalBudget(woning))}
+                {profilesForComparison.map((profile) => (
+                  <div key={profile._id} className="data-cell">
+                    {formatPrice(profile.totalBudget)}
                   </div>
                 ))}
               </div>
@@ -458,11 +523,11 @@ const CompareProfiles = () => {
                     <ReceiptEuro size={16} className="indicator-icon" />
                     <span>Totaal incl. BTW</span>
                   </div>
-                  {woningenForComparison.map((woning) => {
-                    const breakdown = calculateBudgetBreakdown(getTotalBudget(woning));
+                  {profilesForComparison.map((profile) => {
+                    const breakdown = calculateBudgetBreakdown(profile.totalBudget);
                     return (
-                      <div key={woning._id} className="data-cell total-cost">
-                        {breakdown ? formatPrice(breakdown.finalAmount) : formatPrice(getTotalBudget(woning))}
+                      <div key={profile._id} className="data-cell total-cost">
+                        {breakdown ? formatPrice(breakdown.finalAmount) : formatPrice(profile.totalBudget)}
                       </div>
                     );
                   })}
@@ -474,9 +539,9 @@ const CompareProfiles = () => {
                   <ReceiptEuro size={16} className="indicator-icon" />
                   <span>Onderhoud per jaar</span>
                 </div>
-                {woningenForComparison.map((woning) => (
-                  <div key={woning._id} className="data-cell">
-                    {formatPrice(getTotalMaintenanceCost(woning))}
+                {profilesForComparison.map((profile) => (
+                  <div key={profile._id} className="data-cell">
+                    {formatPrice(getTotalMaintenanceCost(profile))}
                   </div>
                 ))}
               </div>
@@ -486,14 +551,11 @@ const CompareProfiles = () => {
                   <Flame size={16} className="indicator-icon" />
                   <span>Warmtebehoefte reductie</span>
                 </div>
-                {woningenForComparison.map((woning) => {
-                  const heatDemand = getTotalHeatDemand(woning);
-                  return (
-                    <div key={woning._id} className="data-cell">
-                      {typeof heatDemand === 'number' ? heatDemand.toFixed(1) : '0.0'} kWh/m²
-                    </div>
-                  );
-                })}
+                {profilesForComparison.map((profile) => (
+                  <div key={profile._id} className="data-cell">
+                    {profile.totalHeatDemand.toFixed(1)} kWh/m²
+                  </div>
+                ))}
               </div>
 
               <div className="comparison-row">
@@ -501,29 +563,29 @@ const CompareProfiles = () => {
                   <Volume1 size={16} className="indicator-icon" />
                   <span>Aantal maatregelen</span>
                 </div>
-                {woningenForComparison.map((woning) => (
-                  <div key={woning._id} className="data-cell">
-                    {woning.measures?.length || 0}
+                {profilesForComparison.map((profile) => (
+                  <div key={profile._id} className="data-cell">
+                    {profile.measures.length}
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Measures comparison by group */}
-            {getMeasureGroups(woningenForComparison).map((group) => (
+            {getMeasureGroups(profilesForComparison).map((group) => (
               <div key={group} className="comparison-section measures-section">
                 <div className="measures-grid">
-                  {woningenForComparison.map((woning) => {
-                    const measures = getMeasuresForGroup(woning, group);
+                  {profilesForComparison.map((profile) => {
+                    const measures = getMeasuresForGroup(profile, group);
 
                     return (
                       <div
-                        key={woning._id}
+                        key={profile._id}
                         className="profile-measures-column"
                       >
                         {measures.length > 0 ? (
                           <ul className="measures-list">
-                            {measures.map((measure: any, index: number) => (
+                            {measures.map((measure, index: number) => (
                               <li key={measure.id || `measure-${index}`} className="measure-item">
                                 <div className="measure-name">
                                   {measure.name}
