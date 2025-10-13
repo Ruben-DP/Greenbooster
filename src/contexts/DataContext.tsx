@@ -135,5 +135,8 @@ export const { DataProvider: VariableProvider, useData: useVariableData } =
 export const { DataProvider: WoningenProvider, useData: useWoningenData } =
   createDataContext("woningen");
 
-  export const { DataProvider: TypesProvider, useData: useTypesData } =
+export const { DataProvider: TypesProvider, useData: useTypesData } =
   createDataContext("types");
+
+export const { DataProvider: ScenariosProvider, useData: useScenariosData } =
+  createDataContext("scenarios");

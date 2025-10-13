@@ -28,18 +28,31 @@ function PageContent() {
   } = useWoningenData();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  // Store selected residence ID in localStorage for cross-page navigation
+  const handleSelectItem = (item: any, startEditing?: boolean) => {
+    selectItem(item, startEditing);
+    if (item?._id) {
+      localStorage.setItem('selectedResidenceId', item._id);
+      // Dispatch custom event to notify Header of the change
+      window.dispatchEvent(new Event('residenceSelected'));
+    } else {
+      localStorage.removeItem('selectedResidenceId');
+      window.dispatchEvent(new Event('residenceSelected'));
+    }
+  };
+
   return (
     <>
       <div className="search-area">
         <div className="search-container">
           <SearchBar onSearch={searchItems} isLoading={isLoading} />
-          <Button icon={Plus} onClick={() => selectItem({}, true)}>
+          <Button icon={Plus} onClick={() => handleSelectItem({}, true)}>
             Nieuw
           </Button>
         </div>
         <SearchResults
           items={items}
-          onSelect={selectItem}
+          onSelect={handleSelectItem}
           displayField="projectInformation.adres"
           groupBy=""
         />

@@ -1,0 +1,41 @@
+@use "../../../../scss/abstracts/variables" as *;
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.stats__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stats__label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+}
+
+.stats__value {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.icon-grouper {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+
+  svg {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.alert {
+  color: rgb(255, 95, 21);
+}
