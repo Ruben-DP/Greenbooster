@@ -9,7 +9,8 @@
       "mcp__ide__getDiagnostics",
       "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_zisycm/**)",
       "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_fX6CPQ/**)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_5SmriA/**)"
     ],
     "deny": [],
     "ask": []

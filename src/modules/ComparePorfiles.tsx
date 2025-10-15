@@ -1,904 +1,590 @@
+// src/modules/CompareProfiles.tsx
 "use client";
-import { useEffect, useState } from "react";
-
+import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { MeasureProvider } from "@/contexts/DataContext";
+import Budget from "./frontend/calculations/Budget";
+import Stats from "./frontend/calculations/Stats";
+import { Woning, WoningType } from "@/types/woningen";
+import { CalculationHandler } from "./frontend/calculations/CalculationHandler";
+import SelectedMeasures from "./frontend/calculations/SelectMeasures";
+import { EnergyLabel } from "./frontend/calculations/EnergyLabel";
+import { calculateMeasurePrice } from "./frontend/calculations/price.calculator";
+import ImageSelect from "./ImageSelect";
+import ScenarioSelector from "./scenario/ScenarioSelector";
 import { searchDocuments } from "@/app/actions/crudActions";
 import { getSettings } from "@/app/actions/settingsActions";
-import { getSavedProfiles, deleteProfile } from "./residenceProfile/saveProfile";
-import { Flame, ReceiptEuro, Volume1, Home, MapPin, Calendar, Building, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 
-interface Woning {
-  _id: string;
-  projectInformation: {
-    projectNumber: string;
-    complexName: string;
-    aantalVHE: number;
-    adres: string;
-    postcode: string;
-    plaats: string;
-    renovatieJaar: number;
-    bouwPeriode: string;
-  };
-  energyDetails: {
-    huidigLabel: string;
-    huidigEnergie: number;
-    voorkostenScenario: string;
-    nieuwLabel: string;
-    labelStappen: string;
-    huidigVerbruik: number;
-    huidigEnergieprijs: number;
-  };
-  typeId: string;
-  isGrondgebonden: boolean;
-  isPortiekflat: boolean;
-  isGalerieflat: boolean;
-  measures?: any[];
-  dimensions: {
-    breed: string;
-    diepte: string;
-    goothoogte: string;
-    nokhoogte: string;
-    aantalwoningen: string;
-    kopgevels: string;
-    breedtecomplex: string;
-    portieken: string;
-    bouwlagen: string;
-  };
-}
-
-interface WoningType {
-  _id: string;
-  naam: string;
-  type?: string;
-}
-
-interface ProfileMeasure {
-  id: string;
+interface Measure {
   name: string;
   group?: string;
+  measure_prices?: any[];
+  mjob_prices?: any[];
   price?: number;
-  heatDemandValue?: number;
+  priceCalculations?: any[];
+  maintenancePrice?: number;
+  maintenanceCalculations?: any[];
+  maintenanceCost40Years?: number;
   maintenanceCostPerYear?: number;
+  calculationError?: string;
+  maintenanceError?: string;
+  heatDemandValue?: number | string;
+  heat_demand?: {
+    portiek?: Array<{ period: string; value: number }>;
+    gallerij?: Array<{ period: string; value: number }>;
+    grondgebonden?: Array<{ period: string; value: number }>;
+  };
+  action?: string;
+  [key: string]: any;
 }
 
-interface Profile {
-  _id: string;
-  name: string;
-  woningId: string;
-  typeId: string;
-  measures: ProfileMeasure[];
-  totalBudget: number;
-  totalHeatDemand: number;
-  savedAt: string;
-  woningName?: string;
-  typeName?: string;
+interface CalculationResults {
+  woningSpecifiek: {
+    breedte: number;
+    diepte: number;
+    gootHoogte: number;
+    nokHoogte: number;
+    aantalWoningen: number;
+    heeftPlatDak: boolean;
+    bouwlagen?: number;
+    breedteComplex?: number;
+    kopgevels?: number;
+    portieken?: number;
+    bouwPeriode?: string;
+  };
+  gevelOppervlakVoor: number;
+  gevelOppervlakAchter: number;
+  gevelOppervlakTotaal: number;
+  dakOppervlak: number;
+  dakOppervlakTotaal: number;
+  dakLengte: number;
+  dakLengteTotaal: number;
+  vloerOppervlak: number;
+  vloerOppervlakTotaal: number;
+  kozijnenVoorgevel: any[];
+  kozijnenAchtergevel: any[];
+  kozijnOppervlakVoorTotaal: number;
+  kozijnOppervlakAchterTotaal: number;
+  kozijnOppervlakTotaal: number;
+  kozijnRendementTotaal: number;
+  kozijnOmtrekTotaal: number;
+  gevelOppervlakNetto: number;
+  projectGevelOppervlak: number;
+  projectKozijnenOppervlak: number;
+  projectDakOppervlak: number;
+  dakOverstekOppervlak: number;
+  dakTotaalMetOverhang: number;
+  projectOmtrek: number;
+  kozijnenPerGrootte: {
+    tot1M2: number;
+    tot1_5M2: number;
+    tot2M2: number;
+    tot2_5M2: number;
+    tot3M2: number;
+    tot3_5M2: number;
+    tot4M2: number;
+    boven4M2: number;
+  };
+  missingInputs: string[];
+  calculationWarnings: string[];
+  calculationExplanations?: Record<string, string>;
 }
 
-interface Settings {
-  _id?: string;
-  hourlyLaborCost: number;     
-  profitPercentage: number;    
-  vatPercentage: number;       
-  inflationPercentage: number; 
-  cornerHouseCorrection: number; 
+interface ComparisonColumnProps {
+  columnIndex: number;
 }
 
-const CompareProfiles = () => {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [residenceDetails, setResidenceDetails] = useState<Record<string, Woning>>({});
-  const [typeDetails, setTypeDetails] = useState<Record<string, WoningType>>({});
-  const [settings, setSettings] = useState<Settings | null>(null);
+function ComparisonColumn({ columnIndex }: ComparisonColumnProps) {
+  const [woningen, setWoningen] = useState<Woning[]>([]);
+  const [selectedResidence, setSelectedResidence] = useState<Woning | null>(null);
+  const [selectedType, setSelectedType] = useState<WoningType | null>(null);
+  const [calculations, setCalculations] = useState<CalculationResults | null>(null);
+  const [processedMeasures, setProcessedMeasures] = useState<Measure[]>([]);
+  const [totalBudget, setTotalBudget] = useState<number>(0);
+  const [totalHeatDemand, setTotalHeatDemand] = useState<number>(0);
+  const [settings, setSettings] = useState<any>(null);
+  const [types, setTypes] = useState<WoningType[]>([]);
+  const [hasScenario, setHasScenario] = useState(false);
+  const pendingMeasuresRef = useRef<Measure[]>([]);
 
-  const loadProfiles = async () => {
-    setIsLoading(true);
-    try {
-      const result = await getSavedProfiles();
-      if (result.success && result.data) {
-        setProfiles(result.data as Profile[]);
-
-        const woningIds = [...new Set(result.data.map((p) => p.woningId))];
-        const typeIds = [...new Set(result.data.map((p) => p.typeId))];
-
-        await loadResidenceDetails(woningIds);
-        await loadTypeDetails(typeIds);
-      } else {
-        setError(result.message || "Failed to load profiles");
-      }
-    } catch (error) {
-      console.error("Error loading profiles:", error);
-      setError("An error occurred while loading profiles");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadResidenceDetails = async (ids: string[]) => {
-    try {
-      for (const id of ids) {
-        const response = await searchDocuments("woningen", id, "_id");
-        if (response && response.length > 0) {
-          setResidenceDetails((prev) => ({
-            ...prev,
-            [id]: response[0],
-          }));
-        }
-      }
-    } catch (error) {
-      console.error("Error loading residence details:", error);
-    }
-  };
-
-
-  const loadTypeDetails = async (ids: string[]) => {
-    try {
-      for (const id of ids) {
-        const response = await searchDocuments<WoningType>("types", id, "_id");
-        if (response && response.length > 0) {
-          setTypeDetails((prev) => ({
-            ...prev,
-            [id]: response[0],
-          }));
-        }
-      }
-    } catch (error) {
-      console.error("Error loading type details:", error);
-    }
-  };
-
-  const loadSettings = async () => {
-    try {
-      const result = await getSettings();
-      if (result.success && result.data) {
-        setSettings(result.data);
-      }
-    } catch (error) {
-      console.error("Error loading settings:", error);
-    }
-  };
-
+  // Load woningen on mount
   useEffect(() => {
-    loadProfiles();
-    loadSettings();
-  }, []);
-
-  const handleDeleteProfile = async (id: string) => {
-    if (confirm("Weet je zeker dat je dit profiel wilt verwijderen?")) {
+    const loadData = async () => {
       try {
-        const result = await deleteProfile(id);
-        if (result.success) {
-          toast.success(result.message || "Profiel verwijderd");
-          setSelectedProfiles((prev) =>
-            prev.filter((profileId) => profileId !== id)
-          );
-          loadProfiles();
-        } else {
-          toast.error(result.message || "Kon profiel niet verwijderen");
+        const woningenResult = await searchDocuments<Woning>("woningen", "", "");
+        if (woningenResult) {
+          setWoningen(woningenResult);
+        }
+
+        const typesResult = await searchDocuments<WoningType>("types", "", "");
+        if (typesResult) {
+          setTypes(typesResult);
+        }
+
+        const settingsResult = await getSettings();
+        if (settingsResult.success && settingsResult.data) {
+          setSettings(settingsResult.data);
         }
       } catch (error) {
-        console.error("Error deleting profile:", error);
-        toast.error("Er is een fout opgetreden bij het verwijderen");
+        console.error("Error loading data:", error);
+        toast.error("Fout bij laden van gegevens");
       }
+    };
+
+    loadData();
+  }, []);
+
+  // Update total heat demand when measures change
+  useEffect(() => {
+    const newTotalHeatDemand = processedMeasures.reduce((total, measure) => {
+      const demandValue = measure.heatDemandValue
+        ? parseFloat(String(measure.heatDemandValue))
+        : 0;
+      return total + (isNaN(demandValue) ? 0 : demandValue);
+    }, 0);
+
+    setTotalHeatDemand(newTotalHeatDemand);
+  }, [processedMeasures]);
+
+  // Recalculate measures when calculations become available
+  useEffect(() => {
+    if (calculations && pendingMeasuresRef.current.length > 0) {
+      const recalculated = recalculateMeasures(pendingMeasuresRef.current, calculations);
+      setProcessedMeasures(recalculated);
+
+      const newBudget = recalculated.reduce(
+        (sum, measure) => sum + (measure.price || 0),
+        0
+      );
+      setTotalBudget(newBudget);
+      pendingMeasuresRef.current = [];
+    }
+  }, [calculations]);
+
+  const handleResidenceSelect = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const residenceId = event.target.value;
+    const residence = woningen.find((w) => w._id === residenceId);
+    if (!residence) return;
+
+    setSelectedResidence(residence);
+
+    // Find the type
+    const type = types.find((t) => t._id === residence.typeId);
+    setSelectedType(type || null);
+
+    // Reset scenario when residence changes
+    setHasScenario(false);
+    setProcessedMeasures([]);
+    setTotalBudget(0);
+  };
+
+  const handleScenarioLoad = (measures: any[]) => {
+    if (measures.length === 0) {
+      setProcessedMeasures([]);
+      setTotalBudget(0);
+      setHasScenario(false);
+      pendingMeasuresRef.current = [];
+      return;
+    }
+
+    setHasScenario(true);
+
+    if (!calculations) {
+      // Store measures to process when calculations become available
+      pendingMeasuresRef.current = measures;
+      return;
+    }
+
+    // Recalculate measures with current residence data
+    const recalculated = recalculateMeasures(measures, calculations);
+    setProcessedMeasures(recalculated);
+
+    const newBudget = recalculated.reduce(
+      (sum, measure) => sum + (measure.price || 0),
+      0
+    );
+    setTotalBudget(newBudget);
+  };
+
+  const recalculateMeasures = (
+    measures: Measure[],
+    calculationData: CalculationResults
+  ) => {
+    if (!calculationData || measures.length === 0) return [];
+
+    return measures.map((measure) => {
+      const priceResult = calculationData
+        ? calculateMeasurePrice(measure.measure_prices, calculationData, selectedType?.type || "", false)
+        : { isValid: false, price: 0, calculations: [] };
+
+      const maintenanceResult = calculationData
+        ? calculateMeasurePrice(measure.mjob_prices, calculationData, selectedType?.type || "", false)
+        : { isValid: false, price: 0, calculations: [] };
+
+      const { total40Years, perYear } = calculateMaintenanceCosts(
+        maintenanceResult,
+        measure.mjob_prices
+      );
+
+      const heatDemandValue =
+        selectedType && selectedResidence
+          ? getHeatDemandValue(
+              measure,
+              selectedType.type || "",
+              selectedResidence.projectInformation?.bouwPeriode || ""
+            )
+          : 0;
+
+      return {
+        ...measure,
+        price: priceResult.isValid ? priceResult.price : undefined,
+        priceCalculations: priceResult.calculations,
+        calculationError: !priceResult.isValid
+          ? priceResult.errorMessage
+          : undefined,
+        maintenancePrice: maintenanceResult.isValid
+          ? maintenanceResult.price
+          : undefined,
+        maintenanceCalculations: maintenanceResult.calculations,
+        maintenanceError: !maintenanceResult.isValid
+          ? maintenanceResult.errorMessage
+          : undefined,
+        maintenanceCost40Years: total40Years,
+        maintenanceCostPerYear: perYear,
+        heatDemandValue: heatDemandValue,
+      };
+    });
+  };
+
+  const calculateMaintenanceCosts = (
+    maintenanceResult: { isValid: boolean; price: number; calculations: any[] },
+    mjob_prices?: any[]
+  ) => {
+    if (
+      !maintenanceResult.isValid ||
+      !mjob_prices ||
+      !Array.isArray(mjob_prices)
+    ) {
+      return { total40Years: 0, perYear: 0 };
+    }
+
+    const inflationPercentage = settings?.inflationPercentage || 1;
+    const maintenancePeriodYears = 40;
+
+    let total40Years = 0;
+
+    mjob_prices.forEach((job, index) => {
+      const calculation = maintenanceResult.calculations[index];
+      if (!calculation || !job.cycle || job.cycle <= 0) return;
+
+      if (calculation.name !== job.name) return;
+
+      const baseJobCost = calculation.totalPrice;
+
+      const cycleStart = job.cycleStart || 0;
+      const cycle = job.cycle || 1;
+
+      if (cycleStart >= maintenancePeriodYears) {
+        return;
+      }
+
+      if (cycle <= 0) {
+        return;
+      }
+
+      for (
+        let year = cycleStart;
+        year < maintenancePeriodYears;
+        year += cycle
+      ) {
+        const inflatedCost =
+          baseJobCost * Math.pow(1 + inflationPercentage / 100, year);
+
+        total40Years += inflatedCost;
+      }
+    });
+
+    const perYear = total40Years / maintenancePeriodYears;
+
+    return { total40Years, perYear };
+  };
+
+  const getHeatDemandValue = (
+    measure: any,
+    buildingType: string,
+    buildPeriod: string
+  ): number => {
+    const defaultValue = 0;
+
+    if (!measure?.heat_demand) {
+      return defaultValue;
+    }
+
+    let typeKey = "grondgebonden";
+
+    if (buildingType?.toLowerCase().includes("portiek")) {
+      typeKey = "portiek";
+    } else if (
+      buildingType?.toLowerCase().includes("galerij") ||
+      buildingType?.toLowerCase().includes("gallerij")
+    ) {
+      typeKey = "gallerij";
+    }
+
+    const typeValues = measure.heat_demand[typeKey];
+
+    if (!Array.isArray(typeValues) || typeValues.length === 0) {
+      return defaultValue;
+    }
+
+    const periodData = typeValues.find((p) => p.period === buildPeriod);
+
+    return periodData?.value ?? defaultValue;
+  };
+
+  const handleCalculations = (newCalculations: CalculationResults) => {
+    setCalculations(newCalculations);
+
+    // If we have measures loaded, recalculate them with new calculations
+    if (processedMeasures.length > 0) {
+      const recalculated = recalculateMeasures(
+        processedMeasures,
+        newCalculations
+      );
+      setProcessedMeasures(recalculated);
+
+      const newBudget = recalculated.reduce(
+        (sum, measure) => sum + (measure.price || 0),
+        0
+      );
+      setTotalBudget(newBudget);
     }
   };
 
-  const toggleProfileSelection = (id: string) => {
-    setSelectedProfiles((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((profileId) => profileId !== id);
-      } else {
-        if (prev.length >= 3) {
-          toast.info("Je kunt maximaal 3 profielen vergelijken");
-          return prev;
-        }
-        return [...prev, id];
-      }
-    });
-  };
-
-  // Calculate budget breakdown with simplified settings
-  const calculateBudgetBreakdown = (totalBudget: number) => {
-    if (!settings) return null;
-
-    const directCosts = Math.max(0, totalBudget);
-    const vat = directCosts * (settings.vatPercentage / 100);
-    const finalAmount = directCosts + vat;
-
-    return { finalAmount };
-  };
-
-  const profilesForComparison = profiles.filter((profile) =>
-    selectedProfiles.includes(profile._id)
-  );
-
-  const sortedProfiles = [...profiles].sort(
-    (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
-  );
-
-  const formatPrice = (price: number) => {
-    return price.toLocaleString("nl-NL", {
-      style: "currency",
-      currency: "EUR",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  };
-
-  const getMeasureGroups = (selectedProfiles: Profile[]) => {
-    const allGroups = new Set<string>();
-
-    selectedProfiles.forEach((profile) => {
-      profile.measures.forEach((measure) => {
-        if (measure.group) {
-          allGroups.add(measure.group);
-        } else {
-          allGroups.add("Overig");
-        }
-      });
-    });
-
-    return Array.from(allGroups).sort();
-  };
-
-  const getMeasuresForGroup = (profile: Profile, group: string) => {
-    return profile.measures.filter((measure) =>
-      group === "Overig" ? !measure.group : measure.group === group
-    );
-  };
-
-  const getTotalMaintenanceCost = (profile: Profile) => {
-    return profile.measures.reduce(
-      (sum, measure) => sum + (measure.maintenanceCostPerYear || 0),
-      0
-    );
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("nl-NL", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  if (isLoading) {
-    return <div className="compare-profiles loading">Profielen laden...</div>;
-  }
-
-  if (error) {
-    return <div className="compare-profiles error">Fout: {error}</div>;
-  }
-
-  if (profiles.length === 0) {
-    return (
-      <div className="compare-profiles empty">
-        <div className="empty-message">
-          <h3>Geen opgeslagen profielen</h3>
-          <p>
-            Ga naar de <a href="/kosten-berekening">Kosten berekening</a> pagina
-            om een profiel op te slaan.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const residenceOptions = woningen.map((woning) => ({
+    value: woning._id,
+    label: woning.projectInformation?.adres || "Onbekend",
+    imageSrc: woning.imagePath,
+  }));
 
   return (
-    <div className="compare-profiles">
-      <div className="profiles-container">
-        <h3 className="section-title">Opgeslagen profielen</h3>
-        <p className="section-description">
-          Selecteer maximaal 3 profielen om te vergelijken
-        </p>
-
-        <div className="profiles-grid">
-          {sortedProfiles.map((profile) => {
-            const residence = residenceDetails[profile.woningId];
-            const type = typeDetails[profile.typeId];
-            const isSelected = selectedProfiles.includes(profile._id);
-
-            return (
-              <div
-                key={profile._id}
-                className={`profile-card ${isSelected ? "selected" : ""}`}
-                onClick={() => toggleProfileSelection(profile._id)}
-              >
-                <div className="profile-header">
-                  <h3 className="profile-name">{profile.name}</h3>
-                  <button
-                    className="delete-button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteProfile(profile._id);
-                    }}
-                    title="Verwijder profiel"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-
-                <div className="profile-details">
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      <Home size={14} className="detail-icon" />
-                      Woning:
-                    </span>
-                    <span className="detail-value">
-                      {residence?.projectInformation?.adres || "Onbekend"}
-                    </span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      <Building size={14} className="detail-icon" />
-                      Type:
-                    </span>
-                    <span className="detail-value">
-                      {type?.naam || "Onbekend"}
-                    </span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      <Volume1 size={14} className="detail-icon" />
-                      Maatregelen:
-                    </span>
-                    <span className="detail-value">
-                      {profile.measures.length}
-                    </span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">
-                      <ReceiptEuro size={14} className="detail-icon" />
-                      Direct kosten:
-                    </span>
-                    <span className="detail-value">
-                      {formatPrice(profile.totalBudget)}
-                    </span>
-                  </div>
-                  <div className="detail-row highlight-row">
-                    <span className="detail-label">
-                      <Flame size={14} className="detail-icon" />
-                      Warmtebehoefte:
-                    </span>
-                    <span className="detail-value heat-value">
-                      {profile.totalHeatDemand.toFixed(1)} kWh/m²
-                    </span>
-                  </div>
-                </div>
-
-                <div className="selection-status">
-                  {isSelected ? "Geselecteerd ✓" : "Klik om te selecteren"}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+    <div className="comparison-column">
+      <div className="column-header">
+        <h3 className="column-title">Vergelijking {columnIndex + 1}</h3>
       </div>
 
-      {profilesForComparison.length > 0 && (
-        <div className="comparison-container">
-          <h2 className="tile-title">Vergelijking</h2>
+      <div className="column-selectors">
+        <div className="selector-group">
+          <ImageSelect
+            id={`residence-select-${columnIndex}`}
+            name={`residence-${columnIndex}`}
+            options={residenceOptions}
+            value={selectedResidence?._id || ""}
+            onChange={handleResidenceSelect}
+            label="Woning"
+          />
+        </div>
 
-          <div className="comparison-table">
-            {/* Table header - profile names */}
-            <div className="comparison-header">
-              <div className="header-cell category-header">Vergelijking</div>
-              {profilesForComparison.map((profile) => (
-                <div key={profile._id} className="header-cell profile-header">
-                  {profile.name}
-                </div>
-              ))}
-            </div>
+        {selectedResidence && (
+          <ScenarioSelector
+            onScenarioLoad={handleScenarioLoad}
+            woningId={selectedResidence._id}
+          />
+        )}
+      </div>
 
-            {/* Residence information section */}
-            <div className="comparison-section">
-              <div className="section-title-row">
-                <div className="category-header">Woning informatie</div>
-                {Array(profilesForComparison.length)
-                  .fill(0)
-                  .map((_, i) => (
-                    <div key={`woning-info-header-${i}`} className="header-cell empty-cell"></div>
-                  ))}
-              </div>
+      {selectedResidence &&
+        selectedType &&
+        selectedResidence.dimensions && (
+          <CalculationHandler
+            dimensions={selectedResidence.dimensions}
+            woningType={selectedType}
+            onCalculate={handleCalculations}
+          />
+        )}
 
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <Home size={16} className="indicator-icon" />
-                  <span>Adres</span>
-                </div>
-                {profilesForComparison.map((profile) => {
-                  const residence = residenceDetails[profile.woningId];
-                  return (
-                    <div key={profile._id} className="data-cell">
-                      {residence?.projectInformation?.adres || "Onbekend"}
-                    </div>
-                  );
-                })}
-              </div>
+      {selectedResidence && hasScenario && calculations && (
+        <div className="column-data">
+          <EnergyLabel
+            currentEnergyUsage={selectedResidence?.energyDetails?.huidigVerbruik || 0}
+            totalWarmth={totalHeatDemand}
+          />
 
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <MapPin size={16} className="indicator-icon" />
-                  <span>Plaats</span>
-                </div>
-                {profilesForComparison.map((profile) => {
-                  const residence = residenceDetails[profile.woningId];
-                  return (
-                    <div key={profile._id} className="data-cell">
-                      {residence?.projectInformation?.plaats || "Onbekend"}
-                    </div>
-                  );
-                })}
-              </div>
+          <Budget
+            totalAmount={totalBudget}
+            numberOfUnits={calculations?.woningSpecifiek?.aantalWoningen}
+            residenceCustomFields={selectedResidence?.customFields}
+          />
 
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <Building size={16} className="indicator-icon" />
-                  <span>Gebouwtype</span>
-                </div>
-                {profilesForComparison.map((profile) => {
-                  const type = typeDetails[profile.typeId];
-                  return (
-                    <div key={profile._id} className="data-cell">
-                      {type?.naam || "Onbekend"}
-                    </div>
-                  );
-                })}
-              </div>
+          <Stats
+            selectedMeasures={processedMeasures}
+            totalHeatDemand={totalHeatDemand}
+          />
 
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <Calendar size={16} className="indicator-icon" />
-                  <span>Bouwperiode</span>
-                </div>
-                {profilesForComparison.map((profile) => {
-                  const residence = residenceDetails[profile.woningId];
-                  return (
-                    <div key={profile._id} className="data-cell">
-                      {residence?.projectInformation?.bouwPeriode || "Onbekend"}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <Home size={16} className="indicator-icon" />
-                  <span>Aantal VHE</span>
-                </div>
-                {profilesForComparison.map((profile) => {
-                  const residence = residenceDetails[profile.woningId];
-                  return (
-                    <div key={profile._id} className="data-cell">
-                      {residence?.projectInformation?.aantalVHE || "Onbekend"}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <span>Huidig energielabel</span>
-                </div>
-                {profilesForComparison.map((profile) => {
-                  const residence = residenceDetails[profile.woningId];
-                  return (
-                    <div key={profile._id} className="data-cell">
-                      {residence?.energyDetails?.huidigLabel || "Onbekend"}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Results comparison section */}
-            <div className="comparison-section">
-              <div className="section-title-row">
-                <div className="category-header">Resultaten</div>
-                {Array(profilesForComparison.length)
-                  .fill(0)
-                  .map((_, i) => (
-                    <div key={`results-header-${i}`} className="header-cell empty-cell"></div>
-                  ))}
-              </div>
-
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <ReceiptEuro size={16} className="indicator-icon" />
-                  <span>Directe kosten</span>
-                </div>
-                {profilesForComparison.map((profile) => (
-                  <div key={profile._id} className="data-cell">
-                    {formatPrice(profile.totalBudget)}
-                  </div>
-                ))}
-              </div>
-
-              {settings && (
-                <div className="comparison-row">
-                  <div className="category-cell">
-                    <ReceiptEuro size={16} className="indicator-icon" />
-                    <span>Totaal incl. BTW</span>
-                  </div>
-                  {profilesForComparison.map((profile) => {
-                    const breakdown = calculateBudgetBreakdown(profile.totalBudget);
-                    return (
-                      <div key={profile._id} className="data-cell total-cost">
-                        {breakdown ? formatPrice(breakdown.finalAmount) : formatPrice(profile.totalBudget)}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <ReceiptEuro size={16} className="indicator-icon" />
-                  <span>Onderhoud per jaar</span>
-                </div>
-                {profilesForComparison.map((profile) => (
-                  <div key={profile._id} className="data-cell">
-                    {formatPrice(getTotalMaintenanceCost(profile))}
-                  </div>
-                ))}
-              </div>
-
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <Flame size={16} className="indicator-icon" />
-                  <span>Warmtebehoefte reductie</span>
-                </div>
-                {profilesForComparison.map((profile) => (
-                  <div key={profile._id} className="data-cell">
-                    {profile.totalHeatDemand.toFixed(1)} kWh/m²
-                  </div>
-                ))}
-              </div>
-
-              <div className="comparison-row">
-                <div className="category-cell">
-                  <Volume1 size={16} className="indicator-icon" />
-                  <span>Aantal maatregelen</span>
-                </div>
-                {profilesForComparison.map((profile) => (
-                  <div key={profile._id} className="data-cell">
-                    {profile.measures.length}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Measures comparison by group */}
-            {getMeasureGroups(profilesForComparison).map((group) => (
-              <div key={group} className="comparison-section measures-section">
-                <div className="measures-grid">
-                  {profilesForComparison.map((profile) => {
-                    const measures = getMeasuresForGroup(profile, group);
-
-                    return (
-                      <div
-                        key={profile._id}
-                        className="profile-measures-column"
-                      >
-                        {measures.length > 0 ? (
-                          <ul className="measures-list">
-                            {measures.map((measure, index: number) => (
-                              <li key={measure.id || `measure-${index}`} className="measure-item">
-                                <div className="measure-name">
-                                  {measure.name}
-                                </div>
-                                <div className="measure-details">
-                                  {measure.price && (
-                                    <div className="measure-price">
-                                      {formatPrice(measure.price)}
-                                    </div>
-                                  )}
-                                  {measure.heatDemandValue && (
-                                    <div className="measure-heat">
-                                      <Flame size={12} />
-                                      {measure.heatDemandValue} kWh/m²
-                                    </div>
-                                  )}
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <div className="no-measures">
-                            Geen maatregelen in deze categorie
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+          <SelectedMeasures
+            measures={processedMeasures}
+            onRemove={() => {}}
+          />
         </div>
       )}
 
+      {!selectedResidence && (
+        <div className="empty-state">
+          <p>Selecteer een woning om te beginnen</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PageContent() {
+  const [numberOfColumns, setNumberOfColumns] = useState(2);
+
+  return (
+    <div className="compare-profiles-container">
+      <div className="controls">
+        <label>
+          Aantal kolommen:
+          <select
+            value={numberOfColumns}
+            onChange={(e) => setNumberOfColumns(Number(e.target.value))}
+          >
+            <option value={2}>2</option>
+            <option value={3}>3</option>
+          </select>
+        </label>
+      </div>
+
+      <div className={`comparison-grid columns-${numberOfColumns}`}>
+        {Array.from({ length: numberOfColumns }).map((_, index) => (
+          <ComparisonColumn key={index} columnIndex={index} />
+        ))}
+      </div>
+
       <style jsx>{`
-        .compare-profiles {
+        .compare-profiles-container {
           padding: 20px;
-          max-width: 1200px;
-          margin: 0 auto;
-          padding-top: 4em;
+          max-width: 1300px;
+          margin-left: auto;
+          margin-right: auto;
+          min-height:660px;
         }
 
-        .section-description {
-          font-size: 16px;
-          color: #666;
+        .controls {
           margin-bottom: 20px;
+          padding: 15px;
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .profiles-grid {
+        .controls label {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-weight: 600;
+        }
+
+        .controls select {
+          padding: 8px 12px;
+          border-radius: 4px;
+          border: 1px solid #ccc;
+          font-size: 16px;
+        }
+
+        .comparison-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
           gap: 20px;
           margin-bottom: 40px;
         }
 
-        .profile-card {
-          background-color: #fff;
+        .comparison-grid.columns-2 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .comparison-grid.columns-3 {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .comparison-column {
+          background: white;
           border-radius: 8px;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           padding: 20px;
-          transition: all 0.3s ease;
-          cursor: pointer;
-          border: 2px solid transparent;
+          min-height: 400px;
         }
 
-        .profile-card:hover {
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          transform: translateY(-2px);
+        .column-header {
+          margin-bottom: 20px;
+          padding-bottom: 15px;
+          border-bottom: 2px solid #f0f0f0;
         }
 
-        .profile-card.selected {
-          border-color: var(--accent-color, #4361ee);
-          background-color: rgba(67, 97, 238, 0.05);
-        }
-
-        .profile-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 15px;
-        }
-
-        .profile-name {
-          font-size: 18px;
+        .column-title {
+          font-size: 20px;
           font-weight: 600;
           margin: 0;
+          color: var(--accent-color, #4361ee);
         }
 
-        .delete-button {
-          background: none;
-          border: none;
-          color: #ff4d4f;
-          cursor: pointer;
-          padding: 4px;
-          border-radius: 4px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .column-selectors {
+          margin-bottom: 20px;
         }
 
-        .delete-button:hover {
-          background-color: rgba(255, 77, 79, 0.1);
-        }
-
-        .profile-details {
+        .selector-group {
           margin-bottom: 15px;
         }
 
-        .detail-row {
-          display: flex;
-          justify-content: space-between;
+        .selector-group label {
+          display: block;
+          font-weight: 600;
           margin-bottom: 8px;
-          font-size: 14px;
+          color: #333;
         }
 
-        .detail-label {
-          color: #666;
-          font-weight: 500;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .detail-icon {
-          color: var(--accent-color, #4361ee);
-        }
-
-        .highlight-row {
-          background-color: rgba(255, 125, 0, 0.08);
-          padding: 6px 8px;
-          border-radius: 4px;
-          margin-top: 10px;
-          margin-bottom: 10px;
-        }
-
-        .heat-value {
-          color: #ff7d00;
-        }
-
-        .selection-status {
-          text-align: center;
-          font-size: 14px;
-          color: var(--accent-color, #4361ee);
-          margin-top: 10px;
-          font-weight: 500;
-        }
-
-        .comparison-container {
-          margin-top: 40px;
-          background-color: #fff;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          padding: 20px;
-          overflow-x: auto;
-        }
-
-        .comparison-table {
+        .scenario-select {
           width: 100%;
-          border-collapse: collapse;
-        }
-
-        .comparison-header {
-          display: grid;
-          grid-template-columns: 280px repeat(3, 1fr);
-          background-color: #f5f5f5;
-          border-radius: 6px 6px 0 0;
-          font-weight: 600;
-          border-bottom: 1px solid #e0e0e0;
-        }
-
-        .header-cell {
-          padding: 12px 16px;
-          text-align: center;
-        }
-
-        .category-header {
-          text-align: left;
-          font-weight: 600;
-          padding: 12px 16px;
-        }
-
-        .section-title-row {
-          display: grid;
-          grid-template-columns: 280px repeat(3, 1fr);
-          background-color: #f9f9f9;
-          font-weight: 600;
-        }
-
-        .comparison-row {
-          display: grid;
-          grid-template-columns: 280px repeat(3, 1fr);
-          border-bottom: 1px solid #eeeeee;
-        }
-
-        .comparison-row:last-child {
-          border-bottom: none;
-        }
-
-        .category-cell {
-          padding: 10px 16px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .data-cell {
-          padding: 10px 16px;
-          text-align: start;
-        }
-
-        .total-cost {
-          font-weight: 600;
-          color: var(--accent-color, #4361ee);
+          padding: 10px;
+          border-radius: 4px;
+          border: 1px solid #ccc;
           font-size: 16px;
         }
 
-        .indicator-icon {
-          color: var(--accent-color, #4361ee);
-        }
-
-        .measures-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          margin-left: 280px;
-          gap: 20px;
-          padding: 16px;
-        }
-
-        .profile-measures-column {
-          border-radius: 8px;
-        }
-
-        .measures-list {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-        }
-
-        .measure-item {
-          background-color: white;
-          margin-bottom: 10px;
-          padding: 12px;
-          border-radius: 6px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .measure-name {
-          font-weight: 500;
-          margin-bottom: 8px;
-        }
-
-        .measure-details {
+        .column-data {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 20px;
+          margin-top: 20px;
         }
 
-        .measure-price {
-          font-weight: 600;
+        .column-data > * {
+          margin-bottom: 16px;
         }
 
-        .measure-heat {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          color: #ff7d00;
-          font-size: 12px;
+        .column-data > *:last-child {
+          margin-bottom: 0;
         }
 
-        .no-measures {
+        .empty-state {
           text-align: center;
-          padding: 20px;
-          color: #999;
+          padding: 60px 20px;
+          color: #666;
           font-style: italic;
         }
 
-        .empty-message {
-          text-align: center;
-          padding: 40px;
-          background-color: #fff;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .empty-message h3 {
-          margin-bottom: 10px;
-          color: #666;
-        }
-
-        .empty-message a {
-          color: var(--accent-color, #4361ee);
-          text-decoration: none;
-          font-weight: 600;
-        }
-
-        .empty-message a:hover {
-          text-decoration: underline;
-        }
-
-        .loading,
-        .error {
-          text-align: center;
-          padding: 40px;
-          font-size: 18px;
-        }
-
-        .error {
-          color: #ff4d4f;
+        .empty-state p {
+          margin: 0;
+          font-size: 16px;
         }
       `}</style>
     </div>
   );
-};
+}
 
-export default CompareProfiles;
+export default function CompareProfiles() {
+  return (
+    <MeasureProvider>
+      <PageContent />
+    </MeasureProvider>
+  );
+}
