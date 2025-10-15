@@ -7,6 +7,8 @@ import SearchBar from "@/modules/search/SearchBar";
 import SearchResults from "@/modules/search/SearchResults";
 import { Plus } from "lucide-react";
 import Button from "@/modules/Button";
+import DetailHandler from "@/modules/details/DetailHandler";
+import DetailConfirmation from "@/modules/details/DetailConfirmation";
 import { useState } from "react";
 
 function PageContent() {
@@ -23,6 +25,7 @@ function PageContent() {
     setIsEditing,
     setPendingChanges,
   } = useScenariosData();
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   return (
     <>
@@ -40,7 +43,35 @@ function PageContent() {
         />
       </div>
 
-      {/* DetailHandler will be added later */}
+      {selectedItem && (
+        <DetailHandler
+          key={selectedItem._id}
+          isNew={!selectedItem._id}
+          item={selectedItem}
+          isEditing={isEditing}
+          formType="scenarios"
+          pendingChanges={pendingChanges}
+          onEdit={setIsEditing}
+          onUpdate={updateItem}
+          onCreate={createItem}
+          onChanges={setPendingChanges}
+        />
+      )}
+
+      {showConfirmation && (
+        <DetailConfirmation
+          title="Niet-opgeslagen wijzigingen"
+          message="Er zijn niet-opgeslagen wijzigingen. Wil je deze opslaan voordat je verdergaat?"
+          confirm="Opslaan en doorgaan"
+          cancel="Wijzigingen negeren"
+          changes={pendingChanges}
+          onConfirm={async () => setShowConfirmation(false)}
+          onCancel={() => {
+            setShowConfirmation(false);
+            selectItem(null);
+          }}
+        />
+      )}
     </>
   );
 }

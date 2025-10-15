@@ -1,4 +1,6 @@
 // src/types/woningen.ts
+import { CustomField } from './settings';
+
 export interface ProjectInformation {
   projectNumber: string;
   complexName: string;
@@ -66,6 +68,8 @@ export interface Woning {
   isPortiekflat: boolean;
   isGalerieflat: boolean;
   measures?: any[];
+  imagePath?: string;
+  customFields?: CustomField[];
   dimensions: {
     breed: string;
     diepte: string;

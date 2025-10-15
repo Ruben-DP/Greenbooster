@@ -602,7 +602,7 @@ export default function SettingsPage() {
         {/* Third card - Custom fields */}
         <div className="settings-card">
           <div className="settings-header">
-            <h2>Extra velden eindblad</h2>
+            <h2>Globale extra velden</h2>
             {isEditing && (
               <button
                 type="button"

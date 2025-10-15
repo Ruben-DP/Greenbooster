@@ -6,6 +6,9 @@ import { CheckboxField } from "../fields/CheckboxField";
 import { ReferenceField } from "../fields/ReferenceField";
 import ImageSelect from "../ImageSelect";
 import { searchDocuments } from "@/app/actions/crudActions";
+import { toast } from "sonner";
+import { CustomField } from "@/types/settings";
+import { X } from "lucide-react";
 
 type BuildingType = {
   _id: string;
@@ -26,9 +29,12 @@ const ResidenceForm = ({
   onChange,
 }: Props) => {
   if (!item) return null;
-  
+
   const [buildingTypes, setBuildingTypes] = useState<BuildingType[]>([]);
   const [selectedTypeId, setSelectedTypeId] = useState<string>(item.typeId || "");
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [customFields, setCustomFields] = useState<CustomField[]>([]);
 
   useEffect(() => {
     const fetchBuildingTypes = async () => {
@@ -42,6 +48,29 @@ const ResidenceForm = ({
 
     fetchBuildingTypes();
   }, []);
+
+  // Set initial preview if image exists
+  useEffect(() => {
+    if (item.imagePath) {
+      setPreviewUrl(item.imagePath);
+    }
+  }, [item.imagePath]);
+
+  // Initialize custom fields from item
+  useEffect(() => {
+    if (item.customFields && Array.isArray(item.customFields)) {
+      setCustomFields(item.customFields);
+    }
+  }, [item._id]);
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   // Build image options for the selector
   const buildingTypeOptions = buildingTypes.map((type) => {
@@ -117,6 +146,86 @@ const ResidenceForm = ({
     const newTypeId = e.target.value;
     setSelectedTypeId(newTypeId);
     handleChange("typeId", item.typeId || "", newTypeId);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error("Bestand is te groot. Maximaal 5MB toegestaan.");
+      return;
+    }
+
+    // Create preview immediately
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await fetch("/api/upload-residence-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        // Clean up object URL and use the uploaded image path
+        URL.revokeObjectURL(objectUrl);
+        setPreviewUrl(result.data.imagePath);
+        handleChange("imagePath", item.imagePath || "", result.data.imagePath);
+        toast.success("Afbeelding succesvol geüpload");
+      } else {
+        // Revert preview on error
+        URL.revokeObjectURL(objectUrl);
+        setPreviewUrl(item.imagePath || null);
+        toast.error(result.error || "Upload mislukt");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      // Revert preview on error
+      URL.revokeObjectURL(objectUrl);
+      setPreviewUrl(item.imagePath || null);
+      toast.error("Er is een fout opgetreden bij het uploaden");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Custom field management functions
+  const addCustomField = () => {
+    const newField: CustomField = {
+      id: `custom-${Date.now()}`,
+      name: `Extra veld ${customFields.length + 1}`,
+      value: 0,
+      type: 'euro'
+    };
+    const updatedFields = [...customFields, newField];
+    setCustomFields(updatedFields);
+    handleChange("customFields", item.customFields || [], updatedFields);
+  };
+
+  const removeCustomField = (id: string) => {
+    const updatedFields = customFields.filter(field => field.id !== id);
+    setCustomFields(updatedFields);
+    handleChange("customFields", item.customFields || [], updatedFields);
+  };
+
+  const updateCustomField = (id: string, fieldName: 'name' | 'value' | 'type', value: string | number) => {
+    const updatedFields = customFields.map(field =>
+      field.id === id
+        ? { ...field, [fieldName]: value }
+        : field
+    );
+    setCustomFields(updatedFields);
+    handleChange("customFields", item.customFields || [], updatedFields);
   };
 
   return (
@@ -578,6 +687,153 @@ const ResidenceForm = ({
               handleChange("isGalerieflat", item.isGalerieflat || false, next)
             }
           />
+        </div>
+      </div>
+
+      <div className="form__section">
+        <h4 className="form__heading">Afbeelding</h4>
+        <div className="form__fields">
+          {isEditing ? (
+            <div className="form-field">
+              <label className="field-label" htmlFor="residence-image">
+                Upload afbeelding (max 5MB)
+              </label>
+              <input
+                id="residence-image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={isUploading}
+                className="file-input"
+              />
+              {isUploading && <span className="upload-status">Uploaden...</span>}
+              {previewUrl && (
+                <div className="image-preview">
+                  <img src={previewUrl} alt="Preview" className="preview-image" />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="form-field">
+              <label className="field-label">Afbeelding</label>
+              {item.imagePath ? (
+                <div className="image-preview">
+                  <img src={item.imagePath} alt="Woning afbeelding" className="preview-image" />
+                </div>
+              ) : (
+                <div className="input-read-only">
+                  <span className="empty-reference">Geen afbeelding</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="form__section">
+        <div className="form__heading-row">
+          <h4 className="form__heading">Extra velden</h4>
+          {isEditing && (
+            <button
+              type="button"
+              onClick={addCustomField}
+              className="add-field-button"
+              title="Voeg nieuw veld toe"
+            >
+              <span className="plus-icon">+</span>
+              Nieuw veld
+            </button>
+          )}
+        </div>
+        <div className="form__fields">
+          {customFields.length > 0 ? (
+            customFields.map((field, index) => (
+              <div key={field.id} className="custom-field-group">
+                <div className="custom-field-header">
+                  <span className="field-number">Veld {index + 1}</span>
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={() => removeCustomField(field.id)}
+                      className="remove-field-button"
+                      title="Verwijder veld"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="form-field">
+                  <label className="field-label">Naam</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={field.name}
+                      onChange={(e) => updateCustomField(field.id, 'name', e.target.value)}
+                      placeholder="Naam van het veld"
+                      className="text-input"
+                    />
+                  ) : (
+                    <div className="input-read-only">{field.name}</div>
+                  )}
+                </div>
+
+                <div className="form-field">
+                  <label className="field-label">Type</label>
+                  {isEditing ? (
+                    <select
+                      value={field.type || 'euro'}
+                      onChange={(e) => updateCustomField(field.id, 'type', e.target.value as 'percentage' | 'euro')}
+                      className="select-input"
+                    >
+                      <option value="euro">Euro (€)</option>
+                      <option value="percentage">Percentage (%)</option>
+                    </select>
+                  ) : (
+                    <div className="input-read-only">
+                      {field.type === 'percentage' ? 'Percentage (%)' : 'Euro (€)'}
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-field">
+                  <label className="field-label">Waarde</label>
+                  {isEditing ? (
+                    <div className="input-with-symbol">
+                      <input
+                        type="number"
+                        value={field.value}
+                        onChange={(e) => updateCustomField(field.id, 'value', parseFloat(e.target.value) || 0)}
+                        step="0.01"
+                        className="number-input"
+                      />
+                      <span className="input-symbol">
+                        {field.type === 'percentage' ? '%' : '€'}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="input-read-only">
+                      {field.value} {field.type === 'percentage' ? '%' : '€'}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="no-custom-fields">
+              <p>Geen extra velden toegevoegd</p>
+              {isEditing && (
+                <button
+                  type="button"
+                  onClick={addCustomField}
+                  className="add-first-field-button"
+                >
+                  <span className="plus-icon">+</span>
+                  Voeg eerste veld toe
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

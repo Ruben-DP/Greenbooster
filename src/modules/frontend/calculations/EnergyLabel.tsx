@@ -19,19 +19,19 @@ const LabelAmounts = {
   G: 1000,
 };
 
-// Colors for the energy labels
+// Colors for the energy labels - matching BENG2 scale (color picked from official scale)
 const labelColors = {
-  "A++++": "#00703c",
-  "A+++": "#00853f",
-  "A++": "#319b42",
-  "A+": "#4cb648",
-  A: "#bfd630",
-  B: "#fff200",
-  C: "#fdb913",
-  D: "#f37021",
-  E: "#ed1c24",
-  F: "#cf142b",
-  G: "#b31b34",
+  "A++++": "#0a5a28",  // Darkest green (rightmost)
+  "A+++": "#1a7a3a",   // Very dark green
+  "A++": "#2a8f4a",    // Dark green
+  "A+": "#3ba55c",     // Medium-dark green
+  A: "#4cbd6e",        // Medium green
+  B: "#7fcd4e",        // Light green
+  C: "#c5d83d",        // Yellow-green
+  D: "#fdd835",        // Yellow
+  E: "#ffb327",        // Orange
+  F: "#ff7a1a",        // Dark orange
+  G: "#e63027",        // Red
 };
 
 export const EnergyLabel = ({

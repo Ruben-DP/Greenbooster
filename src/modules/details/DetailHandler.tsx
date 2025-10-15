@@ -10,13 +10,14 @@ import MeasureForm from "../forms/MeasureForm";
 import VariableForm from "../forms/VariableForm";
 import ResidenceForm from "../forms/ResidenceForm";
 import TypeForm from "../forms/TypeForm";
+import ScenarioForm from "../forms/ScenarioForm";
 
 interface DetailHandlerProps {
   isNew: boolean;
   item: any;
   isEditing: boolean;
   pendingChanges: Record<string, any>;
-  formType: "measures" | "variables" | "woningen" | "types";
+  formType: "measures" | "variables" | "woningen" | "types" | "scenarios";
   onEdit: (isEditing: boolean) => void;
   onUpdate: (item: any) => Promise<boolean>;
   onCreate: (item: any) => Promise<boolean>;
@@ -115,6 +116,14 @@ export default function DetailHandler({
       )}
       {formType === "types" && (
         <TypeForm
+          item={currentItem}
+          isEditing={isEditing}
+          onChange={handleChange}
+          pendingChanges={pendingChanges}
+        />
+      )}
+      {formType === "scenarios" && (
+        <ScenarioForm
           item={currentItem}
           isEditing={isEditing}
           onChange={handleChange}

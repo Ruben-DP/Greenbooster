@@ -18,6 +18,7 @@
 @use "ui/search-area";
 @use "ui/search-bar";
 @use "ui/search-results";
+@use "ui/search-select";
 
 // frontend components
 @use "ui/frontend/hero";
@@ -47,6 +48,7 @@
 @use "ui/forms/measure-form";
 @use "ui/form-field";
 @use "ui/forms/residence-form";
+@use "ui/forms/scenario-form";
 
 
 

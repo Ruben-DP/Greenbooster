@@ -1,0 +1,108 @@
+.scenario-form {
+  // Scoped styling for search-select component
+  .form-field .search-select {
+    width: 320px;
+    max-width: 320px;
+  }
+
+  &__container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  &__measures-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__measures {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__measure-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    h5 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  &__measure-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__measure-details {
+    display: flex;
+    gap: 24px;
+    margin-top: 8px;
+  }
+
+  &__measure-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    label {
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    span {
+      font-size: 1rem;
+      color: #111827;
+    }
+  }
+
+  &__formulas {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    span {
+      font-size: 0.875rem;
+      color: #374151;
+      font-family: monospace;
+      background: #f9fafb;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+  }
+
+  &__search-area {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #edeef1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    h5 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    // Scoped styling for input fields in the search area
+    .input-base {
+      min-width: 320px;
+    }
+  }
+
+  &__empty {
+    color: #6b7280;
+    text-align: center;
+    padding: 32px;
+    font-size: 0.875rem;
+  }
+}

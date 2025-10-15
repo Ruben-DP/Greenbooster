@@ -2,6 +2,7 @@ export interface CustomField {
   id: string;
   name: string;
   value: number;
+  type?: 'percentage' | 'euro'; // For residence custom fields
 }
 
 export interface Settings {

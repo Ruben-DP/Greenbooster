@@ -1,0 +1,128 @@
+@use "../abstracts/variables" as *;
+
+// =====================================================
+// TILES - Reusable card/tile components
+// Used in woninggegevens and kosten-berekening
+// =====================================================
+
+.tile {
+  background-color: var(--color-bg-secondary);
+  border-radius: $radius-xl;
+  border: 1px solid var(--color-border-light);
+  padding: $spacing-6;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  box-shadow: $shadow-sm;
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  &__title {
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-2xl);
+    color: var(--color-text-primary);
+    margin-bottom: $spacing-2;
+  }
+
+  &__subtitle {
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    margin-bottom: $spacing-4;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+
+  // Residence tile variant
+  &.residence {
+    .residence__title {
+      margin-bottom: $spacing-2;
+    }
+
+    .residence__button select {
+      padding: $spacing-1 $spacing-2;
+      border: 1px solid var(--color-border-light);
+      border-radius: $radius-sm;
+      font-size: var(--font-size-base);
+      background: var(--color-gray-50);
+    }
+  }
+
+  // Actions tile variant
+  &.actions-tile {
+    button {
+      height: 54px;
+      background-color: #1b3054;
+      padding: $spacing-3 $spacing-5;
+      color: var(--color-white);
+      border: none;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      width: 100%;
+      gap: $spacing-2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: $transition-base;
+
+      &:hover {
+        opacity: 0.9;
+      }
+
+      &:first-child {
+        background-color: var(--accent-color);
+      }
+    }
+  }
+
+  .downloadPDF {
+    display: flex;
+  }
+}
+
+// Tile title with centered text and bottom border
+.tile-title {
+  text-align: center;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  padding-bottom: $spacing-3;
+  width: 100%;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-primary);
+  margin-bottom: $spacing-4;
+}
+
+// Tile grouper - for horizontal tile layouts
+.tile-grouper {
+  display: flex;
+  width: 100%;
+  gap: $spacing-4;
+
+  > * {
+    flex: 1;
+  }
+
+  @media (max-width: $screen-sm-max) {
+    flex-direction: column;
+  }
+}
+
+// Compact tile variant
+.tile--compact {
+  padding: $spacing-4;
+  gap: $spacing-2;
+}
+
+// Highlighted tile variant
+.tile--highlighted {
+  border-color: var(--color-primary);
+  background: linear-gradient(to bottom, var(--color-bg-secondary), var(--color-bg-tertiary));
+}

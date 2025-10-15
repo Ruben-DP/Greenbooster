@@ -2,7 +2,8 @@
 "use client";
 import { searchDocuments } from "@/app/actions/crudActions";
 import { useEffect, useState } from "react";
-import { Pencil } from "lucide-react";
+import ScenarioSelector from "@/modules/scenario/ScenarioSelector";
+import ImageSelect from "@/modules/ImageSelect";
 
 // ... (interfaces remain the same)
 
@@ -35,6 +36,7 @@ interface Woning {
   isGrondgebonden: boolean;
   isPortiekflat: boolean;
   isGalerieflat: boolean;
+  imagePath?: string;
 }
 
 interface RoomDimensions {
@@ -80,11 +82,13 @@ interface ResidenceProps {
   ) => void;
   onTypeSelect?: (type: WoningType) => void;
   residenceType?: string;
+  onScenarioLoad?: (measures: any[]) => void;
 }
 
 export default function Residence({
   selectedResidence,
   onTypeSelect,
+  onScenarioLoad,
 }: ResidenceProps) {
   const [woningen, setWoningen] = useState<Woning[]>([]);
   const [selectedWoning, setSelectedWoning] = useState<Woning | null>(null);
@@ -93,7 +97,6 @@ export default function Residence({
   const [selectedId, setSelectedId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
 
   const fetchTypeDetails = async (typeId: string) => {
     if (!typeId) return;
@@ -122,17 +125,17 @@ export default function Residence({
       const response = await searchDocuments<Woning>("woningen");
       if (Array.isArray(response)) {
         setWoningen(response);
-        
-        const storedWoningId = localStorage.getItem('selectedResidenceId');
+
+        const storedWoningId = localStorage.getItem("selectedResidenceId");
         let idToSelect = storedWoningId;
 
         if (!idToSelect && response.length > 0) {
           idToSelect = response[0]._id;
         }
-        
+
         if (idToSelect) {
-            setSelectedId(idToSelect);
-            await fetchWoning(idToSelect);
+          setSelectedId(idToSelect);
+          await fetchWoning(idToSelect);
         }
       }
     } catch (error) {
@@ -187,53 +190,46 @@ export default function Residence({
   ) => {
     const newId = event.target.value;
     setSelectedId(newId);
-    localStorage.setItem('selectedResidenceId', newId);
+    localStorage.setItem("selectedResidenceId", newId);
     fetchWoning(newId);
-    setIsEditing(false);
-  };
-
-  const toggleEditMode = () => {
-    setIsEditing(!isEditing);
   };
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!woningen.length) return <div>No woningen found</div>;
 
+  // Map woningen to ImageSelect options format
+  const residenceOptions = woningen.map((woning) => ({
+    value: woning._id,
+    label: woning.projectInformation.adres,
+    imageSrc: woning.imagePath, // Will be undefined if no image, which is fine
+  }));
+
   return (
     <div className="residence tile">
       <div className="residence__header">
         <h4 className="tile-title">Woning</h4>
       </div>
-      <div className="residence__controls">
-        {isEditing ? (
-          <div className="residence__selector">
-            <select value={selectedId} onChange={handleResidenceChange}>
-              {woningen.map((woning) => (
-                <option key={woning._id} value={woning._id}>
-                  {woning.projectInformation.adres}
-                </option>
-              ))}
-            </select>
-          </div>
-        ) : (
-          <div className="residence__address">
-            {selectedWoning && selectedWoning.projectInformation.adres}
-          </div>
-        )}
-
-        <button
-          onClick={toggleEditMode}
-          className="edit-button"
-          aria-label="Edit residence"
-        >
-          <Pencil size={18} />
-        </button>
-      </div>
       {typeDetails && (
         <div className="residence__type">
           Type woning: <span>{typeDetails.type || typeDetails.naam}</span>
         </div>
+      )}
+      <div className="residence__controls">
+        <ImageSelect
+          id="residence-select"
+          name="residence"
+          value={selectedId}
+          onChange={handleResidenceChange}
+          options={residenceOptions}
+        />
+      </div>
+
+      {onScenarioLoad && (
+        <ScenarioSelector
+          onScenarioLoad={onScenarioLoad}
+          woningId={selectedId}
+        />
       )}
     </div>
   );

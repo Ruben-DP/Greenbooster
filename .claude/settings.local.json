@@ -3,7 +3,13 @@
     "allow": [
       "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_xzIYm2/**)",
       "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_pVqN2v/**)",
-      "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_Tyqs8K/**)"
+      "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_Tyqs8K/**)",
+      "Read(//Users/ruben/Downloads/**)",
+      "Bash(node:*)",
+      "mcp__ide__getDiagnostics",
+      "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_zisycm/**)",
+      "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_fX6CPQ/**)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

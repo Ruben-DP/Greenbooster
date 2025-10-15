@@ -2,16 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { getSettings } from "@/app/actions/settingsActions";
-import { Settings } from "@/types/settings";
+import { Settings, CustomField } from "@/types/settings";
 
 interface BudgetProps {
   totalAmount: number;
   numberOfUnits?: number;
+  residenceCustomFields?: CustomField[];
 }
 
 export default function Budget({
   totalAmount,
   numberOfUnits = 0,
+  residenceCustomFields = [],
 }: BudgetProps) {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,19 +49,45 @@ export default function Budget({
 
     const directCosts = Math.max(0, totalAmount);
 
-    // Calculate custom fields amounts
-    const customFieldsAmounts = settings.customFields?.map(field => ({
+    // Calculate global custom fields amounts
+    const globalCustomFieldsAmounts = settings.customFields?.map(field => ({
       name: field.name,
-      amount: directCosts > 0 ? field.value || 0 : 0
+      amount: directCosts > 0 ? field.value || 0 : 0,
+      type: field.type || 'euro'
     })) || [];
+
+    // Calculate residence-specific custom fields amounts
+    const residenceCustomFieldsAmounts = residenceCustomFields.map(field => {
+      const fieldType = field.type || 'euro';
+      let amount = 0;
+
+      if (directCosts > 0) {
+        if (fieldType === 'percentage') {
+          // Calculate percentage of direct costs
+          amount = directCosts * ((field.value || 0) / 100);
+        } else {
+          // Use absolute value for euro
+          amount = field.value || 0;
+        }
+      }
+
+      return {
+        name: field.name,
+        amount,
+        type: fieldType
+      };
+    });
 
     // Legacy support for old custom fields
     const legacyCustomValue1Amount = directCosts > 0 ? settings.customValue1 || 0 : 0;
     const legacyCustomValue2Amount = directCosts > 0 ? settings.customValue2 || 0 : 0;
 
-    // Calculate total custom fields amount
-    const totalCustomFieldsAmount = customFieldsAmounts.reduce((sum, field) => sum + field.amount, 0) + 
-                                   legacyCustomValue1Amount + legacyCustomValue2Amount;
+    // Calculate total custom fields amount (global + residence + legacy)
+    const totalCustomFieldsAmount =
+      globalCustomFieldsAmounts.reduce((sum, field) => sum + field.amount, 0) +
+      residenceCustomFieldsAmounts.reduce((sum, field) => sum + field.amount, 0) +
+      legacyCustomValue1Amount +
+      legacyCustomValue2Amount;
 
     const subtotalDirectAndCustom = directCosts + totalCustomFieldsAmount;
 
@@ -114,7 +142,8 @@ export default function Budget({
 
     return {
       directCosts,
-      customFieldsAmounts,
+      globalCustomFieldsAmounts,
+      residenceCustomFieldsAmounts,
       legacyCustomValue1Amount,
       legacyCustomValue2Amount,
       totalCustomFieldsAmount,
@@ -197,6 +226,10 @@ export default function Budget({
                 <span>Prijs per eenheid (excl. BTW)</span>
                 <span>€ {formatCurrency(breakdown.pricePerUnitExclVAT)}</span>
               </div>
+              <div className="budget__unit-count-line">
+                <span>Aantal woningen</span>
+                <span>{numberOfUnits}</span>
+              </div>
             </div>
           )}
 
@@ -208,10 +241,19 @@ export default function Budget({
                   <span>Directe kosten</span>
                   <span>€ {formatCurrency(breakdown.directCosts)}</span>
                 </div>
-                {/* Display custom fields */}
-                {breakdown.customFieldsAmounts.map((field, index) => (
+                {/* Display global custom fields */}
+                {breakdown.globalCustomFieldsAmounts.map((field, index) => (
                   field.amount > 0 && (
-                    <div key={`custom-field-${index}`} className="budget__line">
+                    <div key={`global-custom-field-${index}`} className="budget__line">
+                      <span>{field.name}</span>
+                      <span>€ {formatCurrency(field.amount)}</span>
+                    </div>
+                  )
+                ))}
+                {/* Display residence-specific custom fields */}
+                {breakdown.residenceCustomFieldsAmounts.map((field, index) => (
+                  field.amount > 0 && (
+                    <div key={`residence-custom-field-${index}`} className="budget__line">
                       <span>{field.name}</span>
                       <span>€ {formatCurrency(field.amount)}</span>
                     </div>
@@ -378,13 +420,29 @@ export default function Budget({
         }
 
         /* Styling voor de tweede regel: Prijs per eenheid (excl. BTW) */
-        .budget__unit-price-line:last-child {
+        .budget__unit-price-line:nth-child(2) {
           font-size: 14px;
           color: #666;
         }
 
-        .budget__unit-price-line:last-child span:last-child {
+        .budget__unit-price-line:nth-child(2) span:last-child {
           font-weight: 400; /* Normaal gewicht */
+        }
+
+        /* Styling voor aantal eenheden */
+        .budget__unit-count-line {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 14px;
+          color: #666;
+          margin-top: 8px;
+          padding-top: 8px;
+          border-top: 1px solid #f0f0f0;
+        }
+
+        .budget__unit-count-line span:last-child {
+          font-weight: 500;
         }
         .budget {
           display: flex;

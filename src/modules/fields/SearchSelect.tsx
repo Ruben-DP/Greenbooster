@@ -25,6 +25,11 @@ interface SearchSelectProps {
   };
 }
 
+// Helper function to get nested values from objects
+const getNestedValue = <T extends object>(obj: T, path: string): any => {
+  return path.split(".").reduce((acc, part) => acc?.[part], obj);
+};
+
 export function SearchSelect({
   label,
   value,
@@ -50,21 +55,24 @@ export function SearchSelect({
           const mappedOptions = results
             .filter(
               (item: any) =>
-                item[dynamicOptions.displayField] !==
+                getNestedValue(item, dynamicOptions.displayField) !==
                 dynamicOptions.currentValue
             )
-            .map((item: any) => ({
-              label: item[dynamicOptions.displayField],
-              value: item[dynamicOptions.displayField],
-              id: item._id,
-              referenceData: dynamicOptions.referenceFields?.reduce(
-                (acc, field) => {
-                  acc[field] = item[field];
-                  return acc;
-                },
-                {} as Record<string, any>
-              ),
-            }));
+            .map((item: any) => {
+              const displayValue = getNestedValue(item, dynamicOptions.displayField);
+              return {
+                label: displayValue || "N/A",
+                value: item._id, // Use _id as the value instead of displayField
+                id: item._id,
+                referenceData: dynamicOptions.referenceFields?.reduce(
+                  (acc, field) => {
+                    acc[field] = getNestedValue(item, field);
+                    return acc;
+                  },
+                  {} as Record<string, any>
+                ),
+              };
+            });
           setAllOptions(mappedOptions);
         } catch (error) {
           console.error("Failed to fetch options:", error);

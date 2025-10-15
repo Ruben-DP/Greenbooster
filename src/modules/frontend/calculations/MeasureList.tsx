@@ -736,8 +736,22 @@ export default function MeasureList({
                                       {calc.name ||
                                         `Berekening ${calcIndex + 1}`}
                                       <span className="measure__breakdown-formula">
-                                        ({calc.quantity.toFixed(2)} {calc.unit}{" "}
-                                        × €{calc.unitPrice.toFixed(2)})
+                                        {calc.steps && calc.steps.length > 0 ? (
+                                          <>
+                                            ({calc.steps.map((step: any, stepIdx: number) => {
+                                              const operationPart = stepIdx > 0 ? ` ${step.operation} ` : '';
+                                              const valuePart = step.value.toFixed(2);
+                                              const unitPart = (step.variable === 'aantalWoningen' || step.variable === 'AantalWoningen') ? ' woningen' : '';
+                                              return `${operationPart}${valuePart}${unitPart}`;
+                                            }).join('')} = {calc.quantity.toFixed(2)} {calc.unit}{" "}
+                                            × €{calc.unitPrice.toFixed(2)})
+                                          </>
+                                        ) : (
+                                          <>
+                                            ({calc.quantity.toFixed(2)} {calc.unit}{" "}
+                                            × €{calc.unitPrice.toFixed(2)})
+                                          </>
+                                        )}
                                       </span>
                                     </div>
                                     <div className="measure__breakdown-price">
@@ -822,9 +836,24 @@ export default function MeasureList({
                                           {calc.name ||
                                             `Onderhoud ${calcIndex + 1}`}
                                           <span className="measure__breakdown-formula">
-                                            ({calc.quantity.toFixed(2)}{" "}
-                                            {calc.unit} × €
-                                            {calc.unitPrice.toFixed(2)})
+                                            {calc.steps && calc.steps.length > 0 ? (
+                                              <>
+                                                ({calc.steps.map((step: any, stepIdx: number) => {
+                                                  const operationPart = stepIdx > 0 ? ` ${step.operation} ` : '';
+                                                  const valuePart = step.value.toFixed(2);
+                                                  const unitPart = (step.variable === 'aantalWoningen' || step.variable === 'AantalWoningen') ? ' woningen' : '';
+                                                  return `${operationPart}${valuePart}${unitPart}`;
+                                                }).join('')} = {calc.quantity.toFixed(2)}{" "}
+                                                {calc.unit} × €
+                                                {calc.unitPrice.toFixed(2)})
+                                              </>
+                                            ) : (
+                                              <>
+                                                ({calc.quantity.toFixed(2)}{" "}
+                                                {calc.unit} × €
+                                                {calc.unitPrice.toFixed(2)})
+                                              </>
+                                            )}
                                           </span>
                                           {mjob && (
                                             <div className="measure__breakdown-details">

@@ -11,10 +11,9 @@ import { Woning, WoningType } from "@/types/woningen";
 import { CalculationHandler } from "./calculations/CalculationHandler";
 import SelectedMeasures from "./calculations/SelectMeasures";
 import PdfDownloadButton from "../PdfDownloadButton";
-import SaveProfileButton from "../residenceProfile/SaveProfileButton";
+import SaveScenarioButton from "../scenario/SaveScenarioButton";
 import { EnergyLabel } from "./calculations/EnergyLabel";
 import { calculateMeasurePrice } from "./calculations/price.calculator";
-import { updateWoningMeasures } from "@/app/actions/woningActions";
 
 interface Measure {
   name: string;
@@ -141,11 +140,12 @@ function PageContent() {
     fetchSettings();
   }, []);
 
-  useEffect(() => {
-    if (selectedResidence?._id) {
-      updateWoningMeasures(selectedResidence._id, selectedMeasures);
-    }
-  }, [selectedMeasures, selectedResidence]);
+  // Disabled: measures are now managed via scenarios instead
+  // useEffect(() => {
+  //   if (selectedResidence?._id) {
+  //     updateWoningMeasures(selectedResidence._id, selectedMeasures);
+  //   }
+  // }, [selectedMeasures, selectedResidence]);
 
   const recalculateMeasures = (
     measures: Measure[],
@@ -232,6 +232,27 @@ function PageContent() {
       setSelectedMeasures((prev) => [...prev, measure]);
       setTotalBudget((prev) => prev + (measure.price || 0));
     }
+  };
+
+  const handleScenarioLoad = (measures: any[]) => {
+    if (!calculations) {
+      toast.error("Selecteer eerst een woning om berekeningen te maken");
+      return;
+    }
+
+    // Recalculate prices for all measures with current residence data
+    const processedMeasures = recalculateMeasures(
+      measures as Measure[],
+      calculations
+    );
+
+    setSelectedMeasures(processedMeasures);
+
+    const newBudget = processedMeasures.reduce(
+      (sum, measure) => sum + (measure.price || 0),
+      0
+    );
+    setTotalBudget(newBudget);
   };
 
   const findVariableValue = (
@@ -326,11 +347,12 @@ function PageContent() {
     setSelectedResidence(residence);
     setSelectedType(type);
 
-    if (residence.measures) {
-      setSelectedMeasures(residence.measures);
-    } else {
-      setSelectedMeasures([]);
-    }
+    // Disabled: measures are now managed via scenarios instead
+    // if (residence.measures) {
+    //   setSelectedMeasures(residence.measures);
+    // } else {
+    //   setSelectedMeasures([]);
+    // }
   };
 
   useEffect(() => {
@@ -430,6 +452,7 @@ function PageContent() {
           <Budget
             totalAmount={totalBudget}
             numberOfUnits={calculations?.woningSpecifiek?.aantalWoningen}
+            residenceCustomFields={selectedResidence?.customFields}
           />
           <Stats
             selectedMeasures={selectedMeasures}
@@ -439,6 +462,7 @@ function PageContent() {
             <Residence
               selectedResidence={handleSelection}
               residenceType={selectedType?.type}
+              onScenarioLoad={handleScenarioLoad}
             />
             {selectedResidence &&
               selectedType &&
@@ -451,7 +475,14 @@ function PageContent() {
               )}
             <div className="tile actions-tile">
               <h4 className="tile-title">Acties</h4>
-              <div className="downloadPDF">
+              <div className="saveProfile">
+                <SaveScenarioButton
+                  measures={selectedMeasures}
+                  woningId={selectedResidence?._id}
+                  isDisabled={selectedMeasures.length === 0}
+                />
+              </div>
+              {/* <div className="downloadPDF">
                 <PdfDownloadButton
                   selectedResidence={selectedResidence}
                   selectedMeasures={selectedMeasures}
@@ -459,17 +490,7 @@ function PageContent() {
                   totalHeatDemand={totalHeatDemand}
                   settings={settings}
                 />
-              </div>
-              <div className="saveProfile">
-                <SaveProfileButton
-                  woningId={selectedResidence?._id || ""}
-                  typeId={selectedType?._id || ""}
-                  measures={selectedMeasures}
-                  totalBudget={totalBudget}
-                  totalHeatDemand={totalHeatDemand}
-                  isDisabled={!selectedResidence || !selectedType || selectedMeasures.length === 0}
-                />
-              </div>
+              </div> */}
             </div>
           </div>
           <SelectedMeasures

@@ -81,6 +81,8 @@ export default function ProjectForm() {
   const [buildingTypes, setBuildingTypes] = useState<BuildingType[]>([]);
   const [selectedType, setSelectedType] = useState<BuildingType | null>(null);
   const [createNewType, setCreateNewType] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [newTypeData, setNewTypeData] = useState<TypeFormData>({
     naam: "", // Keep empty - will be required when creating new type
     type: "", // Change from "grondgebonden" to empty - will be required when creating new type
@@ -241,6 +243,39 @@ export default function ProjectForm() {
     setNewTypeData(updatedTypeData);
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("Bestand is te groot. Maximaal 5MB toegestaan.");
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Alleen afbeeldingen zijn toegestaan.");
+      return;
+    }
+
+    setSelectedImage(file);
+
+    // Create preview
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+  };
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   async function handleSubmit(formData: FormData) {
     try {
       let typeId = selectedType?._id;
@@ -263,8 +298,33 @@ export default function ProjectForm() {
         toast.success("Nieuw woningtype succesvol aangemaakt");
       }
 
+      // Upload image first if one was selected
+      let imagePath = "";
+      if (selectedImage) {
+        const imageFormData = new FormData();
+        imageFormData.append("image", selectedImage);
+
+        const uploadResponse = await fetch("/api/upload-residence-image", {
+          method: "POST",
+          body: imageFormData,
+        });
+
+        const uploadResult = await uploadResponse.json();
+
+        if (uploadResult.success && uploadResult.data) {
+          imagePath = uploadResult.data.imagePath;
+        } else {
+          toast.error("Afbeelding upload mislukt: " + (uploadResult.error || ""));
+          return;
+        }
+      }
+
       if (typeId) {
         formData.append("typeId", typeId);
+      }
+
+      if (imagePath) {
+        formData.append("imagePath", imagePath);
       }
 
       const result = await createWoning(formData);
@@ -381,6 +441,23 @@ export default function ProjectForm() {
             />
             <label htmlFor="createTypeToggle">Nieuw woningtype aanmaken</label>
           </div>
+
+          <div className="project-form__field">
+            <label htmlFor="residence-image">Woning afbeelding (max 5MB)</label>
+            <input
+              type="file"
+              id="residence-image"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="file-input"
+            />
+            {previewUrl && (
+              <div className="image-preview">
+                <img src={previewUrl} alt="Preview" className="preview-image" />
+              </div>
+            )}
+          </div>
+
           <h2 className=" mt-64 tile-title">Energie details</h2>
           <div className="project-form__field">
             <label htmlFor="huidigEnergieVerbruik">

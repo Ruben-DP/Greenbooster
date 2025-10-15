@@ -105,16 +105,16 @@ export async function deleteDocument(
   try {
     const client = await clientPromise;
     const collection = client.db("main-db").collection(collectionName);
-    
+
     const result = await collection.deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount === 1) {
       return { success: true, data: { id } };
     }
-    
-    return { 
-      success: false, 
-      error: "Document not found or could not be deleted" 
+
+    return {
+      success: false,
+      error: "Document not found or could not be deleted"
     };
   } catch (error) {
     console.error(`Delete error in ${collectionName}:`, error);
@@ -122,5 +122,25 @@ export async function deleteDocument(
       success: false,
       error: error instanceof Error ? error.message : "Deletion failed"
     };
+  }
+}
+
+export async function getMeasuresByIds(
+  measureIds: string[]
+): Promise<any[]> {
+  try {
+    const client = await clientPromise;
+    const collection = client.db("main-db").collection("retrofittingMeasures");
+
+    const objectIds = measureIds.map(id => new ObjectId(id));
+    const measures = await collection.find({ _id: { $in: objectIds } }).toArray();
+
+    return measures.map((measure) => ({
+      ...measure,
+      _id: measure._id.toString(),
+    }));
+  } catch (error) {
+    console.error("Error fetching measures by IDs:", error);
+    return [];
   }
 }

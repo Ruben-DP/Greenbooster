@@ -180,7 +180,8 @@ export default function ImageSelect({
         }
         
         .image-select__selected span {
-          margin-right: auto;
+          margin-top:8px;
+          margin-bottom:8px;
         }
         
         .image-select__placeholder {
@@ -226,8 +227,8 @@ export default function ImageSelect({
         }
         
         .image-select__image {
-          width: 200px;
-          height: 200px;
+          object-fit:contain;
+          width: 50%;
           object-fit: cover;
           margin-right: 10px;
           border-radius: 4px;

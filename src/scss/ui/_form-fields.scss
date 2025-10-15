@@ -1,0 +1,200 @@
+@use "../abstracts/variables" as *;
+
+// =====================================================
+// FORM FIELDS - Unified input styling for tiles
+// Used throughout woninggegevens and kosten-berekening
+// =====================================================
+
+// Base form field wrapper
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+
+  label {
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-medium);
+  }
+
+  // Checkbox variant
+  &--checkbox {
+    flex-direction: row;
+    align-items: center;
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+  }
+
+  // Inline variant (label and input side by side)
+  &--inline {
+    flex-direction: row;
+    align-items: center;
+
+    label {
+      flex-shrink: 0;
+      width: 150px;
+    }
+
+    input,
+    select {
+      flex: 1;
+    }
+  }
+}
+
+// Standard text inputs and selects
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  padding: $spacing-3;
+  border: 1px solid var(--color-border-dark);
+  border-radius: $radius-sm;
+  background: var(--color-bg-secondary);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  transition: $transition-base;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: $shadow-focus;
+  }
+
+  &:disabled,
+  &[readonly] {
+    background-color: var(--color-gray-200);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  &::placeholder {
+    color: var(--color-text-secondary);
+  }
+}
+
+// Select specific styling
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 5l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right $spacing-4 center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+// Textarea specific
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+// Field with unit indicator (e.g., "m²", "%", "€")
+.field-with-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    padding-right: 2.5rem;
+  }
+
+  .unit {
+    position: absolute;
+    right: $spacing-3;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    pointer-events: none;
+  }
+}
+
+// Grouped fields (e.g., width x height)
+.field-group {
+  display: flex;
+  gap: $spacing-3;
+  align-items: center;
+
+  > * {
+    flex: 1;
+  }
+
+  &__separator {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-base);
+  }
+}
+
+// Horizontal field groups
+.fields-horizontal {
+  display: flex;
+  gap: $spacing-4;
+
+  .form-field {
+    flex: 1;
+  }
+}
+
+// Field error state
+.form-field--error {
+  input,
+  select,
+  textarea {
+    border-color: var(--color-error);
+
+    &:focus {
+      box-shadow: $shadow-focus-error;
+    }
+  }
+
+  .error-message {
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+    margin-top: $spacing-1;
+  }
+}
+
+// Field with description
+.field-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: $spacing-1;
+}
+
+// Readonly field with transparent styling
+input[readonly].transparent,
+select[readonly].transparent {
+  background-color: transparent !important;
+  border: 1px solid transparent;
+  padding-left: 0;
+}
+
+// Responsive adjustments
+@media (max-width: $screen-sm-max) {
+  .form-field--inline {
+    flex-direction: column;
+    align-items: flex-start;
+
+    label {
+      width: 100%;
+    }
+  }
+
+  .fields-horizontal {
+    flex-direction: column;
+  }
+
+  .field-group {
+    flex-wrap: wrap;
+  }
+}
