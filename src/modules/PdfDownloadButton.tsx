@@ -168,7 +168,8 @@ const PdfDownloadButton = ({
       const projectInfo = selectedResidence.projectInformation || {};
       const energyInfo = selectedResidence.energyDetails || {};
       const currentEnergyUsage = energyInfo.huidigVerbruik || 0;
-      const currentLabel = energyInfo.huidigLabel || "?";
+      // Calculate current label from energy usage, just like EnergyLabel component
+      const currentLabel = currentEnergyUsage ? determineEnergyLabel(currentEnergyUsage, 0) : "?";
       const newLabel = determineEnergyLabel(currentEnergyUsage, totalHeatDemand);
       
       // Header with dual logos

@@ -11,6 +11,7 @@ import { Woning, WoningType } from "@/types/woningen";
 import { CalculationHandler } from "./calculations/CalculationHandler";
 import SelectedMeasures from "./calculations/SelectMeasures";
 import PdfDownloadButton from "../PdfDownloadButton";
+import ModernPdfDownloadButton from "../ModernPdfDownloadButton";
 import SaveScenarioButton from "../scenario/SaveScenarioButton";
 import { EnergyLabel } from "./calculations/EnergyLabel";
 import { calculateMeasurePrice } from "./calculations/price.calculator";
@@ -491,6 +492,15 @@ function PageContent() {
                   settings={settings}
                 />
               </div> */}
+              <div className="downloadPDF">
+                <ModernPdfDownloadButton
+                  selectedResidence={selectedResidence}
+                  selectedMeasures={selectedMeasures}what
+                  totalBudget={totalBudget}
+                  totalHeatDemand={totalHeatDemand}
+                  settings={settings}
+                />
+              </div>
             </div>
           </div>
           <SelectedMeasures

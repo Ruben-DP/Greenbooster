@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.3.1",
     "@vercel/blob": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
     "lucide-react": "^0.471.0",
     "mongodb": "^6.20.0",
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
