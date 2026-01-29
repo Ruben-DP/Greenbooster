@@ -12,7 +12,9 @@
       "Bash(tree:*)",
       "Read(//var/folders/m8/zjy68nf96t52rxg0zlg_l1k00000gn/T/TemporaryItems/NSIRD_screencaptureui_5SmriA/**)",
       "Bash(npm install:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "WebFetch(domain:vercel.com)",
+      "Bash(npm view:*)"
     ],
     "deny": [],
     "ask": []

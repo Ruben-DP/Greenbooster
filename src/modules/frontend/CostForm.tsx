@@ -495,7 +495,7 @@ function PageContent() {
               <div className="downloadPDF">
                 <ModernPdfDownloadButton
                   selectedResidence={selectedResidence}
-                  selectedMeasures={selectedMeasures}what
+                  selectedMeasures={selectedMeasures}
                   totalBudget={totalBudget}
                   totalHeatDemand={totalHeatDemand}
                   settings={settings}

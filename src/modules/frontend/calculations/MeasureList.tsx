@@ -334,7 +334,9 @@ export default function MeasureList({
 
   const handleAddMeasure = (measure: Measure) => {
     if (isMeasureSelected(measure)) {
-      onSelectMeasure({ ...measure, action: "remove" });
+      // Find the selected measure with its calculated price
+      const selectedMeasure = selectedMeasures.find((m) => m.name === measure.name);
+      onSelectMeasure({ ...(selectedMeasure || measure), action: "remove" });
       return;
     }
 
