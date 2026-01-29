@@ -1,0 +1,90 @@
+@use "../abstracts/variables" as *;
+
+// =====================================================
+// UTILITY CLASSES
+// Common utility classes used across the application
+// =====================================================
+
+// ----------------------- LAYOUT UTILITIES ----------------------- //
+
+.container-width {
+  max-width: $container;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container-xl-width {
+  max-width: $screen-md-max;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// ----------------------- WIDTH UTILITIES ----------------------- //
+
+.w-half {
+  width: 50%;
+}
+
+.w-full {
+  width: 100%;
+}
+
+// ----------------------- FLEX UTILITIES ----------------------- //
+
+.flex-field {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+// ----------------------- TEXT UTILITIES ----------------------- //
+
+.light-text {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    color: var(--title-light);
+  }
+  p,
+  a,
+  strong,
+  li,
+  ul,
+  i {
+    color: var(--paragraph-light);
+  }
+}
+
+.dark-text {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    color: var(--title-dark);
+  }
+  p,
+  a,
+  strong,
+  li,
+  ul,
+  i {
+    color: var(--paragraph-dark);
+  }
+}
+
+// ----------------------- LOGO UTILITIES ----------------------- //
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  gap: $spacing-10;
+
+  img {
+    object-fit: contain;
+    width: 200px;
+  }
+}

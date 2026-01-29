@@ -1,0 +1,82 @@
+@use "../../../scss/abstracts/variables" as *;
+
+.residence-form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-6;
+  width: 100%;
+}
+
+.residence__button {
+  margin-top: $spacing-6;
+
+  select {
+    width: 100%;
+    font-size: var(--font-size-xl);
+  }
+}
+
+.residence__type {
+  text-align: center;
+
+  span {
+    text-transform: capitalize;
+    font-weight: bold;
+  }
+}
+
+.residence__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-4;
+}
+
+.residence__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+}
+
+.edit-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-1;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-tertiary);
+  }
+}
+
+.residence__address {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-2xl);
+  margin-right: $spacing-2;
+}
+
+.residence__selector {
+  select {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--color-border-medium);
+    font-size: var(--font-size-base);
+  }
+}
+
+.residence__type {
+  margin-top: $spacing-2;
+  font-size: 0.875rem;
+
+  span {
+    font-weight: var(--font-weight-medium);
+  }
+}

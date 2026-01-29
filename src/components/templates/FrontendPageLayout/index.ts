@@ -1,0 +1,1 @@
+export { FrontendPageLayout } from "./FrontendPageLayout";

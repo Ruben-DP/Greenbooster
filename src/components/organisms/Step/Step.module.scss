@@ -1,0 +1,107 @@
+@use "../../../scss/abstracts/variables" as *;
+
+.step {
+  background-color: var(--color-bg-primary);
+  display: flex;
+  justify-content: center;
+  padding: $spacing-8;
+  padding-bottom: $spacing-6;
+  position: relative;
+
+  &__no {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 300px;
+  }
+
+  &__container {
+    display: flex;
+    gap: $spacing-5;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: calc(50% - 28px);
+      left: 50%;
+      transform: translate(-50%, 50%);
+      right: 0;
+      height: 4px;
+      background-color: var(--accent-color);
+      width: 600px;
+    }
+  }
+
+  &__circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 78px;
+    height: 78px;
+    border-radius: $radius-full;
+    background: var(--accent-color);
+    font-size: var(--font-size-2xl);
+    color: var(--color-white);
+    font-weight: var(--font-weight-bold);
+    border: 4px solid var(--accent-color);
+    z-index: 1;
+
+    &.active {
+      background-color: var(--color-white);
+      color: #1b3054;
+    }
+  }
+
+  &__title {
+    margin-top: $spacing-8;
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-base);
+    color: #1b3054;
+  }
+
+  &__nav-button {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    background-color: var(--accent-color);
+    color: var(--color-white);
+    border: none;
+    padding: $spacing-2 $spacing-4;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    font-weight: var(--font-weight-medium);
+    transition: background-color $transition-base;
+    z-index: 10;
+    border: 1px solid var(--color-border-light);
+
+    &:hover {
+      background-color: var(--accent-color);
+      color: var(--color-white);
+      border-color: transparent;
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    &--back {
+      left: -180px;
+      top: calc(50% + 112px);
+      background-color: var(--color-white);
+      color: #1b3054;
+      transform: translateY(-50%);
+    }
+
+    &--forward {
+      right: -180px;
+      top: calc(50% + 112px);
+      background-color: var(--color-white);
+      color: #1b3054;
+      transform: translateY(-50%);
+    }
+  }
+}

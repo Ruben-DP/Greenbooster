@@ -1,0 +1,101 @@
+@use "../../../scss/abstracts/variables" as *;
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+
+  &__empty {
+    padding: $spacing-4;
+    text-align: center;
+    color: var(--color-text-secondary);
+  }
+
+  &__group-name {
+    text-transform: capitalize;
+  }
+
+  &__group {
+    &-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: $spacing-3;
+      cursor: pointer;
+      background-color: var(--color-white);
+    }
+
+    &-title {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+    }
+
+    &-icon {
+      width: $spacing-5;
+      height: $spacing-5;
+    }
+
+    &-text {
+      font-weight: var(--font-weight-medium);
+      text-transform: capitalize;
+    }
+  }
+
+  &__list {
+    padding: 0 $spacing-4 $spacing-4 $spacing-8;
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__item {
+    border-top: 1px solid var(--color-gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-3;
+    background-color: var(--color-white);
+    cursor: pointer;
+    transition: background-color $transition-base;
+
+    &:hover {
+      background-color: var(--color-gray-50);
+    }
+
+    &-name {
+      flex: 1;
+    }
+  }
+
+  &__copy-button {
+    opacity: 0;
+    transition: opacity $transition-base;
+    padding: $spacing-1;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &__copy-icon {
+    width: $spacing-4;
+    height: $spacing-4;
+  }
+
+  button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+  }
+}

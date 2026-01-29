@@ -1,0 +1,93 @@
+@use "../../../scss/abstracts/variables" as *;
+
+.type-form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-6;
+  width: 100%;
+
+  input {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid var(--color-border-light);
+    border-radius: 4px;
+    font-size: var(--font-size-base);
+    background: var(--color-bg-secondary);
+  }
+
+  // Style the form sections
+  .form__section {
+    border-radius: 6px;
+
+    &--full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  // Keep existing form styles
+  .form__heading {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: $spacing-4;
+    padding-bottom: $spacing-2;
+    border-bottom: 2px solid var(--color-border-medium);
+  }
+
+  .form__fields {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+
+  .form__group {
+    background: var(--color-bg-primary);
+    border-radius: 6px;
+    padding: $spacing-4;
+    margin-bottom: $spacing-4;
+    border: 1px solid var(--color-border-medium);
+
+    h5 {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      margin-bottom: $spacing-3;
+    }
+
+    &:not(:has(.form__group)) {
+      border: 1px solid var(--color-border-light);
+      margin-bottom: 0;
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: $spacing-4;
+  }
+}
+
+.type-title {
+  margin-bottom: $spacing-8;
+
+  .title-fields-container {
+    justify-content: space-between;
+  }
+
+  * {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+  }
+
+  label {
+    display: none;
+  }
+
+  input {
+    max-width: 100%;
+  }
+}
