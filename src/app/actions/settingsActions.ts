@@ -29,7 +29,7 @@ const DEFAULT_SETTINGS: Settings = {
 export async function getSettings(): Promise<SettingsResult> {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
     
     // Try to get existing settings
     const settings = await db.collection('settings').findOne({});
@@ -89,7 +89,7 @@ export async function getSettings(): Promise<SettingsResult> {
 export async function updateSettings(settings: Settings): Promise<SettingsResult> {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
     
     // Check if settings already exist
     const existingSettings = await db.collection('settings').findOne({});

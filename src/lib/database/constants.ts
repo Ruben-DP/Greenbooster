@@ -2,7 +2,7 @@
  * Database configuration constants
  */
 
-export const DB_NAME = "main-db";
+export const DB_NAME = "verduurzaamings-versneller";
 
 export const COLLECTIONS = {
   WONINGEN: "woningen",
@@ -12,6 +12,7 @@ export const COLLECTIONS = {
   SETTINGS: "settings",
   RESIDENCE_PROFILES: "residenceProfiles",
   SAVED_CALCULATIONS: "savedCalculations",
+  SCENARIOS: "scenarios",
 } as const;
 
 export type CollectionName = typeof COLLECTIONS[keyof typeof COLLECTIONS];

@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 export async function createWoning(formData: FormData) {
   try {
     const client = await clientPromise;
-    const collection = client.db("main-db").collection("woningen");
+    const collection = client.db("verduurzaamings-versneller").collection("woningen");
     
     // Get the typeId from the form
     const typeId = formData.get("typeId");
@@ -78,7 +78,7 @@ export async function createWoning(formData: FormData) {
 export async function updateWoning(id: string, formData: FormData) {
   try {
     const client = await clientPromise;
-    const collection = client.db("main-db").collection("woningen");
+    const collection = client.db("verduurzaamings-versneller").collection("woningen");
     const { ObjectId } = require('mongodb');
 
     // Convert FormData to object and parse nested structure
@@ -148,7 +148,7 @@ export async function updateWoning(id: string, formData: FormData) {
 export async function searchWoningen(searchTerm?: string) {
   try {
     const client = await clientPromise;
-    const collection = client.db("main-db").collection("woningen");
+    const collection = client.db("verduurzaamings-versneller").collection("woningen");
 
     const query = searchTerm
       ? {
@@ -190,7 +190,7 @@ export async function searchWoningen(searchTerm?: string) {
 export async function updateWoningMeasures(id: string, measures: any[]) {
   try {
     const client = await clientPromise;
-    const collection = client.db("main-db").collection("woningen");
+    const collection = client.db("verduurzaamings-versneller").collection("woningen");
     const { ObjectId } = require('mongodb');
 
     const result = await collection.updateOne(

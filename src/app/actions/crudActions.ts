@@ -16,7 +16,7 @@ export async function searchDocuments<T>(
 ): Promise<T[]> {
   try {
     const client = await clientPromise;
-    const collection = client.db("main-db").collection(collectionName);
+    const collection = client.db("verduurzaamings-versneller").collection(collectionName);
 
     let query = {};
     
@@ -49,7 +49,7 @@ export async function createDocument<T extends { _id?: string }>(
 ): Promise<DatabaseResult<T>> {
   try {
     const client = await clientPromise;
-    const collection = client.db("main-db").collection(collectionName);
+    const collection = client.db("verduurzaamings-versneller").collection(collectionName);
 
     const { _id, ...documentData } = document;
     const result = await collection.insertOne(documentData);
@@ -74,7 +74,7 @@ export async function updateDocument<T extends { _id: string }>(
 ): Promise<DatabaseResult<T>> {
   try {
     const client = await clientPromise;
-    const collection = client.db("main-db").collection(collectionName);
+    const collection = client.db("verduurzaamings-versneller").collection(collectionName);
     
     const { _id, ...updateData } = document;
     const result = await collection.updateOne(
@@ -104,7 +104,7 @@ export async function deleteDocument(
 ): Promise<DatabaseResult<{ id: string }>> {
   try {
     const client = await clientPromise;
-    const collection = client.db("main-db").collection(collectionName);
+    const collection = client.db("verduurzaamings-versneller").collection(collectionName);
 
     const result = await collection.deleteOne({ _id: new ObjectId(id) });
 
@@ -130,7 +130,7 @@ export async function getMeasuresByIds(
 ): Promise<any[]> {
   try {
     const client = await clientPromise;
-    const collection = client.db("main-db").collection("retrofittingMeasures");
+    const collection = client.db("verduurzaamings-versneller").collection("retrofittingMeasures");
 
     const objectIds = measureIds.map(id => new ObjectId(id));
     const measures = await collection.find({ _id: { $in: objectIds } }).toArray();

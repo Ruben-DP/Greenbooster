@@ -13,7 +13,7 @@ interface SaveScenarioData {
 export async function saveScenario(data: SaveScenarioData) {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
 
     const scenarioData = {
       naam: data.name, // Using 'naam' to match the pattern of other collections
@@ -46,7 +46,7 @@ export async function saveScenario(data: SaveScenarioData) {
 export async function getSavedScenarios() {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
 
     const scenarios = await db
       .collection('scenarios')
@@ -75,7 +75,7 @@ export async function getSavedScenarios() {
 export async function getScenarioById(id: string) {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
 
     const scenario = await db
       .collection('scenarios')
@@ -108,7 +108,7 @@ export async function getScenarioById(id: string) {
 export async function deleteScenario(id: string) {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
 
     const result = await db
       .collection('scenarios')
@@ -141,7 +141,7 @@ export async function deleteScenario(id: string) {
 export async function getMeasuresByIds(measureIds: string[]) {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
 
     // Convert string IDs to ObjectIds
     const objectIds = measureIds.map(id => new ObjectId(id));

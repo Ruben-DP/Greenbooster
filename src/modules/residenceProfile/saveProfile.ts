@@ -25,7 +25,7 @@ interface SaveProfileData {
 export async function saveProfile(data: SaveProfileData) {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
     
     const profileData = {
       ...data,
@@ -56,7 +56,7 @@ export async function saveProfile(data: SaveProfileData) {
 export async function getSavedProfiles() {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
     
     const profiles = await db
       .collection('residenceProfiles')
@@ -85,7 +85,7 @@ export async function getSavedProfiles() {
 export async function getProfileById(id: string) {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
     
     const profile = await db
       .collection('residenceProfiles')
@@ -118,7 +118,7 @@ export async function getProfileById(id: string) {
 export async function deleteProfile(id: string) {
   try {
     const client = await clientPromise;
-    const db = client.db("main-db");
+    const db = client.db("verduurzaamings-versneller");
     
     const result = await db
       .collection('residenceProfiles')
